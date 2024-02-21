@@ -17,7 +17,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	});
 
 	// user API tokens
-	Route::get('/user/token', function (Request $request) {
+	Route::get('/user/tokens', function (Request $request) {
 		return $request->user()->tokens;
 	});
 	Route::post('/user/token/create', function (Request $request) {
