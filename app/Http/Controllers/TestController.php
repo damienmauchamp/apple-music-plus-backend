@@ -6,13 +6,14 @@ use AppleMusicAPI\AppleMusic;
 use AppleMusicAPI\iTunesAPI;
 use AppleMusicAPI\iTunesScrappedAPI;
 use AppleMusicAPI\MusicKit;
+use App\Exceptions\ArtistUpdateException;
+use App\Exceptions\CatalogArtistNotFoundException;
 use App\Models\Album;
 use App\Models\Artist;
 use App\Models\Song;
 use App\Models\User;
+use App\Repositories\ArtistRepository;
 use App\Services\Token\DeveloperToken;
-use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -111,29 +112,10 @@ class TestController extends Controller {
 
 		/** @var User $user */
 		$user = Auth::user();
-		$api = new AppleMusic;
 
-		// search for artist by id via Apple Music API
 		try {
-			$catalogArtist = $api->getCalalogArtist($request->artist_id, $request->except('artist_id'));
-		} catch (GuzzleException $exception) {
-			// todo : global error return + logs
-			return [
-				'error' => $exception->getMessage(),
-				'message' => 'Something went wrong',
-			];
-		}
-
-		// todo : move this ?
-		// add or update artist info in database
-		$data = $catalogArtist->getData()['data'][0];
-		try {
-			$artist = Artist::updateOrCreate(['storeId' => $data['id']], [
-				'name' => $data['attributes']['name'],
-				'artworkUrl' => $data['attributes']['artwork']['url'] ?? '',
-			]);
-		} catch (Exception $exception) {
-			// todo : global error return + logs
+			$artist = (new ArtistRepository)->updateArtistByStoreId($request->artist_id, $request);
+		} catch (CatalogArtistNotFoundException | ArtistUpdateException $exception) {
 			return [
 				'error' => $exception->getMessage(),
 				'message' => 'Something went wrong',
@@ -185,5 +167,22 @@ class TestController extends Controller {
 			'was_subscribed' => $isSubscribed,
 			'message' => $isSubscribed ? 'Unsubscribed' : 'Not subscribed',
 		];
+	}
+
+	public function updateArtist(Request $request) {
+		$request->validate([
+			'artist_id' => 'required|integer',
+		]);
+
+		try {
+			$artist = (new ArtistRepository)->updateArtistByStoreId($request->artist_id, $request);
+		} catch (CatalogArtistNotFoundException | ArtistUpdateException $exception) {
+			return [
+				'error' => $exception->getMessage(),
+				'message' => 'Something went wrong',
+			];
+		}
+
+		return $artist;
 	}
 }

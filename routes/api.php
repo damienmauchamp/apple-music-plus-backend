@@ -72,3 +72,5 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/test/applemusicapi/subscribeArtist', [TestController::class, 'subscribeToArtist']);
 	Route::post('/test/applemusicapi/unsubscribeArtist', [TestController::class, 'unsubscribeToArtist']);
 });
+// todo : master token middleware ?
+Route::post('/test/applemusicapi/updateArtist', [TestController::class, 'updateArtist']);
