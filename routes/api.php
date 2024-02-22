@@ -65,3 +65,10 @@ Route::get('/test/artists', [TestController::class, 'getTestArtists']);
 Route::get('/test/albums', [TestController::class, 'getTestAlbums']);
 Route::get('/test/users', [TestController::class, 'getTestUsers']);
 Route::get('/test/songs', [TestController::class, 'getTestSongs']);
+
+// Methods tests
+Route::middleware('auth:sanctum')->group(function () {
+	Route::get('/test/applemusicapi/searchArtists', [TestController::class, 'getTestSearchAMArtists']);
+	Route::post('/test/applemusicapi/subscribeArtist', [TestController::class, 'subscribeToArtist']);
+	Route::post('/test/applemusicapi/unsubscribeArtist', [TestController::class, 'unsubscribeToArtist']);
+});

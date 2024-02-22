@@ -8,6 +8,7 @@ class MusicKit extends AppleMusic {
 	protected string $path = 'v1/me/';
 	private string $music_kit_token = '';
 
+	public const MAX_LIMIT = 100;
 	private ?int $limit = null;
 	private string $offset = '';
 	private string $l = '';
@@ -72,25 +73,12 @@ class MusicKit extends AppleMusic {
 		}
 	}
 
-	public function test(): APIResponse {
-		return $this->get('/library/search', [
-			'term' => 'test',
-			'types' => 'library-songs',
-		]);
-	}
-
-	// region Artists
-
-	public function getAllLibraryArtists(array $parameters = []): APIResponse {
-		return $this->get('/library/artists', $parameters);
-	}
-
 	private function getPage($uri, array $parameters = [],
 		?int $max_page = 5,
 		?int $max_results = null): array {
 
 		// setting limit
-		$parameters['limit'] = $parameters['limit'] ?? $this->limit ?? 100;
+		$parameters['limit'] = $parameters['limit'] ?? $this->limit ?? self::MAX_LIMIT;
 
 		$page = 1;
 		$results = 0;
@@ -122,6 +110,23 @@ class MusicKit extends AppleMusic {
 			'total_page' => (int) ceil($total / $parameters['limit']),
 			'total' => $total ?? 0,
 		];
+	}
+
+	public function test(): APIResponse {
+		return $this->get('/library/search', [
+			'term' => 'test',
+			'types' => 'library-songs',
+		]);
+	}
+
+	// region Search
+
+	// endregion Search
+
+	// region Artists
+
+	public function getAllLibraryArtists(array $parameters = []): APIResponse {
+		return $this->get('/library/artists', $parameters);
 	}
 
 	public function getAllLibraryArtistsPaginate(array $parameters = [],

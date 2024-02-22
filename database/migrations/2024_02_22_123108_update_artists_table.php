@@ -10,11 +10,11 @@ return new class extends Migration {
 	 */
 	public function up(): void {
 		Schema::table('artists', function (Blueprint $table) {
-			$table->string('artworkUrl')
-				->comment('Can be formatted as {w}x{h}bb.{b}')
-				->after('name');
+			$table->dateTime('last_updated')
+				->nullable()
+				->comment('Last time the artist data has been fetched')
+				->after('artworkUrl');
 		});
-
 	}
 
 	/**
@@ -22,7 +22,7 @@ return new class extends Migration {
 	 */
 	public function down(): void {
 		Schema::table('artists', function (Blueprint $table) {
-			$table->dropColumn('artworkUrl');
+			$table->dropColumn('last_updated');
 		});
 	}
 };

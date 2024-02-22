@@ -11,7 +11,10 @@ use App\Models\Artist;
 use App\Models\Song;
 use App\Models\User;
 use App\Services\Token\DeveloperToken;
+use Exception;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TestController extends Controller {
 	//
@@ -79,5 +82,108 @@ class TestController extends Controller {
 	}
 	public function getTestSongs(Request $request) {
 		return Song::with(['album', 'artists'])->get();
+	}
+
+	public function getTestSearchAMArtists(Request $request) {
+
+		$request->validate([
+			'term' => 'required|string|max:255',
+			'page' => 'integer|min:1',
+			'l' => 'string',
+			'limit' => 'integer|min:5|max:25',
+			'offset' => 'string',
+			// 'types' => 'string',
+			'with' => 'string',
+		]);
+
+		return (new AppleMusic)->searchCatalogResources($request->term, array_merge($request->except('term'), [
+			'types' => 'artists',
+		]))->getData();
+	}
+
+	public function subscribeToArtist(Request $request) {
+		$request->validate([
+			'artist_id' => 'required|integer',
+			// 'include' => 'string',
+			// 'views' => 'string',
+			// 'extend' => 'string',
+		]);
+
+		/** @var User $user */
+		$user = Auth::user();
+		$api = new AppleMusic;
+
+		// search for artist by id via Apple Music API
+		try {
+			$catalogArtist = $api->getCalalogArtist($request->artist_id, $request->except('artist_id'));
+		} catch (GuzzleException $exception) {
+			// todo : global error return + logs
+			return [
+				'error' => $exception->getMessage(),
+				'message' => 'Something went wrong',
+			];
+		}
+
+		// todo : move this ?
+		// add or update artist info in database
+		$data = $catalogArtist->getData()['data'][0];
+		try {
+			$artist = Artist::updateOrCreate(['storeId' => $data['id']], [
+				'name' => $data['attributes']['name'],
+				'artworkUrl' => $data['attributes']['artwork']['url'] ?? '',
+			]);
+		} catch (Exception $exception) {
+			// todo : global error return + logs
+			return [
+				'error' => $exception->getMessage(),
+				'message' => 'Something went wrong',
+			];
+		}
+
+		// check if artist is already subscribed
+		$alreadySubscribed = $user->artists()->where('artists.id', $artist->id)->exists();
+
+		if (!$alreadySubscribed) {
+			// add subscription for user
+			$sync = $user->artists()->syncWithoutDetaching($artist->id);
+
+			// TODO : delete last_updated in pivot + add it in artist table
+			// $update = $user->artists()->updateExistingPivot($artist->id, [
+			// 	'last_updated' => now(),
+			// ]);
+		}
+
+		return [
+			'artist_id' => $request->artist_id,
+			'is_subscribed' => true,
+			'already_subscribed' => $alreadySubscribed,
+			'message' => $alreadySubscribed ? 'Already subscribed' : 'Subscribed',
+		];
+	}
+
+	public function unsubscribeToArtist(Request $request) {
+		$request->validate([
+			'artist_id' => 'required|integer',
+		]);
+
+		/** @var User $user */
+		$user = Auth::user();
+
+		// check if artist is subscribed
+		$query = $user->artists()->where('artists.storeId', $request->artist_id);
+		$isSubscribed = $query->exists();
+
+		if ($isSubscribed) {
+			// unsubscribe for user
+			$artist = $query->first();
+			$sync = $user->artists()->detach($artist->id);
+		}
+
+		return [
+			'artist_id' => $request->artist_id,
+			'is_unsubscribed' => true,
+			'was_subscribed' => $isSubscribed,
+			'message' => $isSubscribed ? 'Unsubscribed' : 'Not subscribed',
+		];
 	}
 }

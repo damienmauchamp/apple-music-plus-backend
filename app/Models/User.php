@@ -8,6 +8,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @property Artist[] $artists
+ */
 class User extends Authenticatable {
 	use HasApiTokens, HasFactory, Notifiable;
 
@@ -43,6 +46,7 @@ class User extends Authenticatable {
 	];
 
 	public function artists() {
-		return $this->belongsToMany(Artist::class);
+		return $this->belongsToMany(Artist::class)
+			->withTimestamps();
 	}
 }
