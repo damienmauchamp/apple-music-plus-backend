@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\DB;
 
 class DeveloperToken {
 
+	public const ONE_HOUR = 3600;
+	public const SIX_MONTHS = 15552000;
+
 	public function __construct(private bool $renew = false) {
 
 	}
@@ -22,7 +25,7 @@ class DeveloperToken {
 			return env('AM_DEVELOPER_TOKEN');
 		}
 
-		$expiracy = $expiracy ?: 3600;
+		$expiracy = $expiracy ?: self::SIX_MONTHS;
 		if ($this->renew) {
 			return $this->generate($expiracy);
 		}
@@ -78,7 +81,7 @@ class DeveloperToken {
 	 * @todo : custom exceptions
 	 * @todo : expiracy default value as env variable
 	 */
-	public function generate(int $expiracy = 3600): string {
+	public function generate(int $expiracy): string {
 		$private_key = $this->getAppleAuthKey();
 		$team_id = env('APPLE_TEAM_ID');
 		$key_id = env('APPLE_KEY_ID');

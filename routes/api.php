@@ -59,3 +59,9 @@ Route::middleware('musicKit')->group(function () {
 	Route::get('/test/musickitapi/artists', [TestController::class, 'getAllLibraryArtists']);
 	Route::get('/test/musickitapi/artists/full', [TestController::class, 'getAllLibraryArtistsFull']);
 });
+
+// Models tests
+Route::get('/test/artists', [TestController::class, 'getTestArtists']);
+Route::get('/test/albums', [TestController::class, 'getTestAlbums']);
+Route::get('/test/users', [TestController::class, 'getTestUsers']);
+Route::get('/test/songs', [TestController::class, 'getTestSongs']);
