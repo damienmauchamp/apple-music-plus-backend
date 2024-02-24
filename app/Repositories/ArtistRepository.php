@@ -22,7 +22,18 @@ class ArtistRepository {
 	// 	return Artist::with(['albums', 'songs', 'users'])->get();
 	// }
 
-	public function updateArtistByStoreId($storeId, ?Request $request): Artist {
+	/**
+	 * Undocumented function
+	 *
+	 * @param [type] $storeId
+	 * @param Request|null $request
+	 *
+	 * @return Artist
+	 *
+	 * @throws CatalogArtistNotFoundException
+	 * @throws ArtistUpdateException
+	 */
+	public function updateArtistByStoreId($storeId, ?Request $request = null): Artist {
 
 		$api = new AppleMusic;
 
@@ -34,7 +45,6 @@ class ArtistRepository {
 			throw new CatalogArtistNotFoundException($exception->getMessage());
 		}
 
-		// todo : move this ?
 		// add or update artist info in database
 		$data = $catalogArtist->getData()['data'][0];
 		try {

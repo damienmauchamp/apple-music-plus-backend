@@ -2,17 +2,28 @@
 
 ## Next
 
+### Important
+
+-   ‼️ storefront/timezone => must be the same ? if not, "upcoming" will contain stuff releasing tomorrow !OR! if streamable OK
+    -   preorders : `"isComplete": false`
+    -   songs : `"attributes.previews": []` // `"attributes.previews": [ { url: "..." } ]`
+
 ### Routes
+
+-   subscribe to multiple artists
+-   unsubscribe to multiple artists
+-   fetch multiple artists
+-   ? iTunes API version of fetching ?
 
 ### Commands
 
 -   fetching artist's infos (https://developer.apple.com/documentation/applemusicapi/get_a_catalog_artist)
--   fetching method for an artist's new releases
-
-    > if not possible with Apple Music API :
-
-    -   fetch with iTunes API
-    -   get releases data with Apple Music API
+    -   for albums: : https://api.music.apple.com/v1/catalog/:storefront/artists/:id/:relationship?limit=100&sort=-releaseDate ({next?: string, data: [{id, type: "albums", href, attributes: {...}] )
+        -   relationship: albums
+        -   limit : <=100
+    -   for albums: : https://api.music.apple.com/v1/catalog/:storefront/artists/:id/:relationship?limit=20&sort=-releaseDate ({next?: string, data: [{id, type: "songs", href, attributes: {...}] )
+        -   relationship: songs
+        -   limit : <=20
 
 ## Later
 

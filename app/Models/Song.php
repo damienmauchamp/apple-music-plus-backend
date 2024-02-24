@@ -17,12 +17,28 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $contentRating
  * @property int $discNumber
  * @property int $durationInMillis
+ * @property string $previewUrl
  * @property boolean $custom
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
 class Song extends Model {
 	use HasFactory;
+
+	protected $fillable = [
+		'storeId',
+		'name',
+		'albumId',
+		'albumName',
+		'artistName',
+		'artworkUrl',
+		'releaseDate',
+		'contentRating',
+		'discNumber',
+		'durationInMillis',
+		'previewUrl',
+		'custom',
+	];
 
 	public function artists() {
 		return $this->belongsToMany(Artist::class);
