@@ -114,6 +114,7 @@ class ReleasesUpdater {
 		}
 
 		$this->artist->last_updated = now();
+		$this->artist->save();
 
 		return $this;
 	}
@@ -153,6 +154,7 @@ class ReleasesUpdater {
 		}
 
 		$this->artist->last_updated = now();
+		$this->artist->save();
 
 		return $this;
 	}
@@ -180,32 +182,33 @@ class ReleasesUpdater {
 		$results = [];
 		$errors = [];
 
-		try {
-			$updater = new ReleasesUpdater();
+		set_time_limit(0);
+		$updater = new ReleasesUpdater();
 
-			foreach ($artists as $artist) {
-				$updater->setArtist($artist->storeId);
+		foreach ($artists as $artist) {
+			$updater->setArtist($artist->storeId);
+
+			try {
 				$updater->update();
-
-				$data = $updater->toArray();
-				$results[] = [
-					'id' => $data['artist']->id,
-					'storeId' => $data['artist']->storeId,
-					'artist' => $data['artist']->name,
-					'last_updated' => $data['artist']->last_updated,
+			} catch (CatalogArtistNotFoundException | ArtistUpdateException $exception) {
+				$errors[] = [ // todo : artist in exception
+					'error' => $exception->getMessage(),
+					'message' => 'Something went wrong (1)',
+					// 'artist_id' => $exception->getArtistId(),
+				];
+			} catch (Exception $exception) {
+				$errors[] = [ // todo : artist in exception
+					'error' => $exception->getMessage(),
+					'message' => 'Something went wrong (2)',
 				];
 			}
 
-		} catch (CatalogArtistNotFoundException | ArtistUpdateException $exception) {
-			$errors[] = [ // todo : artist in exception
-				'error' => $exception->getMessage(),
-				'message' => 'Something went wrong (1)',
-				// 'artist_id' => $exception->getArtistId(),
-			];
-		} catch (Exception $exception) {
-			$errors[] = [ // todo : artist in exception
-				'error' => $exception->getMessage(),
-				'message' => 'Something went wrong (2)',
+			$data = $updater->toArray();
+			$results[] = [
+				'id' => $data['artist']->id,
+				'storeId' => $data['artist']->storeId,
+				'artist' => $data['artist']->name,
+				'last_updated' => $data['artist']->last_updated,
 			];
 		}
 
