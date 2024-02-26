@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\SystemHelper;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\AuthController;
@@ -70,6 +71,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::get('/releases/eps', [UserReleasesController::class, 'eps']);
 		Route::get('/releases/projects', [UserReleasesController::class, 'projects']);
 
+		// /user/releases/songs
+		Route::get('/releases/songs', [UserReleasesController::class, 'songs']);
+
 		// /user/token
 		Route::prefix('token')->group(function () {
 
@@ -134,3 +138,6 @@ Route::get('/test/artists', [TestController::class, 'getTestArtists']);
 Route::get('/test/albums', [TestController::class, 'getTestAlbums']);
 Route::get('/test/users', [TestController::class, 'getTestUsers']);
 Route::get('/test/songs', [TestController::class, 'getTestSongs']);
+Route::get('/test/weeklydate', function (Request $request) {
+	return SystemHelper::getLastWeekDayFromDate($request->date ?? null);
+});

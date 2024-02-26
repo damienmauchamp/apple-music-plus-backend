@@ -10,7 +10,7 @@
 
 ### Routes
 
--   subscribe to multiple artists
+-   subscribe to multiple artists ======> if error, do not sub
 -   unsubscribe to multiple artists
 -   fetch multiple artists
 -   ? iTunes API version of fetching ?
