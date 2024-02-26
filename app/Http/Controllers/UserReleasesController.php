@@ -88,6 +88,7 @@ class UserReleasesController extends Controller {
 		$releasesStoreIds = array_column($releases->toArray(), 'storeId');
 
 		return $songs
+			->unique('storeId')
 			->sortBy([
 				[DBHelper::parseSort($request->sort ?? 'releaseDate'), DBHelper::parseSortOrder($request->sort ?? null)],
 				['created_at', 'desc'],
@@ -201,19 +202,20 @@ class UserReleasesController extends Controller {
 			}
 		}
 
-		// $releases = $releases
-		// 	->when($only_upcoming, function ($query) {
-		// 		return $query->where('releaseDate', '>', now()->format('Y-m-d'));
-		// 	})
-		// 	->when($hide_upcoming && !$only_upcoming, function ($query) {
-		// 		return $query->where('releaseDate', '<', now()->format('Y-m-d'));
-		// 	})
-		// 	->where('releaseDate', '>=', $from)
-		// 	->when($to, function ($query) use ($to) {
-		// 		return $query->where('releaseDate', '<=', $to);
-		// 	});
+		$releases = $releases
+			->when($only_upcoming, function ($query) {
+				return $query->where('releaseDate', '>', now()->format('Y-m-d'));
+			})
+			->when($hide_upcoming && !$only_upcoming, function ($query) {
+				return $query->where('releaseDate', '<', now()->format('Y-m-d'));
+			})
+			->where('releaseDate', '>=', $from)
+			->when($to, function ($query) use ($to) {
+				return $query->where('releaseDate', '<=', $to);
+			});
 
 		return $releases
+			->unique('storeId')
 			->sortBy([
 				[DBHelper::parseSort($request->sort ?? 'releaseDate'), DBHelper::parseSortOrder($request->sort ?? null)],
 				['created_at', 'desc'],

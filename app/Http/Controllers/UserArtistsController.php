@@ -9,6 +9,7 @@ use App\Helpers\DBHelper;
 use App\Models\User;
 use App\Repositories\ArtistRepository;
 use App\Services\Core\ReleasesUpdater;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -48,6 +49,7 @@ class UserArtistsController extends Controller {
 		$request->validate([
 			'artist_id' => 'required|integer',
 			// todo : multiple ids + artists_id OR artists_ids required
+			'fetch' => 'boolean',
 			// 'artist_id' => 'nullable|integer',
 			// 'artists_ids' => 'nullable|array|required_without:artist_id',
 			// 'include' => 'string',
@@ -59,7 +61,7 @@ class UserArtistsController extends Controller {
 		$user = Auth::user();
 
 		try {
-			$artist = (new ArtistRepository)->updateArtistByStoreId($request->artist_id, $request);
+			$artist = (new ArtistRepository)->updateArtistByStoreId($request->artist_id);
 		} catch (CatalogArtistNotFoundException | ArtistUpdateException $exception) {
 			return [
 				'error' => $exception->getMessage(),
@@ -80,11 +82,25 @@ class UserArtistsController extends Controller {
 			// ]);
 		}
 
+		if ($request->fetch) {
+			// todo : multiple ids
+			try {
+				$updater = new ReleasesUpdater($request->artist_id);
+				$updater->update();
+			} catch (CatalogArtistNotFoundException | ArtistUpdateException | Exception $exception) {
+				return [
+					'error' => $exception->getMessage(),
+					'message' => 'Something went wrong (2)',
+				];
+			}
+		}
+
 		return [
 			'artist_id' => $request->artist_id,
 			'is_subscribed' => true,
 			'already_subscribed' => $alreadySubscribed,
 			'message' => $alreadySubscribed ? 'Already subscribed' : 'Subscribed',
+			'fetch' => $request->fetch,
 		];
 	}
 
