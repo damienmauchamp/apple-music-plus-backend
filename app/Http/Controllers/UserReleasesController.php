@@ -228,6 +228,7 @@ class UserReleasesController extends Controller {
 				$releaseKey = sprintf('%s|%s',
 					$release->name,
 					$release->artistName);
+
 				if (in_array($contentRating, ['explicit', 'clean']) && ($contentRatingFilter[$releaseKey] ?? false) && $release->contentRating && $release->contentRating !== $contentRating) {
 					return false;
 				}
