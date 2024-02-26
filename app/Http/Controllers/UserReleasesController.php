@@ -16,6 +16,7 @@ class UserReleasesController extends Controller {
 			'sort' => 'string|max:255|in:name,-name,artistName,-artistName,releaseDate,-releaseDate,created_at,-created_at',
 			'from' => 'date_format:Y-m-d',
 			'content_rating' => 'string|max:255',
+			'all_content_rating' => 'boolean',
 			'weekly' => 'boolean',
 			'weeks' => 'integer|min:1',
 			'include_releases' => 'boolean',
@@ -80,7 +81,9 @@ class UserReleasesController extends Controller {
 			}
 		}
 
-		//
+		$request->query->add([
+			'all_content_rating' => true,
+		]);
 		$releases = $this->list($request);
 		$releasesStoreIds = array_column($releases->toArray(), 'storeId');
 
@@ -104,7 +107,11 @@ class UserReleasesController extends Controller {
 				return !in_array($song->album->storeId, $releasesStoreIds);
 			})
 			// content rating filter
-			->filter(function ($song) use (&$contentRatingFilter, $contentRating) {
+			->filter(function ($song) use ($request, &$contentRatingFilter, $contentRating) {
+				if ($request->all_content_rating) {
+					return true;
+				}
+
 				$songKey = sprintf('%s|%s|%s|%s',
 					$song->name,
 					$song->artistName,
@@ -131,6 +138,7 @@ class UserReleasesController extends Controller {
 			'hide_eps' => 'boolean',
 			'hide_singles' => 'boolean',
 			'content_rating' => 'string|max:255',
+			'all_content_rating' => 'boolean',
 			'weekly' => 'boolean',
 			'artists_ids' => 'array|exists:artists,storeId',
 			'hide_upcoming' => 'boolean|prohibits:only_upcoming',
@@ -156,7 +164,8 @@ class UserReleasesController extends Controller {
 			->whereHas('albums', function ($query) use ($from, $to, $hide_upcoming, $only_upcoming) {
 
 				if ($only_upcoming) {
-					$query->where('releaseDate', '>', now()->format('Y-m-d'));
+					$query->where('releaseDate', '>', now()->format('Y-m-d'))
+						->Orwhere('isComplete', false);
 
 					return;
 				}
@@ -192,6 +201,18 @@ class UserReleasesController extends Controller {
 			}
 		}
 
+		// $releases = $releases
+		// 	->when($only_upcoming, function ($query) {
+		// 		return $query->where('releaseDate', '>', now()->format('Y-m-d'));
+		// 	})
+		// 	->when($hide_upcoming && !$only_upcoming, function ($query) {
+		// 		return $query->where('releaseDate', '<', now()->format('Y-m-d'));
+		// 	})
+		// 	->where('releaseDate', '>=', $from)
+		// 	->when($to, function ($query) use ($to) {
+		// 		return $query->where('releaseDate', '<=', $to);
+		// 	});
+
 		return $releases
 			->sortBy([
 				[DBHelper::parseSort($request->sort ?? 'releaseDate'), DBHelper::parseSortOrder($request->sort ?? null)],
@@ -201,6 +222,9 @@ class UserReleasesController extends Controller {
 			])
 			// content rating filter
 			->filter(function ($release) use ($request, &$contentRatingFilter, $contentRating) {
+				if ($request->all_content_rating) {
+					return true;
+				}
 				$releaseKey = sprintf('%s|%s',
 					$release->name,
 					$release->artistName);
