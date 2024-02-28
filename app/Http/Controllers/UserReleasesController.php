@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Helpers\DBHelper;
 use App\Helpers\SystemHelper;
+use App\Http\Resources\AlbumCollection;
+use App\Http\Resources\SongCollection;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -84,10 +86,10 @@ class UserReleasesController extends Controller {
 		$request->query->add([
 			'all_content_rating' => true,
 		]);
-		$releases = $this->list($request);
+		$releases = $this->list($request, true);
 		$releasesStoreIds = array_column($releases->toArray(), 'storeId');
 
-		return $songs
+		$songs = $songs
 			->unique('storeId')
 			->sortBy([
 				[DBHelper::parseSort($request->sort ?? 'releaseDate'), DBHelper::parseSortOrder($request->sort ?? null)],
@@ -126,11 +128,13 @@ class UserReleasesController extends Controller {
 
 				return true;
 			})->values();
+
+		return new SongCollection($songs);
 	}
 
 	//
 
-	public function list(Request $request) {
+	public function list(Request $request, bool $returnRaw = false) {
 
 		$request->validate([
 			'sort' => 'string|max:255|in:name,-name,artistName,-artistName,releaseDate,-releaseDate,created_at,-created_at',
@@ -214,7 +218,7 @@ class UserReleasesController extends Controller {
 				return $query->where('releaseDate', '<=', $to);
 			});
 
-		return $releases
+		$releases = $releases
 			->unique('storeId')
 			->sortBy([
 				[DBHelper::parseSort($request->sort ?? 'releaseDate'), DBHelper::parseSortOrder($request->sort ?? null)],
@@ -260,6 +264,8 @@ class UserReleasesController extends Controller {
 
 				return true;
 			})->values();
+
+		return $returnRaw ? $releases : new AlbumCollection($releases);
 	}
 
 	public function albums(Request $request) {
