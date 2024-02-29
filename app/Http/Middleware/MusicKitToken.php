@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class MusicKit {
+class MusicKitToken {
 	/**
 	 * Handle an incoming request.
 	 *
@@ -24,7 +24,7 @@ class MusicKit {
 			], 403);
 		}
 
-		if ($this->isValidToken($request)) {
+		if (!$this->isValidToken($request)) {
 			return response()->json([
 				'error' => 'Your music token is invalid',
 				'message' => 'Edit your music token in the "Music-Token" header',

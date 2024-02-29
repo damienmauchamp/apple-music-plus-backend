@@ -7,7 +7,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserArtistsController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\UserReleasesController;
+use App\Http\Controllers\UserReleases\UserReleasesAlbumsController;
+use App\Http\Controllers\UserReleases\UserReleasesSongsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -65,14 +66,14 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::post('/artists/unsubscribe', [UserArtistsController::class, 'unsubscribe']);
 
 		// /user/releases
-		Route::get('/releases', [UserReleasesController::class, 'list']);
-		Route::get('/releases/albums', [UserReleasesController::class, 'albums']);
-		Route::get('/releases/singles', [UserReleasesController::class, 'singles']);
-		Route::get('/releases/eps', [UserReleasesController::class, 'eps']);
-		Route::get('/releases/projects', [UserReleasesController::class, 'projects']);
+		Route::get('/releases', [UserReleasesAlbumsController::class, 'list']);
+		Route::get('/releases/albums', [UserReleasesAlbumsController::class, 'albums']);
+		Route::get('/releases/singles', [UserReleasesAlbumsController::class, 'singles']);
+		Route::get('/releases/eps', [UserReleasesAlbumsController::class, 'eps']);
+		Route::get('/releases/projects', [UserReleasesAlbumsController::class, 'projects']);
 
 		// /user/releases/songs
-		Route::get('/releases/songs', [UserReleasesController::class, 'songs']);
+		Route::get('/releases/songs', [UserReleasesSongsController::class, 'songs']);
 
 		// /user/token
 		Route::prefix('token')->group(function () {
