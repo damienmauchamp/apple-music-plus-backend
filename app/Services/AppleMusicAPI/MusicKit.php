@@ -19,43 +19,23 @@ class MusicKit extends AppleMusic {
 		parent::__construct($renew);
 	}
 
-	private static function getHeaderToken(): ?string {
+	public static function getRequestHeaderMusicToken(): ?string {
 		return request()?->headers?->get('Music-Token', null);
 	}
 
-//	public static function current(): self {
-//		$api = new self();
-//		return $api->setUserToken();
-//	}
-//
-//	/**
-//	 * @throws Exception No user found
-//	 */
-//	public static function fromUser(int $id): self {
-//		$api = new self();
-//		return $api->setUserTokenViaId($id);
-//	}
-//
-//	public function setUserToken(): self {
-//		return $this->setMusicKitToken($this->app->getUserToken());
-//	}
-//
-//	/**
-//	 * @throws Exception No user found
-//	 */
-//	public function setUserTokenViaId(int $id): self {
-//		$user = $this->app->manager()->findOne2('users', ['id' => $id]);
-//		if(!$user) {
-//			throw new Exception('No user found');
-//		}
-//		return $this->setMusicKitToken($user['musickit_user_token']);
-//	}
+	private static function getHeaderToken(): ?string {
+		return self::getRequestHeaderMusicToken();
+	}
 
 	public function setMusicKitToken(string $music_kit_token): self {
 		$this->music_kit_token = $music_kit_token;
 		$this->init();
 
 		return $this;
+	}
+
+	public function getMusicKitToken(): string {
+		return $this->music_kit_token;
 	}
 
 	public function headers(): array {
@@ -136,5 +116,36 @@ class MusicKit extends AppleMusic {
 	}
 
 	// endregion Artists
+
+	// region trash
+
+//	public static function current(): self {
+//		$api = new self();
+//		return $api->setUserToken();
+//	}
+//
+//	/**
+//	 * @throws Exception No user found
+//	 */
+//	public static function fromUser(int $id): self {
+//		$api = new self();
+//		return $api->setUserTokenViaId($id);
+//	}
+//
+//	public function setUserToken(): self {
+//		return $this->setMusicKitToken($this->app->getUserToken());
+//	}
+//
+//	/**
+//	 * @throws Exception No user found
+//	 */
+//	public function setUserTokenViaId(int $id): self {
+//		$user = $this->app->manager()->findOne2('users', ['id' => $id]);
+//		if(!$user) {
+//			throw new Exception('No user found');
+//		}
+//		return $this->setMusicKitToken($user['musickit_user_token']);
+//	}
+	// endregion trash
 
 }

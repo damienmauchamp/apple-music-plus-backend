@@ -17,6 +17,7 @@ class AbstractAPI {
 	protected bool $developer = true;
 	protected bool $scrapped = false;
 	private string $developer_token = '';
+	private string $music_kit_token = '';
 	// private int $token_expiracy = 3600; // 3600;
 	//
 	private ?int $token_expiracy_status = 401;
@@ -34,6 +35,7 @@ class AbstractAPI {
 
 	public function init(bool $renew = false): void {
 		$this->initDeveloperToken($renew);
+		$this->initMusicKitToken();
 		$this->initClient();
 	}
 
@@ -56,7 +58,12 @@ class AbstractAPI {
 	}
 
 	public function headers(): array {
-		return [];
+		$headers = [];
+		if ($this->music_kit_token) {
+			$headers['Music-User-Token'] = $this->music_kit_token;
+		}
+
+		return $headers;
 	}
 
 	protected function setUrl(&$uri, array $parameters = []): string {
@@ -70,13 +77,20 @@ class AbstractAPI {
 		$options = [
 			'base_uri' => $this->url,
 //			'Accept' => 'application/json',
-			'verify' => (bool) env('AM_SSL_VERIRY', false),
 			'headers' => $this->headers(),
 		];
 
+		if (env('AM_SSL_CERT')) {
+			$options['verify'] = env('AM_SSL_CERT');
+		} else {
+			$options['verify'] = env('AM_SSL_VERIRY', false);
+		}
+
 		$token = ($token ?? $this->developer_token) ?: '';
 		if ($token) {
-			$options['headers']['Authorization'] = "Bearer {$token}";
+			$options['headers'] = array_merge([
+				'Authorization' => "Bearer {$token}",
+			], $options['headers']);
 		}
 		$this->client = new Client($options);
 
@@ -112,6 +126,16 @@ class AbstractAPI {
 		$this->developer_token = (new DeveloperToken($renew))->getToken();
 	}
 
+	protected function initMusicKitToken(): void {
+		$this->music_kit_token = MusicKit::getRequestHeaderMusicToken() ?? '';
+	}
+
+	public function setMusicKitToken(string $music_kit_token): self {
+		$this->music_kit_token = $music_kit_token;
+
+		return $this;
+	}
+
 	/**
 	 * @throws GuzzleException 400 error
 	 * @throws Exception Too many failures
@@ -122,7 +146,6 @@ class AbstractAPI {
 		$this->setUrl($uri, $parameters);
 
 		try {
-//			return $this->client->get($uri, $this->options);
 			$request = new APIRequest($this->client, 'GET', $uri, $parameters, $options, $retrying, $this->scrapped);
 
 			return $request->run();

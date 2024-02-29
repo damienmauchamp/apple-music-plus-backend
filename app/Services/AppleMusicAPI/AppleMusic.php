@@ -91,6 +91,76 @@ class AppleMusic extends AbstractAPI {
 
 	//
 
+	/**
+	 * @param $id
+	 * @param array $parameters
+	 * 	- l string
+	 * 	- include string[] (ex : library, tracks, artist, ...)
+	 * 	- views string[]
+	 * 	- extend string[]
+	 * @link https://developer.apple.com/documentation/applemusicapi/get_a_catalog_album
+	 * @return APIResponse
+	 */
+	public function getCatalogAlbum($id, array $parameters = []): APIResponse {
+		return $this->get("/catalog/{$this->storefront}/albums/{$id}", $parameters);
+	}
+
+	/**
+	 * @param $id
+	 * @param array $parameters
+	 * 	- l string
+	 * 	- include string[] (ex : library, tracks, artist, ...)
+	 * 	- views string[]
+	 * 	- extend string[]
+	 * @link https://developer.apple.com/documentation/applemusicapi/get_multiple_catalog_albums
+	 * @return APIResponse
+	 */
+	public function getMultipleCatalogAlbums(array $ids, array $parameters = []): APIResponse {
+
+		$parameters = array_merge([
+			'ids' => implode(',', $ids),
+		], $parameters);
+
+		return $this->get("/catalog/{$this->storefront}/albums", $parameters);
+	}
+
+	//
+
+	/**
+	 * @param $id
+	 * @param array $parameters
+	 * 	- l string
+	 * 	- include string[] (ex : library, tracks, artist, ...)
+	 * 	- views string[]
+	 * 	- extend string[]
+	 * @link https://developer.apple.com/documentation/applemusicapi/get_a_catalog_song
+	 * @return APIResponse
+	 */
+	public function getCatalogSong($id, array $parameters = []): APIResponse {
+		return $this->get("/catalog/{$this->storefront}/songs/{$id}", $parameters);
+	}
+
+	/**
+	 * @param $id
+	 * @param array $parameters
+	 * 	- l string
+	 * 	- include string[] (ex : library, tracks, artist, ...)
+	 * 	- views string[]
+	 * 	- extend string[]
+	 * @link https://developer.apple.com/documentation/applemusicapi/get_multiple_catalog_songs
+	 * @return APIResponse
+	 */
+	public function getMultipleCatalogSongs(array $ids, array $parameters = []): APIResponse {
+
+		$parameters = array_merge([
+			'ids' => implode(',', $ids),
+		], $parameters);
+
+		return $this->get("/catalog/{$this->storefront}/songs", $parameters);
+	}
+
+	//
+
 	public function fetchCatalogArtistsRelationshipByReleaseDate($id, string $relationship, array $parameters = []): array {
 
 		$parameters = array_merge($parameters, [

@@ -30,7 +30,7 @@ class APIRequest {
 	 * @throws GuzzleException
 	 */
 	public function run(): APIResponse {
-		switch($this->methode) {
+		switch ($this->methode) {
 			case 'GET':
 				$request = $this->client->get($this->uri, $this->options);
 				break;
