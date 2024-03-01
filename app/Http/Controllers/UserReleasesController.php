@@ -57,7 +57,7 @@ class UserReleasesController extends Controller {
 				}
 
 				if ($hide_upcoming) {
-					$query->where('releaseDate', '<', now()->format('Y-m-d'));
+					$query->where('releaseDate', '<=', now()->format('Y-m-d'));
 				}
 
 				$query->where('releaseDate', '>=', $from);
@@ -78,7 +78,7 @@ class UserReleasesController extends Controller {
 			$releases = $releases->where('releaseDate', '>', now()->format('Y-m-d'));
 		} else {
 			if ($hide_upcoming) {
-				$releases = $releases->where('releaseDate', '<', now()->format('Y-m-d'));
+				$releases = $releases->where('releaseDate', '<=', now()->format('Y-m-d'));
 			}
 
 			$releases = $releases->where('releaseDate', '>=', $from);
@@ -92,7 +92,7 @@ class UserReleasesController extends Controller {
 				return $query->where('releaseDate', '>', now()->format('Y-m-d'));
 			})
 			->when($hide_upcoming && !$only_upcoming, function ($query) {
-				return $query->where('releaseDate', '<', now()->format('Y-m-d'));
+				return $query->where('releaseDate', '<=', now()->format('Y-m-d'));
 			})
 			->where('releaseDate', '>=', $from)
 			->when($to, function ($query) use ($to) {
@@ -256,7 +256,7 @@ class UserReleasesController extends Controller {
 				}
 
 				if ($hide_upcoming) {
-					$query->where('releaseDate', '<', now()->format('Y-m-d'));
+					$query->where('releaseDate', '=<', now()->format('Y-m-d'));
 				}
 
 				$query->where('releaseDate', '>=', $from);
@@ -277,7 +277,7 @@ class UserReleasesController extends Controller {
 			$songs = $songs->where('releaseDate', '>', now()->format('Y-m-d'));
 		} else {
 			if ($hide_upcoming) {
-				$songs = $songs->where('releaseDate', '<', now()->format('Y-m-d'));
+				$songs = $songs->where('releaseDate', '=<', now()->format('Y-m-d'));
 			}
 
 			$songs = $songs->where('releaseDate', '>=', $from);
