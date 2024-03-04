@@ -160,6 +160,27 @@ class AbstractAPI {
 		}
 	}
 
+	protected function post($uri, array $parameters = [], array $options = [], bool $retrying = false): APIResponse {
+
+		$this->prepare($retrying);
+		$this->setUrl($uri, $parameters);
+
+		try {
+			$request = new APIRequest($this->client, 'POST', $uri, $parameters, $options, $retrying, $this->scrapped);
+
+			return $request->run();
+		} catch (GuzzleException $e) {
+			if ($this->token_expiracy_status && $this->token_expiracy_status === $e->getCode()) {
+				// retry
+				$this->init(true);
+
+				return $this->get($uri, $parameters, $options, true);
+			}
+			throw $e;
+		}
+
+	}
+
 	/**
 	 * @throws GuzzleException 400 error
 	 */

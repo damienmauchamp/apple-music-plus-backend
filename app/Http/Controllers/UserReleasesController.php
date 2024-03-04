@@ -47,7 +47,7 @@ class UserReleasesController extends Controller {
 
 		$query = $user->artists()
 			->with('albums')
-			->whereHas('albums', function ($query) use ($from, $to, $hide_upcoming, $only_upcoming) {
+			->whereHas('albums', function ($query) use ($from, $to, $request, $hide_upcoming, $only_upcoming) {
 
 				if ($only_upcoming) {
 					$query->where('releaseDate', '>', now()->format('Y-m-d'))
@@ -60,7 +60,7 @@ class UserReleasesController extends Controller {
 					$query->where('releaseDate', '<=', now()->format('Y-m-d'));
 				}
 
-				$query->where('releaseDate', '>=', $from);
+				$query->where('releaseDate', $request->weekly ? '>=' : '>', $from);
 				if ($to) {
 					$query->where('releaseDate', '<=', $to);
 				}
@@ -81,7 +81,7 @@ class UserReleasesController extends Controller {
 				$releases = $releases->where('releaseDate', '<=', now()->format('Y-m-d'));
 			}
 
-			$releases = $releases->where('releaseDate', '>=', $from);
+			$releases = $releases->where('releaseDate', $request->weekly ? '>=' : '>', $from);
 			if ($to) {
 				$releases = $releases->where('releaseDate', '<=', $to);
 			}
@@ -94,16 +94,15 @@ class UserReleasesController extends Controller {
 			->when($hide_upcoming && !$only_upcoming, function ($query) {
 				return $query->where('releaseDate', '<=', now()->format('Y-m-d'));
 			})
-			->where('releaseDate', '>=', $from)
+			->where('releaseDate', $request->weekly ? '>=' : '>', $from)
 			->when($to, function ($query) use ($to) {
 				return $query->where('releaseDate', '<=', $to);
 			});
 
 		$releases = $releases
 			->unique('storeId')
+			// ordering for content rating filtering
 			->sortBy([
-				[DBHelper::parseSort($request->sort ?? 'releaseDate'), DBHelper::parseSortOrder($request->sort ?? null)],
-				['created_at', 'desc'],
 				['name', 'asc'],
 				['contentRating', $contentRating === 'clean' ? 'asc' : 'desc'],
 			])
@@ -144,31 +143,46 @@ class UserReleasesController extends Controller {
 				}
 
 				return true;
-			})->values();
+			})
+			->sortBy([
+				[DBHelper::parseSort($request->sort ?? 'releaseDate'), DBHelper::parseSortOrder($request->sort ?? null)],
+				['created_at', 'desc'],
+				['name', 'asc'],
+				['contentRating', $contentRating === 'clean' ? 'asc' : 'desc'],
+			])
+			//
+			->values();
 
 		// checking if the releases are added in the library
 		$musicKit = new MusicKit();
-		if ($musicKit->getMusicKitToken()) {
-			$appleMusicApi = new AppleMusic();
-			$data = [];
-			$albumStoreIds = $releases->map->storeId->toArray();
-			$albumStoreIdBatches = array_chunk($albumStoreIds, 100);
-			foreach ($albumStoreIdBatches as $batch) {
-				$batchData = $appleMusicApi->getMultipleCatalogAlbums($batch, [
-					'include' => 'library,artists',
-				]);
-				$data = array_merge($data, $batchData->getData()['data']);
-			}
-			$apiData = array_combine(array_column($data, 'id'), $data);
-
-			// adding library & artists info
-			$releases->map(function ($release) use ($apiData) {
-				$release['api'] = [
-					'library' => $apiData[$release->storeId]['relationships']['library']['data'][0] ?? null,
-					'artists' => $apiData[$release->storeId]['relationships']['artists']['data'] ?? [],
-				];
-			});
+		// if ($musicKit->getMusicKitToken()) {
+		$appleMusicApi = new AppleMusic();
+		$data = [];
+		$albumStoreIds = $releases->map->storeId->toArray();
+		$albumStoreIdBatches = array_chunk($albumStoreIds, 100);
+		foreach ($albumStoreIdBatches as $batch) {
+			$batchData = $appleMusicApi->getMultipleCatalogAlbums($batch, [
+				'include' => 'library,artists',
+			]);
+			$data = array_merge($data, $batchData->getData()['data']);
 		}
+		$apiData = array_combine(array_column($data, 'id'), $data);
+
+		// adding library & artists info
+		$releases->map(function ($release) use ($apiData) {
+			$artists = $apiData[$release->storeId]['relationships']['artists']['data'] ?? [];
+			$release['api'] = [
+				'library' => $apiData[$release->storeId]['relationships']['library']['data'][0] ?? null,
+				'artists' => $artists,
+				'available' => (bool) $artists,
+			];
+		});
+
+		// filtering elements not available anymore
+		$releases = $releases->filter(function ($release) {
+			return (bool) $release['api']['available'];
+		});
+		// }
 
 		return $returnRaw ? $releases : new AlbumCollection($releases);
 	}
@@ -247,7 +261,7 @@ class UserReleasesController extends Controller {
 
 		$query = $user->artists()
 			->with($request->include_releases ?? false ? 'songs' : 'songs.album')
-			->whereHas('songs', function ($query) use ($from, $to, $hide_upcoming, $only_upcoming) {
+			->whereHas('songs', function ($query) use ($from, $to, $request, $hide_upcoming, $only_upcoming) {
 
 				if ($only_upcoming) {
 					$query->where('releaseDate', '>', now()->format('Y-m-d'));
@@ -256,10 +270,11 @@ class UserReleasesController extends Controller {
 				}
 
 				if ($hide_upcoming) {
-					$query->where('releaseDate', '=<', now()->format('Y-m-d'));
+					// $query->where('releaseDate', '=<', now()->format('Y-m-d'));
+					$query->where('releaseDate', '<', now()->format('Y-m-d'));
 				}
 
-				$query->where('releaseDate', '>=', $from);
+				$query->where('releaseDate', $request->weekly ? '>=' : '>', $from);
 				if ($to) {
 					$query->where('releaseDate', '<=', $to);
 				}
@@ -277,31 +292,26 @@ class UserReleasesController extends Controller {
 			$songs = $songs->where('releaseDate', '>', now()->format('Y-m-d'));
 		} else {
 			if ($hide_upcoming) {
-				$songs = $songs->where('releaseDate', '=<', now()->format('Y-m-d'));
+				// $songs = $songs->where('releaseDate', '=<', now()->format('Y-m-d'));
+				$songs = $songs->where('releaseDate', '<', now()->format('Y-m-d'));
 			}
 
-			$songs = $songs->where('releaseDate', '>=', $from);
+			$songs = $songs->where('releaseDate', $request->weekly ? '>=' : '>', $from);
 			if ($to) {
 				$songs = $songs->where('releaseDate', '<=', $to);
 			}
 		}
 
 		$request->query->add([
-			'all_content_rating' => true,
+			'all_content_rating' => 1,
+			'hide_singles' => 0,
 		]);
+
 		$releases = $this->list($request, true);
 		$releasesStoreIds = array_column($releases->toArray(), 'storeId');
 
 		$songs = $songs
 			->unique('storeId')
-			->sortBy([
-				[DBHelper::parseSort($request->sort ?? 'releaseDate'), DBHelper::parseSortOrder($request->sort ?? null)],
-				['created_at', 'desc'],
-				['name', 'asc'],
-				['contentRating', $contentRating === 'clean' ? 'asc' : 'desc'],
-				// ['albumName', 'asc'],
-				// ['artistName', 'asc'],
-			])
 			// release filter
 			->filter(function ($song) use ($releasesStoreIds, $request) {
 				if ($request->include_releases ?? false) {
@@ -314,6 +324,11 @@ class UserReleasesController extends Controller {
 
 				return !in_array($song->album->storeId, $releasesStoreIds);
 			})
+			// ordering for content rating filtering
+			->sortBy([
+				['name', 'asc'],
+				['contentRating', $contentRating === 'clean' ? 'asc' : 'desc'],
+			])
 			// content rating filter
 			->filter(function ($song) use ($request, &$contentRatingFilter, $contentRating) {
 				if ($request->all_content_rating) {
@@ -332,31 +347,47 @@ class UserReleasesController extends Controller {
 				$contentRatingFilter[$songKey] = true;
 
 				return true;
-			})->values();
+			})
+			->sortBy([
+				[DBHelper::parseSort($request->sort ?? 'releaseDate'), DBHelper::parseSortOrder($request->sort ?? null)],
+				['created_at', 'desc'],
+				['name', 'asc'],
+				['contentRating', $contentRating === 'clean' ? 'asc' : 'desc'],
+				// ['albumName', 'asc'],
+				// ['artistName', 'asc'],
+			])
+			->values();
 
 		// checking if the songs are added in the library
 		$musicKit = new MusicKit();
-		if ($musicKit->getMusicKitToken()) {
-			$appleMusicApi = new AppleMusic();
-			$data = [];
-			$albumStoreIds = $songs->map->storeId->toArray();
-			$albumStoreIdBatches = array_chunk($albumStoreIds, 100);
-			foreach ($albumStoreIdBatches as $batch) {
-				$batchData = $appleMusicApi->getMultipleCatalogSongs($batch, [
-					'include' => 'library,artists',
-				]);
-				$data = array_merge($data, $batchData->getData()['data']);
-			}
-			$apiData = array_combine(array_column($data, 'id'), $data);
-
-			// adding library & artists info
-			$songs->map(function ($song) use ($apiData) {
-				$song['api'] = [
-					'library' => $apiData[$song->storeId]['relationships']['library']['data'][0] ?? null,
-					'artists' => $apiData[$song->storeId]['relationships']['artists']['data'] ?? [],
-				];
-			});
+		// if ($musicKit->getMusicKitToken()) {
+		$appleMusicApi = new AppleMusic();
+		$data = [];
+		$albumStoreIds = $songs->map->storeId->toArray();
+		$albumStoreIdBatches = array_chunk($albumStoreIds, 100);
+		foreach ($albumStoreIdBatches as $batch) {
+			$batchData = $appleMusicApi->getMultipleCatalogSongs($batch, [
+				'include' => 'library,artists',
+			]);
+			$data = array_merge($data, $batchData->getData()['data']);
 		}
+		$apiData = array_combine(array_column($data, 'id'), $data);
+
+		// adding library & artists info
+		$songs->map(function ($song) use ($apiData) {
+			$artists = $apiData[$song->storeId]['relationships']['artists']['data'] ?? [];
+			$song['api'] = [
+				'library' => $apiData[$song->storeId]['relationships']['library']['data'][0] ?? null,
+				'artists' => $artists,
+				'available' => (bool) $artists,
+			];
+		});
+
+		// filtering elements not available anymore
+		$songs = $songs->filter(function ($song) {
+			return $song['api']['available'];
+		});
+		// }
 
 		return new SongCollection($songs);
 	}

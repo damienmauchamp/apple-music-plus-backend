@@ -40,6 +40,7 @@ class MusicKit extends AppleMusic {
 
 	public function headers(): array {
 		return array_merge(parent::headers(), [
+			'Content-Type' => 'application/json',
 			'Music-User-Token' => $this->music_kit_token,
 		]);
 	}
@@ -98,6 +99,16 @@ class MusicKit extends AppleMusic {
 			'types' => 'library-songs',
 		]);
 	}
+
+	// region Albums
+
+	public function addResourceToLibrary(array $ids, string $type, array $parameters = []): APIResponse {
+		$parameters["ids[$type]"] = implode(',', $ids);
+
+		return $this->post('/library', $parameters);
+	}
+
+	// endregion Albums
 
 	// region Search
 

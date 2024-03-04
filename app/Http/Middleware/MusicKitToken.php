@@ -37,7 +37,7 @@ class MusicKitToken {
 		return $next($request);
 	}
 
-	private function getToken(Request $request): string {
+	private function getToken(Request $request): ?string {
 		return $request->header('Music-Token');
 	}
 

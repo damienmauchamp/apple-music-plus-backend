@@ -4,6 +4,7 @@ use App\Helpers\SystemHelper;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MusicKitController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserArtistsController;
 use App\Http\Controllers\UserController;
@@ -117,9 +118,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Apple Music API
 Route::prefix('applemusic')->group(function () {
-	Route::prefix('catalog')->group(function () {
-	});
-	Route::prefix('library')->group(function () {
+	// Route::prefix('catalog')->group(function () {
+	// });
+
+	Route::middleware('musicKit')->group(function () {
+		Route::prefix('library')->group(function () {
+			// POST /applemusic/library - Add resource to library
+			Route::post('/', [MusicKitController::class, 'addResourceToLibrary']);
+		});
 	});
 });
 
