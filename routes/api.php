@@ -57,7 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::get('/artists/search', [UserArtistsController::class, 'search']);
 
 		// /user/artists/fetchall
-		Route::post('/artists/fetchall', [UserArtistsController::class, 'fetchArtistsReleases']);
+		Route::post('/artists/fetchall', [UserArtistsController::class, 'fetchUserArtistsReleases']);
 
 		// /user/artists/subscribe
 		Route::post('/artists/subscribe', [UserArtistsController::class, 'subscribe']);

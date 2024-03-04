@@ -130,7 +130,7 @@ class UserArtistsController extends Controller {
 		];
 	}
 
-	public function fetchArtistsReleases(Request $request) {
+	public function fetchUserArtistsReleases(Request $request) {
 
 		/** @var User $user */
 		$user = Auth::user();
