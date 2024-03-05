@@ -27,6 +27,25 @@ php artisan serve  --port=8080
 php artisan queue:work --queue=update-artist --daemon
 ```
 
+## Apache conf example
+
+```apacheconf
+Define PROJECT_DIR c:/.../apple-music-plus-backend
+Define PROJECT_URL server-name.wip
+
+<VirtualHost ${PROJECT_URL}:80>
+    DocumentRoot ${PROJECT_DIR}/public
+    ServerName ${PROJECT_URL}
+	ErrorLog ${INSTALL_DIR}/logs/amplus-error.log
+	CustomLog ${INSTALL_DIR}/logs/amplus-access.log combined
+    <Directory "${PROJECT_DIR}/public">
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+```
+
 ---
 
 -   POST /api/auth/register
