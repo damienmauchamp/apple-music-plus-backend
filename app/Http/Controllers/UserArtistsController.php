@@ -74,16 +74,12 @@ class UserArtistsController extends Controller {
 		if (!$alreadySubscribed) {
 			// add subscription for user
 			$sync = $user->artists()->syncWithoutDetaching($artist->id);
-
-			// TODO : delete last_updated in pivot + add it in artist table
-			// $update = $user->artists()->updateExistingPivot($artist->id, [
-			// 	'last_updated' => now(),
-			// ]);
 		}
 
 		if ($request->fetch) {
-			// todo : multiple ids
+			// fetching directly
 			try {
+				// todo : multiple ids
 				$updater = new ReleasesUpdater($request->artist_id);
 				$updater->update();
 			} catch (CatalogArtistNotFoundException | ArtistUpdateException | Exception $exception) {
@@ -92,6 +88,10 @@ class UserArtistsController extends Controller {
 					'message' => 'Something went wrong (2)',
 				];
 			}
+		} else {
+			// creating job
+			$updater = new ReleasesUpdater($request->artist_id, true);
+			$updater->update();
 		}
 
 		return [
