@@ -2,20 +2,29 @@
 
 > Execute queue jobs.
 
-```bashrc
+```bash
 php artisan queue:work --stop-when-empty
 ```
 
 > Execute queue jobs in the background.
 
-```bashrc
+```bash
 php artisan queue:work --queue=update-artist --daemon
 ```
 
 > Clear jobs.
 
-```bashrc
+```bash
 php artisan queue:clear --queue=update-artist
+```
+
+## Run locally
+
+Open 2 terminals, one for serve, one for artisan queue command :
+
+```bash
+php artisan serve  --port=8080
+php artisan queue:work --queue=update-artist --daemon
 ```
 
 ---
