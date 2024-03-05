@@ -36,7 +36,6 @@ class UserArtistsController extends Controller {
 			'l' => 'string',
 			'limit' => 'integer|min:5|max:25',
 			'offset' => 'string',
-			// 'types' => 'string',
 			'with' => 'string',
 		]);
 
@@ -131,6 +130,9 @@ class UserArtistsController extends Controller {
 	}
 
 	public function fetchUserArtistsReleases(Request $request) {
+		$request->validate([
+			'job' => 'boolean',
+		]);
 
 		/** @var User $user */
 		$user = Auth::user();

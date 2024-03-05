@@ -44,6 +44,7 @@ class ArtistController extends Controller {
 	public function fetchArtistReleases(Request $request) {
 		$request->validate([
 			'artist_id' => 'required|integer',
+			'job' => 'boolean',
 		]);
 
 		try {
@@ -65,6 +66,10 @@ class ArtistController extends Controller {
 	}
 
 	public function fetchArtistsReleases(Request $request) {
+		$request->validate([
+			'job' => 'boolean',
+		]);
+
 		// getting all artists linked to at least one user
 		$artists = Artist::whereHas('users')->orderBy('name')->get();
 
