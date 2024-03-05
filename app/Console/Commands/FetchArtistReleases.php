@@ -37,7 +37,5 @@ class FetchArtistReleases extends Command {
 		}
 
 		$this->info($job ? "Job created for $artist->name" : "$artist->name updated");
-
-		return true;
 	}
 }

@@ -31,7 +31,5 @@ class FetchAllArtistsReleases extends Command {
 		}
 
 		$this->info($job ? "Jobs created for " . count($artists) . " artists" : count($artists) . " artists updated");
-
-		return true;
 	}
 }

@@ -55,7 +55,13 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
-        ]
+        ],
+        "fetch-artist": "@php artisan app:fetch-artist",
+        "fetch-all-artists": "@php artisan app:fetch-all-artists"
+    },
+    "scripts-descriptions": {
+        "fetch-artist": "Update an artist's releases & info (Arguments: {Artist.storeId} {job=0})",
+        "fetch-all-artists": "Update all artists' releases & info (Arguments: {job=0})"
     },
     "extra": {
         "laravel": {
