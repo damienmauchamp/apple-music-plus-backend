@@ -48,6 +48,20 @@ Define PROJECT_URL server-name.wip
 </VirtualHost>
 ```
 
+## Commands
+
+### Update all artists
+
+```bash
+php artisan app:fetch-all-artists {job=0}
+```
+
+### Update artist
+
+```bash
+php artisan app:fetch-artist {Artist.storeId} {job=0}
+```
+
 ## Routes
 
 ### /api/auth
