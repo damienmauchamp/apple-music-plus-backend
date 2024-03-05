@@ -1,5 +1,25 @@
 # AM+
 
+> Execute queue jobs.
+
+```bashrc
+php artisan queue:work --stop-when-empty
+```
+
+> Execute queue jobs in the background.
+
+```bashrc
+php artisan queue:work --queue=update-artist --daemon
+```
+
+> Clear jobs.
+
+```bashrc
+php artisan queue:clear --queue=update-artist
+```
+
+---
+
 -   POST /api/auth/register
     -   name (string)
     -   email (string)
@@ -32,3 +52,5 @@ Use Music-Token header with your Music Kit token.
 -   GET /api/test/musickitapi
 -   GET /api/test/musickitapi/artists
 -   GET /api/test/musickitapi/artists/full
+
+> to complete

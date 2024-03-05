@@ -6,16 +6,27 @@ use AppleMusicAPI\AppleMusic;
 use App\Exceptions\ArtistUpdateException;
 use App\Exceptions\CatalogArtistNotFoundException;
 use App\Helpers\SystemHelper;
+use App\Jobs\UpdateArtist;
 use App\Models\Album;
 use App\Models\Artist;
 use App\Models\Song;
 use App\Repositories\ArtistRepository;
 use Exception;
+use GuzzleHttp\Exception\ClientException;
+use Illuminate\Foundation\Bus\PendingDispatch;
 
+/**
+ * @todo : on fetch albums failure
+ * @todo : on fetch songs failure
+ * @todo : check albums & songs not available anymore
+ * @todo : logs
+ */
 class ReleasesUpdater {
 
 	protected $api;
 	protected ?Artist $artist;
+	protected bool $job = false;
+	protected ?PendingDispatch $lastJob = null;
 
 	private array $albumsResults = [];
 	private array $songsResults = [];
@@ -23,16 +34,38 @@ class ReleasesUpdater {
 	private int $albumsDeleted = 0;
 	private int $songsDeleted = 0;
 
-	public function __construct($artistStoreId = null) {
+	public function __construct($artistStoreId = null, bool $job = false) {
 		$this->api = new AppleMusic();
-		$this->setArtist($artistStoreId);
+		$this->setArtistByStoreId($artistStoreId);
+		$this->job = $job;
 
 		return $this;
 	}
 
-	public function setArtist($artistStoreId) {
-		$this->artist = $artistStoreId ? (new ArtistRepository)->updateArtistByStoreId($artistStoreId) : null;
+	public function setArtist(Artist $artist) {
+		if ($this->job) {
+			// we're not fetching artist info, we'll do that when the job is executed
+			$this->artist = $artist;
+		} else {
+			$this->artist = (new ArtistRepository)->updateArtistByStoreId($artist->storeId);
+		}
+
+		return $this;
+	}
+
+	public function setArtistByStoreId($artistStoreId) {
+		if ($artistStoreId) {
+			$artist = Artist::where('storeId', $artistStoreId)->first();
+			$this->setArtist($artist);
+		}
+
 		$this->reset();
+
+		return $this;
+	}
+
+	public function setJob(bool $job) {
+		$this->job = $job;
 
 		return $this;
 	}
@@ -42,17 +75,34 @@ class ReleasesUpdater {
 		$this->songsResults = [];
 		$this->albumsDeleted = 0;
 		$this->songsDeleted = 0;
+		$this->lastJob = null;
 
 		return $this;
 	}
 
 	public function update() {
+		$this->lastJob = null;
+
+		if ($this->job) {
+			return $this->dispatch();
+		}
+
 		$this->updateAlbums();
 		$this->updateSongs();
 		$this->cleanUpAlbums();
 		$this->cleanUpSongs();
 
-		// todo : check albums & songs not available anymore
+		// todo : check albums & songs not available anymore (check releases : UserReleasesController ->map (api, ...))
+		// todo : logs
+
+		return $this;
+	}
+
+	public function dispatch() {
+		$this->lastJob = UpdateArtist::dispatch($this->artist)
+			->onQueue('update-artist');
+
+		// dd('dispatch', $this->artist);
 
 		return $this;
 	}
@@ -77,7 +127,12 @@ class ReleasesUpdater {
 				'songs' => $this->songsDeleted,
 			],
 			'minDate' => SystemHelper::minReleaseDate(),
+			'job' => $this->lastJob,
 		];
+	}
+
+	public function updateArtist() {
+		$this->artist = (new ArtistRepository)->updateArtistByStoreId($this->artist->storeId);
 	}
 
 	public function updateAlbums() {
@@ -85,9 +140,18 @@ class ReleasesUpdater {
 			throw new Exception('No artist found.');
 		}
 
-		$this->albumsResults = $this->api->fetchCatalogArtistsRelationshipByReleaseDate($this->artist->storeId, 'albums', [
-			'limit' => 100,
-		]);
+		try {
+			$this->albumsResults = $this->api->fetchCatalogArtistsRelationshipByReleaseDate($this->artist->storeId, 'albums', [
+				'limit' => 100,
+			]);
+		} catch (ClientException $e) {
+			$this->albumsResults = [
+				'error' => $e->getMessage(),
+			];
+			// todo : log errors / dd($e, $e->getMessage());
+
+			return $this;
+		}
 
 		// Inserting or updating albums
 		foreach ($this->albumsResults['data'] as $data) {
@@ -124,10 +188,19 @@ class ReleasesUpdater {
 			throw new Exception('No artist found.');
 		}
 
-		$this->songsResults = $this->api->fetchCatalogArtistsRelationshipByReleaseDate($this->artist->storeId, 'songs', [
-			'limit' => 20,
-			'include[songs]' => 'albums',
-		]);
+		try {
+			$this->songsResults = $this->api->fetchCatalogArtistsRelationshipByReleaseDate($this->artist->storeId, 'songs', [
+				'limit' => 20,
+				'include[songs]' => 'albums',
+			]);
+		} catch (ClientException $e) {
+			$this->albumsResults = [
+				'error' => $e->getMessage(),
+			];
+			// todo : log errors / dd($e, $e->getMessage());
+
+			return $this;
+		}
 
 		// Inserting or updating songs
 		foreach ($this->songsResults['data'] as $data) {
@@ -177,16 +250,17 @@ class ReleasesUpdater {
 	 *
 	 * @return void
 	 */
-	public static function fromArtistArray($artists) {
+	public static function fromArtistArray($artists, bool $job = false) {
 
 		$results = [];
 		$errors = [];
 
 		set_time_limit(0);
 		$updater = new ReleasesUpdater();
+		$updater->setJob($job);
 
 		foreach ($artists as $artist) {
-			$updater->setArtist($artist->storeId);
+			$updater->setArtistByStoreId($artist->storeId);
 
 			try {
 				$updater->update();
@@ -204,12 +278,17 @@ class ReleasesUpdater {
 			}
 
 			$data = $updater->toArray();
-			$results[] = [
+			$result = [
 				'id' => $data['artist']->id,
 				'storeId' => $data['artist']->storeId,
 				'artist' => $data['artist']->name,
 				'last_updated' => $data['artist']->last_updated,
 			];
+			if ($updater->job) {
+				$result['job'] = $data['job'];
+				// $result['job'] = $updater->lastJob;
+			}
+			$results[] = $result;
 		}
 
 		return [

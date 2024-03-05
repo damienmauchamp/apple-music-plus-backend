@@ -136,6 +136,6 @@ class UserArtistsController extends Controller {
 		$user = Auth::user();
 		$artists = $user->artists()->orderBy('name')->get();
 
-		return ReleasesUpdater::fromArtistArray($artists);
+		return ReleasesUpdater::fromArtistArray($artists, (bool) $request->job);
 	}
 }

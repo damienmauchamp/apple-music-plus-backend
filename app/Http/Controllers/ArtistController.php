@@ -47,7 +47,7 @@ class ArtistController extends Controller {
 		]);
 
 		try {
-			$updater = new ReleasesUpdater($request->artist_id);
+			$updater = new ReleasesUpdater($request->artist_id, (bool) $request->job);
 			$updater->update();
 		} catch (CatalogArtistNotFoundException | ArtistUpdateException $exception) {
 			return [
@@ -68,6 +68,6 @@ class ArtistController extends Controller {
 		// getting all artists linked to at least one user
 		$artists = Artist::whereHas('users')->orderBy('name')->get();
 
-		return ReleasesUpdater::fromArtistArray($artists);
+		return ReleasesUpdater::fromArtistArray($artists, (bool) $request->job);
 	}
 }
