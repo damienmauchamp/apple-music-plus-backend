@@ -109,6 +109,25 @@ Install supervisor
 sudo apt install supervisor
 ```
 
+#### Default queue
+
+Create file `/etc/supervisor/conf.d/amplus-default.conf` and write :
+
+```conf
+[program:default-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /var/www/laravel-example/artisan queue:work --sleep=3 --tries=3
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=<YOUR-USER>
+numprocs=8
+redirect_stderr=true
+stdout_logfile=/var/www/laravel-example/storage/logs/default-worker.log
+stopwaitsecs=3600
+```
+
 #### Update artist
 
 Create file `/etc/supervisor/conf.d/amplus-update-artist.conf` and write :
@@ -124,40 +143,20 @@ killasgroup=true
 user=<YOUR-USER>
 numprocs=8
 redirect_stderr=true
-stdout_logfile=/var/www/laravel-example//storage/logs/supervisord-update-artist.log
-#stopwaitsecs=3600
+stdout_logfile=/var/www/laravel-example/storage/logs/update-artist-worker.log
+stopwaitsecs=3600
 ```
+
+#### Start queues workers
 
 Start supervisor
 
 ```bash
 sudo supervisorctl reread
 sudo supervisorctl update
+sudo supervisorctl start "default-worker:*"
 sudo supervisorctl start "update-artist-worker:*"
 ```
-
----
-
----
-
-```conf
-[program:update-artist-queue]
-process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/apple-music-plus-backend/artisan queue:work --queue=update-artist --sleep=3 --tries=3
-autostart=true
-autorestart=true
-stopasgroup=true
-killasgroup=true
-user=damien
-numprocs=8
-redirect_stderr=true
-stdout_logfile=/var/www/apple-music-plus-backend//storage/logs/supervisord-update-artist.log
-#stopwaitsecs=3600
-```
-
----
-
----
 
 ## Commands
 

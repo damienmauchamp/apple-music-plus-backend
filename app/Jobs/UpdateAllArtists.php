@@ -32,6 +32,6 @@ class UpdateAllArtists implements ShouldQueue {
 			'artists' => count($artists),
 		]);
 
-		ReleasesUpdater::fromArtistArray($artists);
+		ReleasesUpdater::fromArtistArray($artists, true);
 	}
 }
