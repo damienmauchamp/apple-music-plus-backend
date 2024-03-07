@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel {
 		// Update all artists
 		// $schedule->command(FetchAllArtistsReleases::class, [true])->everyThirtyMinutes();
 		$schedule->job(new UpdateAllArtists)->everyThirtyMinutes();
+		$schedule->job(new UpdateAllArtists)->cron('33 * * * *');
 
 		$schedule->call(function () {
 			Log::info("Scheduling test 30m job at " . now(), [
