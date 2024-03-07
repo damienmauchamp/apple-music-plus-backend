@@ -14,16 +14,20 @@ use Illuminate\Support\Facades\Log;
 class UpdateAllArtists implements ShouldQueue {
 	use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-	public function __construct() {}
+	public function __construct() {
+		Log::info("[UpdateAllArtists] Initializing job at " . now(), [
+			'date' => now(),
+		]);
+	}
 
 	public function handle(): void {
-		Log::info("Lauching UpdateAllArtists job at " . now(), [
+		Log::info("[UpdateAllArtists] Lauching job at " . now(), [
 			'date' => now(),
 		]);
 
 		$artists = Artist::orderBy('name')->get();
 
-		Log::info("Scheduling UpdateAllArtists job at " . now(), [
+		Log::info("[UpdateAllArtists] Scheduling job at " . now(), [
 			'date' => now(),
 			'artists' => count($artists),
 		]);
