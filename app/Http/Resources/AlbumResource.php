@@ -23,7 +23,7 @@ class AlbumResource extends JsonResource {
 			'isSingle' => $this->isSingle,
 			'isCompilation' => $this->isCompilation,
 			'isComplete' => $this->isComplete,
-			'inLibrary' => !isset($this->api) ? null : ($this->api && ($this->api['library'] ?? []) !== []),
+			'inLibrary' => !isset($this->api) || !isset($this->api['library']) ? null : ($this->api && ($this->api['library'] ?? []) !== []),
 			'upc' => $this->upc,
 			'api' => !isset($this->api) ? null : ($this->api ?? []),
 			'custom' => $this->custom,

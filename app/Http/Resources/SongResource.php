@@ -25,7 +25,7 @@ class SongResource extends JsonResource {
 			'discNumber' => $this->discNumber,
 			'durationInMillis' => $this->durationInMillis,
 			'previewUrl' => $this->previewUrl,
-			'inLibrary' => !isset($this->api) ? null : ($this->api && ($this->api['library'] ?? []) !== []),
+			'inLibrary' => !isset($this->api) || !isset($this->api['library']) ? null : ($this->api && ($this->api['library'] ?? []) !== []),
 			'api' => !isset($this->api) ? null : ($this->api ?? []),
 			'custom' => $this->custom,
 			'disabled' => $this->disabled,
