@@ -17,6 +17,13 @@ class Kernel extends ConsoleKernel {
 		$schedule->job(new UpdateAllArtists)->everyThirtyMinutes();
 
 		$schedule->call(function () {
+			Log::info("Scheduling test 30m job at " . now(), [
+				'date' => now(),
+				'random' => rand(1, 100),
+			]);
+		})->everyThirtyMinutes();
+
+		$schedule->call(function () {
 			Log::info("Scheduling test job at " . now(), [
 				'date' => now(),
 				'random' => rand(1, 100),
