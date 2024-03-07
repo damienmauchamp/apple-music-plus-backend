@@ -5,7 +5,6 @@ namespace App\Console;
 use App\Jobs\UpdateAllArtists;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel {
 	/**
@@ -15,21 +14,6 @@ class Kernel extends ConsoleKernel {
 		// Update all artists
 		// $schedule->command(FetchAllArtistsReleases::class, [true])->everyThirtyMinutes();
 		$schedule->job(new UpdateAllArtists)->everyThirtyMinutes();
-		$schedule->job(new UpdateAllArtists)->cron('33 * * * *');
-
-		$schedule->call(function () {
-			Log::info("Scheduling test 30m job at " . now(), [
-				'date' => now(),
-				'random' => rand(1, 100),
-			]);
-		})->everyThirtyMinutes();
-
-		$schedule->call(function () {
-			Log::info("Scheduling test job at " . now(), [
-				'date' => now(),
-				'random' => rand(1, 100),
-			]);
-		})->everyMinute();
 	}
 
 	/**

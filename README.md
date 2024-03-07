@@ -1,24 +1,6 @@
 # AM+
 
-## Help
-
-> Execute queue jobs.
-
-```bash
-php artisan queue:work --stop-when-empty
-```
-
-> Execute queue jobs in the background.
-
-```bash
-php artisan queue:work --queue=update-artist --daemon
-```
-
-> Clear jobs.
-
-```bash
-php artisan queue:clear --queue=update-artist
-```
+## Installation
 
 ### Run locally
 
@@ -94,6 +76,10 @@ Define APP_URL server-name.wip
 ```
 
 ### Run the Scheduler
+
+```bash
+crontab -e
+```
 
 ```bash
 * * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
@@ -298,3 +284,35 @@ Use Music-Token header with your Music Kit token.
 -   GET /api/test/musickitapi
 -   GET /api/test/musickitapi/artists
 -   GET /api/test/musickitapi/artists/full
+
+## Tips
+
+### Scheduler
+
+> List all scheduled jobs
+
+```bash
+php artisan schedule:list
+```
+
+### Queues & jobs
+
+> Execute queue jobs.
+
+```bash
+php artisan queue:work --stop-when-empty
+```
+
+> Execute queue jobs in the background.
+
+```bash
+php artisan queue:work --daemon # --queue=update-artist
+```
+
+> Clear jobs.
+
+```bash
+php artisan queue:clear # --queue=update-artist
+```
+
+### Logs

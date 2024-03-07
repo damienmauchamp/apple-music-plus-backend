@@ -16,21 +16,14 @@ class UpdateAllArtists implements ShouldQueue {
 
 	public function __construct(
 		public bool $useJob = true
-	) {
-		Log::info("[UpdateAllArtists] Initializing job at " . now(), [
-			'date' => now(),
-		]);
-	}
+	) {}
 
 	public function handle(): void {
-		Log::info("[UpdateAllArtists] Lauching job at " . now(), [
-			'date' => now(),
-		]);
+		Log::info("[UpdateAllArtists] Lauching job");
 
 		$artists = Artist::orderBy('name')->get();
 
-		Log::info("[UpdateAllArtists] Scheduling job at " . now(), [
-			'date' => now(),
+		Log::info("[UpdateAllArtists] Scheduling job", [
 			'artists' => count($artists),
 		]);
 
