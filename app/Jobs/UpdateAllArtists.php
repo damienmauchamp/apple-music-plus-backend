@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Models\Artist;
-use App\Services\Core\ReleasesUpdater;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -32,6 +31,6 @@ class UpdateAllArtists implements ShouldQueue {
 			'artists' => count($artists),
 		]);
 
-		ReleasesUpdater::fromArtistArray($artists);
+		// ReleasesUpdater::fromArtistArray($artists);
 	}
 }
