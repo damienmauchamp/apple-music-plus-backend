@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Artist;
+use App\Services\Core\ReleasesUpdater;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -14,9 +15,9 @@ class UpdateAllArtists implements ShouldQueue {
 	use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
 	public function __construct() {
-		Log::info("[UpdateAllArtists] Initializing job at " . now(), [
-			'date' => now(),
-		]);
+		// Log::info("[UpdateAllArtists] Initializing job at " . now(), [
+		// 	'date' => now(),
+		// ]);
 	}
 
 	public function handle(): void {
@@ -31,6 +32,6 @@ class UpdateAllArtists implements ShouldQueue {
 			'artists' => count($artists),
 		]);
 
-		// ReleasesUpdater::fromArtistArray($artists);
+		ReleasesUpdater::fromArtistArray($artists);
 	}
 }
