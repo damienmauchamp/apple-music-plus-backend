@@ -15,6 +15,7 @@ use DateTime;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Foundation\Bus\PendingDispatch;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @todo : on fetch albums failure
@@ -83,6 +84,13 @@ class ReleasesUpdater {
 
 	public function update(?DateTime $dateTime = null) {
 		$this->lastJob = null;
+
+		Log::info("[ReleaseUpdater] update " . now(), [
+			'name' => $this->artist?->name,
+			'storeId' => $this->artist?->storeId,
+			'job' => $this->job,
+			'dateTime' => $dateTime,
+		]);
 
 		if ($this->job) {
 			return $this->dispatch($dateTime);
@@ -253,6 +261,11 @@ class ReleasesUpdater {
 	 * @return void
 	 */
 	public static function fromArtistArray($artists, bool $job = false) {
+
+		Log::info("[ReleaseUpdater] fromArtistArray " . now(), [
+			'artists' => count($artists),
+			'job' => $job,
+		]);
 
 		$results = [];
 		$errors = [];
