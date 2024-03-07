@@ -15,7 +15,7 @@ class UpdateAllArtists implements ShouldQueue {
 	use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
 	public function __construct(
-		public bool $job = true
+		public bool $useJob = true
 	) {
 		Log::info("[UpdateAllArtists] Initializing job at " . now(), [
 			'date' => now(),
@@ -34,6 +34,6 @@ class UpdateAllArtists implements ShouldQueue {
 			'artists' => count($artists),
 		]);
 
-		ReleasesUpdater::fromArtistArray($artists, $this->job);
+		ReleasesUpdater::fromArtistArray($artists, $this->useJob);
 	}
 }
