@@ -282,7 +282,7 @@ class ReleasesUpdater {
 			$date = null;
 			if ($job) {
 				// delaying to avoid "Too many requests" from Apple Music
-				$jobTime->addMilliseconds(env('JOB_DELAY', 5000));
+				$jobTime->addMilliseconds(env('JOB_DELAY', 3000));
 				$date = clone $jobTime;
 			}
 
