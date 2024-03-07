@@ -17,9 +17,9 @@ class UpdateAllArtists implements ShouldQueue {
 	public function __construct(
 		public bool $job = true
 	) {
-		// Log::info("[UpdateAllArtists] Initializing job at " . now(), [
-		// 	'date' => now(),
-		// ]);
+		Log::info("[UpdateAllArtists] Initializing job at " . now(), [
+			'date' => now(),
+		]);
 	}
 
 	public function handle(): void {
