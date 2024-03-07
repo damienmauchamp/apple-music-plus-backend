@@ -11,6 +11,7 @@ use App\Models\Album;
 use App\Models\Artist;
 use App\Models\Song;
 use App\Repositories\ArtistRepository;
+use DateTime;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Foundation\Bus\PendingDispatch;
@@ -80,11 +81,11 @@ class ReleasesUpdater {
 		return $this;
 	}
 
-	public function update() {
+	public function update(?DateTime $dateTime = null) {
 		$this->lastJob = null;
 
 		if ($this->job) {
-			return $this->dispatch();
+			return $this->dispatch($dateTime);
 		}
 
 		$this->updateAlbums();
@@ -98,8 +99,9 @@ class ReleasesUpdater {
 		return $this;
 	}
 
-	public function dispatch() {
+	public function dispatch(?DateTime $dateTime = null) {
 		$this->lastJob = UpdateArtist::dispatch($this->artist)
+			->delay($dateTime ?? now())
 			->onQueue('update-artist');
 
 		// dd('dispatch', $this->artist);
@@ -259,11 +261,20 @@ class ReleasesUpdater {
 		$updater = new ReleasesUpdater();
 		$updater->setJob($job);
 
+		$jobTime = now();
+
 		foreach ($artists as $artist) {
 			$updater->setArtistByStoreId($artist->storeId);
 
+			$date = null;
+			if ($job) {
+				// delaying to avoid "Too many requests" from Apple Music
+				$jobTime->addMilliseconds(env('JOB_DELAY', 5000));
+				$date = clone $jobTime;
+			}
+
 			try {
-				$updater->update();
+				$updater->update($date);
 			} catch (CatalogArtistNotFoundException | ArtistUpdateException $exception) {
 				$errors[] = [ // todo : artist in exception
 					'error' => $exception->getMessage(),
@@ -285,8 +296,10 @@ class ReleasesUpdater {
 				'last_updated' => $data['artist']->last_updated,
 			];
 			if ($updater->job) {
-				$result['job'] = $data['job'];
-				// $result['job'] = $updater->lastJob;
+				$result['job'] = [
+					'date' => $date,
+					'job' => $data['job'],
+				];
 			}
 			$results[] = $result;
 		}

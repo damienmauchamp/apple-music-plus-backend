@@ -32,21 +32,132 @@ php artisan queue:work --queue=update-artist --daemon
 ### Apache conf example
 
 ```apacheconf
-Define PROJECT_DIR c:/.../apple-music-plus-backend
-Define PROJECT_URL server-name.wip
+Define APP_DIR c:/.../apple-music-plus-backend
+Define APP_URL server-name.wip
 
-<VirtualHost ${PROJECT_URL}:80>
-    DocumentRoot ${PROJECT_DIR}/public
-    ServerName ${PROJECT_URL}
+<VirtualHost ${APP_URL}:80>
+    DocumentRoot ${APP_DIR}/public
+    ServerName ${APP_URL}
 	ErrorLog ${INSTALL_DIR}/logs/amplus-error.log
 	CustomLog ${INSTALL_DIR}/logs/amplus-access.log combined
-    <Directory "${PROJECT_DIR}/public">
+    <Directory "${APP_DIR}/public">
         Options Indexes FollowSymLinks
         AllowOverride All
         Require all granted
     </Directory>
 </VirtualHost>
+
+# OR
+
+Define APP_DIR c:/.../apple-music-plus-backend
+Define APP_URL server-name.wip
+
+<VirtualHost *:80>
+    ServerName ${APP_URL}
+    DocumentRoot ${APP_DIR}/public
+    ErrorLog ${APACHE_LOG_DIR}/amplus-error.log
+    CustomLog ${APACHE_LOG_DIR}/amplus-access.log combined
+
+    <Directory ${APP_DIR}/public>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    <FilesMatch "\.php$">
+#        SetHandler "proxy:unix:/var/run/php/php-fpm.sock|fcgi://localhost/"
+    </FilesMatch>
+
+    <Files "robots.txt">
+        Require all granted
+    </Files>
+
+    <Files "favicon.ico">
+        Require all granted
+    </Files>
+
+    <IfModule mod_headers.c>
+        Header always set X-Frame-Options "SAMEORIGIN"
+        Header always set X-Content-Type-Options "nosniff"
+    </IfModule>
+
+    ErrorDocument 404 /index.php
+
+    <DirectoryMatch "^/.well-known">
+        Require all granted
+    </DirectoryMatch>
+
+    <FilesMatch "^\.">
+        Require all denied
+    </FilesMatch>
+</VirtualHost>
 ```
+
+### Run the Scheduler
+
+```bash
+* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+https://laravel.com/docs/10.x/scheduling#running-the-scheduler
+
+### Run queues
+
+Install supervisor
+
+```bash
+sudo apt install supervisor
+```
+
+#### Update artist
+
+Create file `/etc/supervisor/conf.d/amplus-update-artist.conf` and write :
+
+```conf
+[program:update-artist-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /var/www/laravel-example/artisan queue:work --queue=update-artist --sleep=3 --tries=3
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=<YOUR-USER>
+numprocs=8
+redirect_stderr=true
+stdout_logfile=/var/www/laravel-example//storage/logs/supervisord-update-artist.log
+#stopwaitsecs=3600
+```
+
+Start supervisor
+
+```bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start "update-artist-worker:*"
+```
+
+---
+
+---
+
+```conf
+[program:update-artist-queue]
+process_name=%(program_name)s_%(process_num)02d
+command=php /var/www/apple-music-plus-backend/artisan queue:work --queue=update-artist --sleep=3 --tries=3
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=damien
+numprocs=8
+redirect_stderr=true
+stdout_logfile=/var/www/apple-music-plus-backend//storage/logs/supervisord-update-artist.log
+#stopwaitsecs=3600
+```
+
+---
+
+---
 
 ## Commands
 
