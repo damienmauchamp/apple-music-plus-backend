@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Carbon\Carbon;
+use DateTimeZone;
 
 class SystemHelper {
 
@@ -34,5 +35,12 @@ class SystemHelper {
 		}
 
 		return $from ?: now()->subWeek()->format('Y-m-d');
+	}
+
+	public static function storeFrontdateTime(?string $date = null) {
+		$date = new Carbon($date ?? now(), new DateTimeZone(env('TIMEZONE')));
+		$date->setTimezone(new DateTimeZone(env('AM_STOREFRONT_TIMEZONE')));
+
+		return $date;
 	}
 }

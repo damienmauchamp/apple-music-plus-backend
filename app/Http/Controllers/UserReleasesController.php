@@ -42,22 +42,23 @@ class UserReleasesController extends Controller {
 		$contentRating = $request->content_rating ?? env('CONTENT_RATING', 'explicit');
 		$hide_upcoming = $request->hide_upcoming ?? true;
 		$only_upcoming = $request->only_upcoming ?? false;
+		$upcomingDate = SystemHelper::storeFrontdateTime()->format('Y-m-d H:i:s');
 
 		$contentRatingFilter = [];
 
 		$query = $user->artists()
 			->with('albums')
-			->whereHas('albums', function ($query) use ($from, $to, $request, $hide_upcoming, $only_upcoming) {
+			->whereHas('albums', function ($query) use ($from, $to, $request, $hide_upcoming, $only_upcoming, $upcomingDate) {
 
 				if ($only_upcoming) {
-					$query->where('releaseDate', '>', now()->format('Y-m-d'))
+					$query->where('releaseDate', '>', $upcomingDate)
 						->Orwhere('isComplete', false);
 
 					return;
 				}
 
 				if ($hide_upcoming) {
-					$query->where('releaseDate', '<=', now()->format('Y-m-d'));
+					$query->where('releaseDate', '<=', $upcomingDate);
 				}
 
 				$query->where('releaseDate', $request->weekly ? '>=' : '>', $from);
@@ -75,10 +76,10 @@ class UserReleasesController extends Controller {
 			->flatten();
 
 		if ($only_upcoming) {
-			$releases = $releases->where('releaseDate', '>', now()->format('Y-m-d'));
+			$releases = $releases->where('releaseDate', '>', $upcomingDate);
 		} else {
 			if ($hide_upcoming) {
-				$releases = $releases->where('releaseDate', '<=', now()->format('Y-m-d'));
+				$releases = $releases->where('releaseDate', '<=', $upcomingDate);
 			}
 
 			$releases = $releases->where('releaseDate', $request->weekly ? '>=' : '>', $from);
@@ -88,11 +89,11 @@ class UserReleasesController extends Controller {
 		}
 
 		$releases = $releases
-			->when($only_upcoming, function ($query) {
-				return $query->where('releaseDate', '>', now()->format('Y-m-d'));
+			->when($only_upcoming, function ($query) use ($upcomingDate) {
+				return $query->where('releaseDate', '>', $upcomingDate);
 			})
-			->when($hide_upcoming && !$only_upcoming, function ($query) {
-				return $query->where('releaseDate', '<=', now()->format('Y-m-d'));
+			->when($hide_upcoming && !$only_upcoming, function ($query) use ($upcomingDate) {
+				return $query->where('releaseDate', '<=', $upcomingDate);
 			})
 			->where('releaseDate', $request->weekly ? '>=' : '>', $from)
 			->when($to, function ($query) use ($to) {
@@ -256,22 +257,23 @@ class UserReleasesController extends Controller {
 		$contentRating = $request->content_rating ?? env('CONTENT_RATING', 'explicit');
 		$hide_upcoming = $request->hide_upcoming ?? true;
 		$only_upcoming = $request->only_upcoming ?? false;
+		$upcomingDate = SystemHelper::storeFrontdateTime()->format('Y-m-d H:i:s');
 
 		$contentRatingFilter = [];
 
 		$query = $user->artists()
 			->with($request->include_releases ?? false ? 'songs' : 'songs.album')
-			->whereHas('songs', function ($query) use ($from, $to, $request, $hide_upcoming, $only_upcoming) {
+			->whereHas('songs', function ($query) use ($from, $to, $request, $hide_upcoming, $only_upcoming, $upcomingDate) {
 
 				if ($only_upcoming) {
-					$query->where('releaseDate', '>', now()->format('Y-m-d'));
+					$query->where('releaseDate', '>', $upcomingDate);
 
 					return;
 				}
 
 				if ($hide_upcoming) {
-					// $query->where('releaseDate', '=<', now()->format('Y-m-d'));
-					$query->where('releaseDate', '<', now()->format('Y-m-d'));
+					// $query->where('releaseDate', '=<', $upcomingDate);
+					$query->where('releaseDate', '<', $upcomingDate);
 				}
 
 				$query->where('releaseDate', $request->weekly ? '>=' : '>', $from);
@@ -289,11 +291,11 @@ class UserReleasesController extends Controller {
 			->flatten();
 
 		if ($only_upcoming) {
-			$songs = $songs->where('releaseDate', '>', now()->format('Y-m-d'));
+			$songs = $songs->where('releaseDate', '>', $upcomingDate);
 		} else {
 			if ($hide_upcoming) {
-				// $songs = $songs->where('releaseDate', '=<', now()->format('Y-m-d'));
-				$songs = $songs->where('releaseDate', '<', now()->format('Y-m-d'));
+				// $songs = $songs->where('releaseDate', '=<', $upcomingDate);
+				$songs = $songs->where('releaseDate', '<', $upcomingDate);
 			}
 
 			$songs = $songs->where('releaseDate', $request->weekly ? '>=' : '>', $from);
