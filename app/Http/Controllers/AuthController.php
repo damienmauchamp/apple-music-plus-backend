@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 class AuthController extends Controller {
 	public function register(Request $request): JsonResponse {
@@ -50,7 +52,7 @@ class AuthController extends Controller {
 		}
 	}
 
-	public function login(Request $request): JsonResponse {
+	public function login(Request $request) {
 		try {
 			//Validated
 			$validateUser = Validator::make($request->all(),
@@ -59,30 +61,34 @@ class AuthController extends Controller {
 					'password' => 'required',
 				]);
 
-			if ($validateUser->fails()) {
+			if (EnsureFrontendRequestsAreStateful::fromFrontend($request)) {
+				$this->authenticateFrontend($request);
+			} else {
+				if ($validateUser->fails()) {
+					return response()->json([
+						'status' => false,
+						'message' => 'validation error',
+						'errors' => $validateUser->errors(),
+					], 401);
+				}
+
+				if (!Auth::attempt($request->only(['email', 'password']))) {
+					return response()->json([
+						'status' => false,
+						'message' => 'Email & Password does not exist.',
+					], 401);
+				}
+
+				$user = User::where('email', $request->email)->first();
+
 				return response()->json([
-					'status' => false,
-					'message' => 'validation error',
-					'errors' => $validateUser->errors(),
-				], 401);
+					'status' => true,
+					'message' => 'Logged In Successfully',
+					'token' => $user->createToken("API_TOKEN")->plainTextToken,
+					// todo : filter data
+					'user' => $user,
+				], 200);
 			}
-
-			if (!Auth::attempt($request->only(['email', 'password']))) {
-				return response()->json([
-					'status' => false,
-					'message' => 'Email & Password does not exist.',
-				], 401);
-			}
-
-			$user = User::where('email', $request->email)->first();
-
-			return response()->json([
-				'status' => true,
-				'message' => 'Logged In Successfully',
-				'token' => $user->createToken("API_TOKEN")->plainTextToken,
-				// todo : filter data
-				'user' => $user,
-			], 200);
 
 		} catch (\Throwable $e) {
 			return response()->json([
@@ -90,5 +96,34 @@ class AuthController extends Controller {
 				'message' => $e->getMessage(),
 			], 500);
 		}
+	}
+
+	public function authenticateFrontend() {
+		if (!Auth::guard('web')->attempt(
+			request()->only(['email', 'password']),
+			request()->boolean('remember')
+		)) {
+			throw ValidationException::withMessages([
+				'email' => __('auth.failed'),
+			]);
+		}
+	}
+
+	public function logout(Request $request) {
+
+		if (EnsureFrontendRequestsAreStateful::fromFrontend($request)) {
+			Auth::guard('web')->logout();
+
+			request()->session()->invalidate();
+
+			request()->session()->regenerateToken();
+		} else {
+			// todo : delete token
+			return [
+				'currentAccessToken' => $request->user()->currentAccessToken(),
+				'tokens' => $request->user()->tokens,
+			];
+		}
+
 	}
 }

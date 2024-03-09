@@ -9,12 +9,23 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserArtistsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserReleasesController;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // auth
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
+// Route::middleware('auth:sanctum')->group(function () {
+Route::post('/auth/logout', [AuthController::class, 'logout']);
+
+// Route::get('/user', function(Request $request) {
+
+// 	return User::find(3);
+// })
+Route::get('/user', [UserController::class, 'index'])
+	->middleware('auth:sanctum');
+// });
 
 // todo : master token middleware ?
 // region master
@@ -48,7 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::prefix('user')->group(function () {
 
 		//
-		Route::get('/', [UserController::class, 'index']);
+		// Route::get('/', [UserController::class, 'index']);
 
 		// /user/artists
 		Route::get('/artists', [UserArtistsController::class, 'list']);

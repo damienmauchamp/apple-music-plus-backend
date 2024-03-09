@@ -172,8 +172,9 @@ class UserReleasesController extends Controller {
 		// adding library & artists info
 		$releases->map(function ($release) use ($apiData) {
 			$artists = $apiData[$release->storeId]['relationships']['artists']['data'] ?? [];
+			$library = $apiData[$release->storeId]['relationships']['library']['data'];
 			$release['api'] = [
-				'library' => $apiData[$release->storeId]['relationships']['library']['data'][0] ?? null,
+				'library' => $library[0] ?? [],
 				'artists' => $artists,
 				'available' => (bool) $artists,
 			];
@@ -378,8 +379,9 @@ class UserReleasesController extends Controller {
 		// adding library & artists info
 		$songs->map(function ($song) use ($apiData) {
 			$artists = $apiData[$song->storeId]['relationships']['artists']['data'] ?? [];
+			$library = $apiData[$song->storeId]['relationships']['library']['data'];
 			$song['api'] = [
-				'library' => $apiData[$song->storeId]['relationships']['library']['data'][0] ?? null,
+				'library' => $library[0] ?? [],
 				'artists' => $artists,
 				'available' => (bool) $artists,
 			];
