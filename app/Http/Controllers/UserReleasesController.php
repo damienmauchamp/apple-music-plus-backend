@@ -305,22 +305,27 @@ class UserReleasesController extends Controller {
 			}
 		}
 
-		$request->query->add([
-			'all_content_rating' => 1,
-			'hide_singles' => 0,
-		]);
-		if (!$request->only_upcoming) {
-			$request->query->add(['hide_upcoming' => 0]);
-		}
+		// filtering on displayed releases
+		$releasesStoreIds = [];
+		if (!$request->include_releases) {
+			$releaseRequest = clone $request;
+			$releaseRequest->query->add([
+				'all_content_rating' => 1,
+				'hide_singles' => 0,
+			]);
+			if (!$releaseRequest->only_upcoming) {
+				$releaseRequest->query->add(['hide_upcoming' => 0]);
+			}
 
-		$releases = $this->list($request, true);
-		$releasesStoreIds = array_column($releases->toArray(), 'storeId');
+			$releases = $this->list($releaseRequest, true);
+			$releasesStoreIds = array_column($releases->toArray(), 'storeId');
+		}
 
 		$songs = $songs
 			->unique('storeId')
 			// release filter
 			->filter(function ($song) use ($releasesStoreIds, $request) {
-				if ($request->include_releases ?? false) {
+				if ($request->include_releases) {
 					return true;
 				}
 
