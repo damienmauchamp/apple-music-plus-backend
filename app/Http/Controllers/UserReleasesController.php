@@ -170,11 +170,11 @@ class UserReleasesController extends Controller {
 		$apiData = array_combine(array_column($data, 'id'), $data);
 
 		// adding library & artists info
-		$releases->map(function ($release) use ($apiData) {
+		$releases->map(function ($release) use ($apiData, $musicKit) {
 			$artists = $apiData[$release->storeId]['relationships']['artists']['data'] ?? [];
-			$library = $apiData[$release->storeId]['relationships']['library']['data'];
+			$library = $apiData[$release->storeId]['relationships']['library']['data'] ?? null;
 			$release['api'] = [
-				'library' => $library[0] ?? [],
+				'library' => $musicKit->getMusicKitToken() ? $library[0] ?? [] : null,
 				'artists' => $artists,
 				'available' => (bool) $artists,
 			];
@@ -309,6 +309,9 @@ class UserReleasesController extends Controller {
 			'all_content_rating' => 1,
 			'hide_singles' => 0,
 		]);
+		if (!$request->only_upcoming) {
+			$request->query->add(['hide_upcoming' => 0]);
+		}
 
 		$releases = $this->list($request, true);
 		$releasesStoreIds = array_column($releases->toArray(), 'storeId');
@@ -377,11 +380,11 @@ class UserReleasesController extends Controller {
 		$apiData = array_combine(array_column($data, 'id'), $data);
 
 		// adding library & artists info
-		$songs->map(function ($song) use ($apiData) {
+		$songs->map(function ($song) use ($apiData, $musicKit) {
 			$artists = $apiData[$song->storeId]['relationships']['artists']['data'] ?? [];
-			$library = $apiData[$song->storeId]['relationships']['library']['data'];
+			$library = $apiData[$song->storeId]['relationships']['library']['data'] ?? null;
 			$song['api'] = [
-				'library' => $library[0] ?? [],
+				'library' => $musicKit->getMusicKitToken() ? $library[0] ?? [] : null,
 				'artists' => $artists,
 				'available' => (bool) $artists,
 			];
