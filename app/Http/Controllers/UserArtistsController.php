@@ -96,6 +96,10 @@ class UserArtistsController extends Controller {
 
 		return [
 			'artist_id' => $request->artist_id,
+			'artist' => [
+				'id' => $artist->id,
+				'name' => $artist->name,
+			],
 			'is_subscribed' => true,
 			'already_subscribed' => $alreadySubscribed,
 			'message' => $alreadySubscribed ? 'Already subscribed' : 'Subscribed',
