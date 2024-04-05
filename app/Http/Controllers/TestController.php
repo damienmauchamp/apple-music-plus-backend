@@ -6,6 +6,7 @@ use AppleMusicAPI\AppleMusic;
 use AppleMusicAPI\iTunesAPI;
 use AppleMusicAPI\iTunesScrappedAPI;
 use AppleMusicAPI\MusicKit;
+use App\Helpers\SystemHelper;
 use App\Models\Album;
 use App\Models\Artist;
 use App\Models\Song;
@@ -13,6 +14,19 @@ use App\Models\User;
 use Illuminate\Http\Request;
 
 class TestController extends Controller {
+
+	public function getCacheKeys(Request $request) {
+		$params = $request->all();
+		ksort($params);
+
+		return [
+			'params' => $params,
+			'user' => $request->user(),
+			'keys' => SystemHelper::getCacheKeys(),
+		];
+	}
+
+	//
 	//
 
 	public function itunesAPITest(Request $request) {

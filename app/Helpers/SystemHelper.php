@@ -4,6 +4,8 @@ namespace App\Helpers;
 
 use Carbon\Carbon;
 use DateTimeZone;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 
 class SystemHelper {
 
@@ -42,5 +44,21 @@ class SystemHelper {
 		$date->setTimezone(new DateTimeZone(env('AM_STOREFRONT_TIMEZONE')));
 
 		return $date;
+	}
+
+	public static function getCacheKeys() {
+		$storage = Cache::getStore();
+		$filesystem = $storage->getFilesystem();
+		$dir = (Cache::getDirectory());
+		$keys = [];
+		foreach ($filesystem->allFiles($dir) as $file1) {
+			if (is_dir($file1->getPath())) {
+				foreach ($filesystem->allFiles($file1->getPath()) as $file2) {
+					$keys = array_merge($keys, [$file2->getRealpath() => unserialize(substr(File::get($file2->getRealpath()), 10))]);
+				}
+			}
+		}
+
+		return $keys;
 	}
 }

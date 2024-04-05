@@ -1,11 +1,9 @@
 <?php
 
-use App\Helpers\SystemHelper;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MusicKitController;
-use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserArtistsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserReleasesController;
@@ -141,20 +139,21 @@ Route::prefix('applemusic')->group(function () {
 });
 
 // API tests
-Route::get('/test/itunesapi', [TestController::class, 'itunesAPITest']);
-Route::get('/test/itunesapiscrapped', [TestController::class, 'itunesAPIScrappedTest']);
-Route::get('/test/applemusicapi', [TestController::class, 'appleMusicApiTest']);
-Route::middleware('musicKit')->group(function () {
-	Route::get('/test/musickitapi', [TestController::class, 'musicKitApiTest']);
-	Route::get('/test/musickitapi/artists', [TestController::class, 'getAllLibraryArtists']);
-	Route::get('/test/musickitapi/artists/full', [TestController::class, 'getAllLibraryArtistsFull']);
-});
+// Route::get('/test/itunesapi', [TestController::class, 'itunesAPITest']);
+// Route::get('/test/itunesapiscrapped', [TestController::class, 'itunesAPIScrappedTest']);
+// Route::get('/test/applemusicapi', [TestController::class, 'appleMusicApiTest']);
+// Route::middleware('musicKit')->group(function () {
+// 	Route::get('/test/musickitapi', [TestController::class, 'musicKitApiTest']);
+// 	Route::get('/test/musickitapi/artists', [TestController::class, 'getAllLibraryArtists']);
+// 	Route::get('/test/musickitapi/artists/full', [TestController::class, 'getAllLibraryArtistsFull']);
+// });
 
 // Models tests
-Route::get('/test/artists', [TestController::class, 'getTestArtists']);
-Route::get('/test/albums', [TestController::class, 'getTestAlbums']);
-Route::get('/test/users', [TestController::class, 'getTestUsers']);
-Route::get('/test/songs', [TestController::class, 'getTestSongs']);
-Route::get('/test/weeklydate', function (Request $request) {
-	return SystemHelper::getLastWeekDayFromDate($request->date ?? null);
-});
+// Route::get('/test/cache', [TestController::class, 'getCacheKeys']);
+// Route::get('/test/artists', [TestController::class, 'getTestArtists']);
+// Route::get('/test/albums', [TestController::class, 'getTestAlbums']);
+// Route::get('/test/users', [TestController::class, 'getTestUsers']);
+// Route::get('/test/songs', [TestController::class, 'getTestSongs']);
+// Route::get('/test/weeklydate', function (Request $request) {
+// 	return SystemHelper::getLastWeekDayFromDate($request->date ?? null);
+// });
