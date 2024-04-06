@@ -13,96 +13,8 @@ use App\Models\User;
 use App\Services\CacheHandler;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class UserReleasesController extends Controller {
-
-	const CACHE_TIME = 30;
-
-	private function getCacheKey(string $key, Request $request) {
-		$params = array_merge($request->all(), ['userUID' => $request->user()->id]);
-		ksort($params);
-
-		return sprintf('%s|||%s', $key, (http_build_query($params)));
-	}
-
-	private function clearRequestCache(string $key, Request $request) {
-		$cacheKey = $this->getCacheKey($key, $request);
-
-		if (Cache::has($cacheKey)) {
-			Cache::forget($cacheKey);
-		}
-	}
-
-	private function getRequestCache(string $key, Request $request) {
-		$cacheKey = $this->getCacheKey($key, $request);
-
-		if (Cache::has($cacheKey)) {
-			return Cache::get($cacheKey);
-		}
-
-		return null;
-	}
-
-	private function saveRequest(string $key, Request $request, $values) {
-		$cacheKey = $this->getCacheKey($key, $request);
-		Cache::put($cacheKey, $values, self::CACHE_TIME);
-	}
-
-	// Custom cache control
-
-	const USER_CACHE_MINS = 5;
-	const USER_CACHE_TIME = self::USER_CACHE_MINS * 60;
-
-	private function hasUserCacheToken(Request $request) {
-		return (bool) trim((string) $request->header('User-Cache-Token'));
-	}
-
-	private function getUserCacheKey(string $key, Request $request) {
-		if (!$this->hasUserCacheToken($request)) {
-			return null;
-		}
-		$params = array_merge($request->all(), ['userUID' => $request->user()->id]);
-		ksort($params);
-
-		return sprintf('%s|||%s|||%s',
-			$key,
-			$request->header('User-Cache-Token'),
-			(http_build_query($params)));
-	}
-
-	private function getUserRequestCache(string $key, Request $request) {
-		$cacheKey = $this->getUserCacheKey($key, $request);
-
-		if ($cacheKey && Cache::has($cacheKey)) {
-			return Cache::get($cacheKey);
-		}
-
-		return null;
-	}
-
-	private function clearUserRequestCache(string $key, Request $request) {
-		$cacheKey = $this->getUserCacheKey($key, $request);
-		if (!$cacheKey) {
-			return;
-		}
-
-		if (Cache::has($cacheKey)) {
-			Cache::forget($cacheKey);
-		}
-	}
-
-	private function saveUserRequest(string $key, Request $request, $values) {
-		$cacheKey = $this->getUserCacheKey($key, $request);
-		if (!$cacheKey) {
-			return;
-		}
-
-		Cache::put($cacheKey, $values, self::USER_CACHE_TIME);
-	}
-
-	//
-	// todo : fetchMK:boolean
 
 	public function list(Request $request, bool $returnRaw = false) {
 
@@ -122,6 +34,7 @@ class UserReleasesController extends Controller {
 			// 'limit' => 'integer|min:5|max:1000',
 			'cache' => 'boolean',
 			'no-cache' => 'boolean',
+			'musickit' => 'boolean',
 		]);
 
 		/** @var User $user */
@@ -255,37 +168,38 @@ class UserReleasesController extends Controller {
 				//
 				->values();
 
-			// checking if the releases are added in the library
-			$musicKit = new MusicKit();
-			// if ($musicKit->getMusicKitToken()) {
-			$appleMusicApi = new AppleMusic();
-			$data = [];
-			$albumStoreIds = $releases->map->storeId->toArray();
-			$albumStoreIdBatches = array_chunk($albumStoreIds, 100);
-			foreach ($albumStoreIdBatches as $batch) {
-				$batchData = $appleMusicApi->getMultipleCatalogAlbums($batch, [
-					'include' => 'library,artists',
-				]);
-				$data = array_merge($data, $batchData->getData()['data']);
+			if ($request->get('musickit', true)) {
+				// checking if the releases are added in the library
+				$musicKit = new MusicKit();
+				// if ($musicKit->getMusicKitToken()) {
+				$appleMusicApi = new AppleMusic();
+				$data = [];
+				$albumStoreIds = $releases->map->storeId->toArray();
+				$albumStoreIdBatches = array_chunk($albumStoreIds, 100);
+				foreach ($albumStoreIdBatches as $batch) {
+					$batchData = $appleMusicApi->getMultipleCatalogAlbums($batch, [
+						'include' => 'library,artists',
+					]);
+					$data = array_merge($data, $batchData->getData()['data']);
+				}
+				$apiData = array_combine(array_column($data, 'id'), $data);
+
+				// adding library & artists info
+				$releases->map(function ($release) use ($apiData, $musicKit) {
+					$artists = $apiData[$release->storeId]['relationships']['artists']['data'] ?? [];
+					$library = $apiData[$release->storeId]['relationships']['library']['data'] ?? null;
+					$release['api'] = [
+						'library' => $musicKit->getMusicKitToken() ? $library[0] ?? [] : null,
+						'artists' => $artists,
+						'available' => (bool) $artists,
+					];
+				});
+
+				// filtering elements not available anymore
+				$releases = $releases->filter(function ($release) {
+					return (bool) $release['api']['available'];
+				});
 			}
-			$apiData = array_combine(array_column($data, 'id'), $data);
-
-			// adding library & artists info
-			$releases->map(function ($release) use ($apiData, $musicKit) {
-				$artists = $apiData[$release->storeId]['relationships']['artists']['data'] ?? [];
-				$library = $apiData[$release->storeId]['relationships']['library']['data'] ?? null;
-				$release['api'] = [
-					'library' => $musicKit->getMusicKitToken() ? $library[0] ?? [] : null,
-					'artists' => $artists,
-					'available' => (bool) $artists,
-				];
-			});
-
-			// filtering elements not available anymore
-			$releases = $releases->filter(function ($release) {
-				return (bool) $release['api']['available'];
-			});
-			// }
 
 			// saving to cache
 			$cacheHandler->save($releases);
@@ -353,6 +267,7 @@ class UserReleasesController extends Controller {
 			// 'limit' => 'integer|min:5|max:1000',
 			'cache' => 'boolean',
 			'no-cache' => 'boolean',
+			'musickit' => 'boolean',
 		]);
 
 		/** @var User $user */
@@ -485,37 +400,38 @@ class UserReleasesController extends Controller {
 				])
 				->values();
 
-			// checking if the songs are added in the library
-			$musicKit = new MusicKit();
-			// if ($musicKit->getMusicKitToken()) {
-			$appleMusicApi = new AppleMusic();
-			$data = [];
-			$albumStoreIds = $songs->map->storeId->toArray();
-			$albumStoreIdBatches = array_chunk($albumStoreIds, 100);
-			foreach ($albumStoreIdBatches as $batch) {
-				$batchData = $appleMusicApi->getMultipleCatalogSongs($batch, [
-					'include' => 'library,artists',
-				]);
-				$data = array_merge($data, $batchData->getData()['data']);
+			if ($request->get('musickit', true)) {
+				// checking if the songs are added in the library
+				$musicKit = new MusicKit();
+				// if ($musicKit->getMusicKitToken()) {
+				$appleMusicApi = new AppleMusic();
+				$data = [];
+				$albumStoreIds = $songs->map->storeId->toArray();
+				$albumStoreIdBatches = array_chunk($albumStoreIds, 100);
+				foreach ($albumStoreIdBatches as $batch) {
+					$batchData = $appleMusicApi->getMultipleCatalogSongs($batch, [
+						'include' => 'library,artists',
+					]);
+					$data = array_merge($data, $batchData->getData()['data']);
+				}
+				$apiData = array_combine(array_column($data, 'id'), $data);
+
+				// adding library & artists info
+				$songs->map(function ($song) use ($apiData, $musicKit) {
+					$artists = $apiData[$song->storeId]['relationships']['artists']['data'] ?? [];
+					$library = $apiData[$song->storeId]['relationships']['library']['data'] ?? null;
+					$song['api'] = [
+						'library' => $musicKit->getMusicKitToken() ? $library[0] ?? [] : null,
+						'artists' => $artists,
+						'available' => (bool) $artists,
+					];
+				});
+
+				// filtering elements not available anymore
+				$songs = $songs->filter(function ($song) {
+					return $song['api']['available'];
+				});
 			}
-			$apiData = array_combine(array_column($data, 'id'), $data);
-
-			// adding library & artists info
-			$songs->map(function ($song) use ($apiData, $musicKit) {
-				$artists = $apiData[$song->storeId]['relationships']['artists']['data'] ?? [];
-				$library = $apiData[$song->storeId]['relationships']['library']['data'] ?? null;
-				$song['api'] = [
-					'library' => $musicKit->getMusicKitToken() ? $library[0] ?? [] : null,
-					'artists' => $artists,
-					'available' => (bool) $artists,
-				];
-			});
-
-			// filtering elements not available anymore
-			$songs = $songs->filter(function ($song) {
-				return $song['api']['available'];
-			});
-			// }
 
 			// saving to cache
 			$cacheHandler->save($songs);
