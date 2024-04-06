@@ -19,10 +19,13 @@ class TestController extends Controller {
 		$params = $request->all();
 		ksort($params);
 
+		return SystemHelper::getCacheKeys();
+
 		return [
-			'params' => $params,
-			'user' => $request->user(),
-			'keys' => SystemHelper::getCacheKeys(),
+			// 'params' => $params,
+			// 'User-Cache-Token' => $request->header('User-Cache-Token'),
+			// 'user' => $request->user(),
+			// 'keys' => SystemHelper::getCacheKeys(),
 		];
 	}
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MusicKitController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserArtistsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserReleasesController;
@@ -149,7 +150,7 @@ Route::prefix('applemusic')->group(function () {
 // });
 
 // Models tests
-// Route::get('/test/cache', [TestController::class, 'getCacheKeys']);
+Route::get('/test/cache', [TestController::class, 'getCacheKeys']);
 // Route::get('/test/artists', [TestController::class, 'getTestArtists']);
 // Route::get('/test/albums', [TestController::class, 'getTestAlbums']);
 // Route::get('/test/users', [TestController::class, 'getTestUsers']);

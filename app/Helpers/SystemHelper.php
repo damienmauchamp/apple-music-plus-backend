@@ -47,7 +47,11 @@ class SystemHelper {
 	}
 
 	public static function getCacheKeys() {
+		/** @var \Illuminate\Cache\FileStore $storage  */
 		$storage = Cache::getStore();
+		if (!method_exists($storage, 'getFilesystem')) {
+			return [];
+		}
 		$filesystem = $storage->getFilesystem();
 		$dir = (Cache::getDirectory());
 		$keys = [];

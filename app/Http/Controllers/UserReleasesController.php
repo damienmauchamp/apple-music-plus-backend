@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AlbumCollection;
 use App\Http\Resources\SongCollection;
 use App\Models\User;
+use App\Services\CacheHandler;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -48,6 +49,61 @@ class UserReleasesController extends Controller {
 		Cache::put($cacheKey, $values, self::CACHE_TIME);
 	}
 
+	// Custom cache control
+
+	const USER_CACHE_MINS = 5;
+	const USER_CACHE_TIME = self::USER_CACHE_MINS * 60;
+
+	private function hasUserCacheToken(Request $request) {
+		return (bool) trim((string) $request->header('User-Cache-Token'));
+	}
+
+	private function getUserCacheKey(string $key, Request $request) {
+		if (!$this->hasUserCacheToken($request)) {
+			return null;
+		}
+		$params = array_merge($request->all(), ['userUID' => $request->user()->id]);
+		ksort($params);
+
+		return sprintf('%s|||%s|||%s',
+			$key,
+			$request->header('User-Cache-Token'),
+			(http_build_query($params)));
+	}
+
+	private function getUserRequestCache(string $key, Request $request) {
+		$cacheKey = $this->getUserCacheKey($key, $request);
+
+		if ($cacheKey && Cache::has($cacheKey)) {
+			return Cache::get($cacheKey);
+		}
+
+		return null;
+	}
+
+	private function clearUserRequestCache(string $key, Request $request) {
+		$cacheKey = $this->getUserCacheKey($key, $request);
+		if (!$cacheKey) {
+			return;
+		}
+
+		if (Cache::has($cacheKey)) {
+			Cache::forget($cacheKey);
+		}
+	}
+
+	private function saveUserRequest(string $key, Request $request, $values) {
+		$cacheKey = $this->getUserCacheKey($key, $request);
+		if (!$cacheKey) {
+			return;
+		}
+
+		Cache::put($cacheKey, $values, self::USER_CACHE_TIME);
+	}
+
+	//
+	// todo : fetchMK:boolean
+
 	public function list(Request $request, bool $returnRaw = false) {
 
 		$request->validate([
@@ -65,15 +121,21 @@ class UserReleasesController extends Controller {
 			// 'page' => 'integer|min:1',
 			// 'limit' => 'integer|min:5|max:1000',
 			'cache' => 'boolean',
+			'no-cache' => 'boolean',
 		]);
 
 		/** @var User $user */
 		$user = $request->user();
 
-		if ($request->cache ?? true && $cacheData = $this->getRequestCache('list', $request)) {
+		// Cache handler
+		$cacheHandler = new CacheHandler($request, 'list');
+
+		if (!$request->get('no-cache', false) && $cacheData = $cacheHandler->getCache()) {
+			// fetching cache
 			$releases = $cacheData;
 		} else {
-			$this->clearRequestCache('list', $request);
+			// clearing cache
+			$cacheHandler->clear();
 
 			// getting all albums from users' artists within last week
 			$from = SystemHelper::defineWeeklyDate($request->from ?? null, $request->weekly ?? false);
@@ -225,7 +287,8 @@ class UserReleasesController extends Controller {
 			});
 			// }
 
-			$this->saveRequest('list', $request, $releases);
+			// saving to cache
+			$cacheHandler->save($releases);
 		}
 
 		return $returnRaw ? $releases : new AlbumCollection($releases);
@@ -289,15 +352,21 @@ class UserReleasesController extends Controller {
 			// 'page' => 'integer|min:1',
 			// 'limit' => 'integer|min:5|max:1000',
 			'cache' => 'boolean',
+			'no-cache' => 'boolean',
 		]);
 
 		/** @var User $user */
 		$user = $request->user();
 
-		if ($request->cache ?? true && $cacheData = $this->getRequestCache('songs', $request)) {
+		// Cache handler
+		$cacheHandler = new CacheHandler($request, 'songs');
+
+		if (!$request->get('no-cache', false) && $cacheData = $cacheHandler->getCache()) {
+			// fetching cache
 			$songs = $cacheData;
 		} else {
-			$this->clearRequestCache('list', $request);
+			// clearing cache
+			$cacheHandler->clear();
 
 			// getting all albums from users' artists within last week
 			$from = SystemHelper::defineWeeklyDate($request->from ?? null, $request->weekly ?? false);
@@ -448,7 +517,8 @@ class UserReleasesController extends Controller {
 			});
 			// }
 
-			$this->saveRequest('songs', $request, $songs);
+			// saving to cache
+			$cacheHandler->save($songs);
 		}
 
 		return new SongCollection($songs);
