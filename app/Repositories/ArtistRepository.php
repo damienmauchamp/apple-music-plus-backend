@@ -42,7 +42,7 @@ class ArtistRepository {
 			$catalogArtist = $api->getCalalogArtist($storeId, $request?->except('artist_id') ?? []);
 		} catch (GuzzleException $exception) {
 			// todo : handle unauthorized ?
-			throw new CatalogArtistNotFoundException($exception->getMessage());
+			throw new CatalogArtistNotFoundException($exception->getMessage(), $exception->getCode(), $exception);
 		}
 
 		// add or update artist info in database
@@ -53,7 +53,7 @@ class ArtistRepository {
 				'artworkUrl' => $data['attributes']['artwork']['url'] ?? '',
 			]);
 		} catch (Exception $exception) {
-			throw new ArtistUpdateException($exception->getMessage());
+			throw new ArtistUpdateException($exception->getMessage(), $exception->getCode(), $exception);
 		}
 
 		return $artist;

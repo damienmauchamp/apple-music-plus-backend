@@ -23,13 +23,22 @@ class FetchAllArtistsReleases extends Command {
 		$this->info($job ? "Creating jobs for " . count($artists) . " artists" : "Fetching releases for " . count($artists) . " artists");
 
 		try {
-			ReleasesUpdater::fromArtistArray($artists, (bool) $job);
+			$data = ReleasesUpdater::fromArtistArray($artists, (bool) $job);
 		} catch (Exception $exception) {
 			$this->error("Something went wrong : " . $exception->getMessage());
 
 			return;
 		}
 
-		$this->info($job ? "Jobs created for " . count($artists) . " artists" : count($artists) . " artists updated");
+		$this->info($job ? "Jobs created for " . count($artists) . " artists" : "{$data['results_count']} artists updated");
+		if ($data['errors_count']) {
+			$this->error("Errors ({$data['errors_count']}) : ");
+			foreach ($data['errors'] as $error) {
+				$this->error(sprintf("- %s (%s) : %s",
+					$error['artist']->name,
+					$error['artist']->storeId,
+					$error['error']));
+			}
+		}
 	}
 }

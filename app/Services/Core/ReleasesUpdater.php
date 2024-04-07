@@ -28,6 +28,7 @@ class ReleasesUpdater {
 	protected $api;
 	protected ?Artist $artist;
 	protected bool $job = false;
+	protected bool $exception = false;
 	protected ?PendingDispatch $lastJob = null;
 
 	private array $albumsResults = [];
@@ -36,10 +37,11 @@ class ReleasesUpdater {
 	private int $albumsDeleted = 0;
 	private int $songsDeleted = 0;
 
-	public function __construct($artistStoreId = null, bool $job = false) {
+	public function __construct($artistStoreId = null, bool $job = false, bool $exception = false) {
 		$this->api = new AppleMusic();
 		$this->setArtistByStoreId($artistStoreId);
 		$this->job = $job;
+		$this->exception = $exception;
 
 		return $this;
 	}
@@ -277,28 +279,35 @@ class ReleasesUpdater {
 		$jobTime = now();
 
 		foreach ($artists as $artist) {
-			$updater->setArtistByStoreId($artist->storeId);
-
-			$date = null;
-			if ($job) {
-				// delaying to avoid "Too many requests" from Apple Music
-				$jobTime->addMilliseconds(env('JOB_DELAY', 3000));
-				$date = clone $jobTime;
-			}
 
 			try {
+				$updater->setArtistByStoreId($artist->storeId);
+
+				$date = null;
+				if ($job) {
+					// delaying to avoid "Too many requests" from Apple Music
+					$jobTime->addMilliseconds(env('JOB_DELAY', 3000));
+					$date = clone $jobTime;
+				}
+
 				$updater->update($date);
 			} catch (CatalogArtistNotFoundException | ArtistUpdateException $exception) {
-				$errors[] = [ // todo : artist in exception
+				$errors[] = [
 					'error' => $exception->getMessage(),
 					'message' => 'Something went wrong (1)',
-					// 'artist_id' => $exception->getArtistId(),
+					'artist' => $artist,
 				];
+				continue;
 			} catch (Exception $exception) {
-				$errors[] = [ // todo : artist in exception
+				$errors[] = [
 					'error' => $exception->getMessage(),
 					'message' => 'Something went wrong (2)',
+					'artist' => $artist,
 				];
+
+				if (!$updater->exception) {
+					continue;
+				}
 			}
 
 			$data = $updater->toArray();
@@ -319,8 +328,9 @@ class ReleasesUpdater {
 
 		return [
 			'results' => $results,
-			'errors_count' => count($errors),
 			'errors' => $errors,
+			'results_count' => count($results),
+			'errors_count' => count($errors),
 		];
 	}
 
