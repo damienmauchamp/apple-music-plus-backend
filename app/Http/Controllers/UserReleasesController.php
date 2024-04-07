@@ -21,6 +21,7 @@ class UserReleasesController extends Controller {
 		$request->validate([
 			'sort' => 'string|max:255|in:name,-name,artistName,-artistName,releaseDate,-releaseDate,created_at,-created_at',
 			'from' => 'date_format:Y-m-d',
+			'to' => 'date_format:Y-m-d',
 			'hide_albums' => 'boolean',
 			'hide_eps' => 'boolean',
 			'hide_singles' => 'boolean',
@@ -40,8 +41,32 @@ class UserReleasesController extends Controller {
 		/** @var User $user */
 		$user = $request->user();
 
+		// getting all albums from users' artists within last week
+		$from = SystemHelper::defineWeeklyDate($request->from ?? null, $request->weekly ?? false);
+		$to = $request->weekly ? (new Carbon($from))->addWeeks($request->weeks ?? 1)->format('Y-m-d') : $request->get('to');
+		$contentRating = $request->content_rating ?? env('CONTENT_RATING', 'explicit');
+		$hide_upcoming = $to ? true : $request->get('hide_upcoming', true);
+		$only_upcoming = $request->get('only_upcoming', false);
+		$upcomingDate = SystemHelper::storeFrontdateTime()->format('Y-m-d H:i:s');
+
 		// Cache handler
-		$cacheHandler = new CacheHandler($request, 'list');
+		$cacheHandler = new CacheHandler($request, 'list', [
+			'from' => $from,
+			'to' => $to,
+			'contentRating' => $contentRating,
+			'hide_upcoming' => $hide_upcoming,
+			'only_upcoming' => $only_upcoming,
+			'upcomingDate' => $upcomingDate,
+		]);
+
+		// dd([
+		// 	'from' => $from,
+		// 	'to' => $to,
+		// 	'contentRating' => $contentRating,
+		// 	'hide_upcoming' => $hide_upcoming,
+		// 	'only_upcoming' => $only_upcoming,
+		// 	'upcomingDate' => $upcomingDate,
+		// ]);
 
 		if (!$request->get('no-cache', false) && $cacheData = $cacheHandler->getCache()) {
 			// fetching cache
@@ -49,14 +74,6 @@ class UserReleasesController extends Controller {
 		} else {
 			// clearing cache
 			$cacheHandler->clear();
-
-			// getting all albums from users' artists within last week
-			$from = SystemHelper::defineWeeklyDate($request->from ?? null, $request->weekly ?? false);
-			$to = $request->weekly ? (new Carbon($from))->addWeeks($request->weeks ?? 1)->format('Y-m-d') : null;
-			$contentRating = $request->content_rating ?? env('CONTENT_RATING', 'explicit');
-			$hide_upcoming = $request->hide_upcoming ?? true;
-			$only_upcoming = $request->only_upcoming ?? false;
-			$upcomingDate = SystemHelper::storeFrontdateTime()->format('Y-m-d H:i:s');
 
 			$contentRatingFilter = [];
 
@@ -255,6 +272,7 @@ class UserReleasesController extends Controller {
 		$request->validate([
 			'sort' => 'string|max:255|in:name,-name,artistName,-artistName,releaseDate,-releaseDate,created_at,-created_at',
 			'from' => 'date_format:Y-m-d',
+			'to' => 'date_format:Y-m-d',
 			'content_rating' => 'string|max:255',
 			'all_content_rating' => 'boolean',
 			'weekly' => 'boolean',
@@ -273,8 +291,23 @@ class UserReleasesController extends Controller {
 		/** @var User $user */
 		$user = $request->user();
 
+		// getting all albums from users' artists within last week
+		$from = SystemHelper::defineWeeklyDate($request->from ?? null, $request->weekly ?? false);
+		$to = $request->weekly ? (new Carbon($from))->addWeeks($request->weeks ?? 1)->format('Y-m-d') : $request->get('to');
+		$contentRating = $request->content_rating ?? env('CONTENT_RATING', 'explicit');
+		$hide_upcoming = $to ? true : $request->get('hide_upcoming', true);
+		$only_upcoming = $request->get('only_upcoming', false);
+		$upcomingDate = SystemHelper::storeFrontdateTime()->format('Y-m-d H:i:s');
+
 		// Cache handler
-		$cacheHandler = new CacheHandler($request, 'songs');
+		$cacheHandler = new CacheHandler($request, 'songs', [
+			'from' => $from,
+			'to' => $to,
+			'contentRating' => $contentRating,
+			'hide_upcoming' => $hide_upcoming,
+			'only_upcoming' => $only_upcoming,
+			'upcomingDate' => $upcomingDate,
+		]);
 
 		if (!$request->get('no-cache', false) && $cacheData = $cacheHandler->getCache()) {
 			// fetching cache
@@ -282,14 +315,6 @@ class UserReleasesController extends Controller {
 		} else {
 			// clearing cache
 			$cacheHandler->clear();
-
-			// getting all albums from users' artists within last week
-			$from = SystemHelper::defineWeeklyDate($request->from ?? null, $request->weekly ?? false);
-			$to = $request->weekly ? (new Carbon($from))->addWeeks($request->weeks ?? 1)->format('Y-m-d') : null;
-			$contentRating = $request->content_rating ?? env('CONTENT_RATING', 'explicit');
-			$hide_upcoming = $request->hide_upcoming ?? true;
-			$only_upcoming = $request->only_upcoming ?? false;
-			$upcomingDate = SystemHelper::storeFrontdateTime()->format('Y-m-d H:i:s');
 
 			$contentRatingFilter = [];
 

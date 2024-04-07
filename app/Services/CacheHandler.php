@@ -13,7 +13,8 @@ class CacheHandler {
 
 	public function __construct(
 		private ?Request $request = null,
-		private ?string $key = null
+		private ?string $key = null,
+		private array $parameters = []
 	) {}
 
 	public function hasToken() {
@@ -27,6 +28,7 @@ class CacheHandler {
 
 		$params = array_merge(
 			$this->request->except('timestamp'),
+			$this->parameters,
 			['userUID' => $this->request->user()->id]
 		);
 		ksort($params);
