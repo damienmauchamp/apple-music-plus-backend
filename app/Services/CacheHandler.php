@@ -61,7 +61,8 @@ class CacheHandler {
 		if (!$cacheKey) {
 			return;
 		}
-		Cache::put($cacheKey, $values, self::USER_CACHE_TIME);
+		Cache::put($cacheKey, $values, now()->addMinutes(self::USER_CACHE_MINS));
+		// Cache::put($cacheKey, $values, self::USER_CACHE_MINS);
 	}
 	//
 

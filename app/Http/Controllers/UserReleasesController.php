@@ -59,15 +59,6 @@ class UserReleasesController extends Controller {
 			'upcomingDate' => $upcomingDate,
 		]);
 
-		// dd([
-		// 	'from' => $from,
-		// 	'to' => $to,
-		// 	'contentRating' => $contentRating,
-		// 	'hide_upcoming' => $hide_upcoming,
-		// 	'only_upcoming' => $only_upcoming,
-		// 	'upcomingDate' => $upcomingDate,
-		// ]);
-
 		if (!$request->get('no-cache', false) && $cacheData = $cacheHandler->getCache()) {
 			// fetching cache
 			$releases = $cacheData;

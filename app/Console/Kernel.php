@@ -14,6 +14,9 @@ class Kernel extends ConsoleKernel {
 		// Update all artists
 		// $schedule->command(FetchAllArtistsReleases::class, [true])->everyThirtyMinutes();
 		$schedule->job(new UpdateAllArtists)->everyThirtyMinutes();
+
+		// clearing expired cache
+		$schedule->command('cache:clear-expired')->dailyAt('01:00');
 	}
 
 	/**
