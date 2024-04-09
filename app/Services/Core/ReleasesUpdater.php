@@ -3,6 +3,7 @@
 namespace App\Services\Core;
 
 use AppleMusicAPI\AppleMusic;
+use AppleMusicAPI\MusicKit;
 use App\Exceptions\ArtistUpdateException;
 use App\Exceptions\CatalogArtistNotFoundException;
 use App\Helpers\SystemHelper;
@@ -18,14 +19,12 @@ use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Support\Facades\Log;
 
 /**
- * @todo : on fetch albums failure
- * @todo : on fetch songs failure
- * @todo : check albums & songs not available anymore
  * @todo : logs
  */
 class ReleasesUpdater {
 
 	protected $api;
+	protected $musicKit;
 	protected ?Artist $artist;
 	protected bool $job = false;
 	protected bool $exception = false;
@@ -37,8 +36,12 @@ class ReleasesUpdater {
 	private int $albumsDeleted = 0;
 	private int $songsDeleted = 0;
 
+	private int $albumsFiltered = 0;
+	private int $songsFiltered = 0;
+
 	public function __construct($artistStoreId = null, bool $job = false, bool $exception = false) {
 		$this->api = new AppleMusic();
+		$this->musicKit = new MusicKit();
 		$this->setArtistByStoreId($artistStoreId);
 		$this->job = $job;
 		$this->exception = $exception;
@@ -79,6 +82,8 @@ class ReleasesUpdater {
 		$this->songsResults = [];
 		$this->albumsDeleted = 0;
 		$this->songsDeleted = 0;
+		$this->albumsFiltered = 0;
+		$this->songsFiltered = 0;
 		$this->lastJob = null;
 
 		return $this;
@@ -102,9 +107,8 @@ class ReleasesUpdater {
 		$this->updateSongs();
 		$this->cleanUpAlbums();
 		$this->cleanUpSongs();
-
-		// todo : check albums & songs not available anymore (check releases : UserReleasesController ->map (api, ...))
-		// todo : logs
+		$this->filterAlbums();
+		$this->filterSongs();
 
 		return $this;
 	}
@@ -137,6 +141,10 @@ class ReleasesUpdater {
 			'deleted' => [
 				'albums' => $this->albumsDeleted,
 				'songs' => $this->songsDeleted,
+			],
+			'filtered' => [
+				'albums' => $this->albumsFiltered,
+				'songs' => $this->songsFiltered,
 			],
 			'minDate' => SystemHelper::minReleaseDate(),
 			'job' => $this->lastJob,
@@ -251,6 +259,85 @@ class ReleasesUpdater {
 	}
 	public function cleanUpSongs() {
 		$this->songsDeleted = Song::where('releaseDate', '<', SystemHelper::minReleaseDate())->delete();
+
+		return $this;
+	}
+
+	public function filterAlbums() {
+		$albumStoreIds = $this->artist->fresh()
+			->albums()
+			->where('custom', false)
+			->pluck('storeId')
+			->toArray();
+
+		if (!$albumStoreIds) {
+			return $this;
+		}
+
+		$albumStoreIdBatches = array_chunk($albumStoreIds, 100);
+
+		// fetching albums with chunks
+		$data = [];
+		foreach ($albumStoreIdBatches as $batch) {
+			$batchData = $this->api->getMultipleCatalogAlbums($batch, [
+				'include' => 'artists',
+			]);
+			$data = array_merge($data, $batchData->getData()['data']);
+		}
+		$apiStoreIds = array_column($data, 'id');
+		$apiData = array_keys(array_combine($apiStoreIds, $data));
+		$enabledStoreIds = array_values(array_intersect($albumStoreIds, $apiData));
+		$disabledStoreIds = array_values(array_diff($albumStoreIds, $apiData));
+
+		// enabling/disabling albums
+		Album::whereIn('storeId', $enabledStoreIds)
+			->where('disabled', true)
+			->update(['disabled' => false]);
+		Album::whereIn('storeId', $disabledStoreIds)
+			->where('disabled', false)
+			->update(['disabled' => true]);
+
+		// count
+		$this->albumsFiltered += count($disabledStoreIds);
+
+		return $this;
+	}
+	public function filterSongs() {
+		$songsStoreIds = $this->artist->fresh()
+			->songs()
+			->where('custom', false)
+			->pluck('storeId')
+			->toArray();
+
+		if (!$songsStoreIds) {
+			return $this;
+		}
+
+		$songsStoreIdBatches = array_chunk($songsStoreIds, 100);
+
+		// fetching songs with chunks
+		$data = [];
+		foreach ($songsStoreIdBatches as $batch) {
+			$batchData = $this->api->getMultipleCatalogSongs($batch, [
+				'include' => 'artists',
+			]);
+			$data = array_merge($data, $batchData->getData()['data']);
+		}
+		$apiStoreIds = array_column($data, 'id');
+		$apiData = array_keys(array_combine($apiStoreIds, $data));
+		$enabledStoreIds = array_values(array_intersect($songsStoreIds, $apiData));
+		$disabledStoreIds = array_values(array_diff($songsStoreIds, $apiData));
+
+		// enabling/disabling songs
+		Song::whereIn('storeId', $enabledStoreIds)
+			->where('disabled', true)
+			->update(['disabled' => false]);
+		Song::whereIn('storeId', $disabledStoreIds)
+			->where('disabled', false)
+			->update(['disabled' => true]);
+
+		// count
+		$this->songsFiltered += count($disabledStoreIds);
 
 		return $this;
 	}
