@@ -63,6 +63,9 @@ class ReleasesUpdater {
 	public function setArtistByStoreId($artistStoreId) {
 		if ($artistStoreId) {
 			$artist = Artist::where('storeId', $artistStoreId)->first();
+			if (!$artist) {
+				throw new ArtistUpdateException("Artist not found {$artistStoreId}", 404);
+			}
 			$this->setArtist($artist);
 		}
 

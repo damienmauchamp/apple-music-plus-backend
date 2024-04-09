@@ -21,10 +21,10 @@ class ArtistController extends Controller {
 		try {
 			$artist = (new ArtistRepository)->updateArtistByStoreId($request->artist_id, $request);
 		} catch (CatalogArtistNotFoundException | ArtistUpdateException $exception) {
-			return [
+			return response()->json([
 				'error' => $exception->getMessage(),
-				'message' => 'Something went wrong',
-			];
+				'message' => 'Something went wrong - can\'t find artist',
+			], $exception->getCode() ?? 404);
 		}
 
 		return $artist;
@@ -51,15 +51,15 @@ class ArtistController extends Controller {
 			$updater = new ReleasesUpdater($request->artist_id, (bool) $request->job);
 			$updater->update();
 		} catch (CatalogArtistNotFoundException | ArtistUpdateException $exception) {
-			return [
+			return response()->json([
 				'error' => $exception->getMessage(),
-				'message' => 'Something went wrong (1)',
-			];
+				'message' => 'Can\'t find artist',
+			], $exception->getCode() ?? 404);
 		} catch (Exception $exception) {
-			return [
+			return response()->json([
 				'error' => $exception->getMessage(),
-				'message' => 'Something went wrong (2)',
-			];
+				'message' => 'Something went wrong',
+			], $exception->getCode() ?? 500);
 		}
 
 		return $updater->toArray();
