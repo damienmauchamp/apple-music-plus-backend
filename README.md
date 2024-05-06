@@ -1,5 +1,11 @@
 # AM+
 
+Stay updated on new music from your favorite artists!
+
+## See also
+
+- [Frontend](https://github.com/damienmauchamp/apple-music-plus-frontend)
+
 ## Installation
 
 ### Deploy
