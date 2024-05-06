@@ -281,28 +281,6 @@ Use token as Bearer token.
     -   type\* (string : albums | songs)
     -   ids (string[] : storeId)
 
----
-
-### /api/test
-
--   GET /test/artists
--   GET /test/albums
--   GET /test/users
--   GET /test/songs
--   GET /test/weeklydate
-
--   GET /api/test/itunesapi
--   GET /api/test/itunesapiscrapped
--   GET /api/test/applemusicapi
-
-#### /api/test/musickitapi
-
-Use Music-Token header with your Music Kit token.
-
--   GET /api/test/musickitapi
--   GET /api/test/musickitapi/artists
--   GET /api/test/musickitapi/artists/full
-
 ## Tips
 
 ### Scheduler
