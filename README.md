@@ -2,6 +2,14 @@
 
 Stay updated on new music from your favorite artists!
 
+## iOS Shortcuts
+
+### Subscribe to an artist
+
+https://www.icloud.com/shortcuts/1c4f2d2e1b1245deb0433dfbce78853e
+
+Add the shortcut by filling your API token and base URL (starting with `https://ˋ), go on an artist page in the Music app, click "Share" and "Follow artist" (or whatever the name of the shortcut).
+
 ## See also
 
 - [Frontend](https://github.com/damienmauchamp/apple-music-plus-frontend)
