@@ -27,7 +27,7 @@ class FetchArtistReleases extends Command {
 		$this->info($job ? "Creating job for $artist->name" : "Fetching releases for $artist->name");
 
 		try {
-			$updater = new ReleasesUpdater($artist->storeId, $job, true);
+			$updater = new ReleasesUpdater($artist->storeId, $job, true, true);
 			$updater->update();
 
 		} catch (Exception $exception) {

@@ -28,6 +28,7 @@ class ReleasesUpdater {
 	protected ?Artist $artist;
 	protected bool $job = false;
 	protected bool $exception = false;
+	protected bool $echo = false;
 	protected ?PendingDispatch $lastJob = null;
 
 	private array $albumsResults = [];
@@ -39,12 +40,13 @@ class ReleasesUpdater {
 	private int $albumsFiltered = 0;
 	private int $songsFiltered = 0;
 
-	public function __construct($artistStoreId = null, bool $job = false, bool $exception = false) {
+	public function __construct($artistStoreId = null, bool $job = false, bool $exception = false, bool $echo = false) {
 		$this->api = new AppleMusic();
 		$this->musicKit = new MusicKit();
 		$this->setArtistByStoreId($artistStoreId);
 		$this->job = $job;
 		$this->exception = $exception;
+		$this->echo = $echo;
 
 		return $this;
 	}
@@ -62,7 +64,7 @@ class ReleasesUpdater {
 
 	public function setArtistByStoreId($artistStoreId) {
 		if ($artistStoreId) {
-			$artist = Artist::where('storeId', $artistStoreId)->first();
+			$artist = Artist::getFromStoreId($artistStoreId);
 			if (!$artist) {
 				throw new ArtistUpdateException("Artist not found {$artistStoreId}", 404);
 			}
@@ -117,7 +119,7 @@ class ReleasesUpdater {
 	}
 
 	public function dispatch(?DateTime $dateTime = null) {
-		$this->lastJob = UpdateArtist::dispatch($this->artist)
+		$this->lastJob = UpdateArtist::dispatch($this->artist, $this->echo)
 			->delay($dateTime ?? now())
 			->onQueue('update-artist');
 
@@ -352,7 +354,7 @@ class ReleasesUpdater {
 	 *
 	 * @return void
 	 */
-	public static function fromArtistArray($artists, bool $job = false) {
+	public static function fromArtistArray($artists, bool $job = false, bool $exception = false, bool $echo = false) {
 
 		Log::info("[ReleaseUpdater] fromArtistArray " . now(), [
 			'artists' => count($artists),
@@ -365,6 +367,8 @@ class ReleasesUpdater {
 		set_time_limit(0);
 		$updater = new ReleasesUpdater();
 		$updater->setJob($job);
+		$updater->setException($exception);
+		$updater->setEcho($echo);
 
 		$jobTime = now();
 
@@ -424,4 +428,23 @@ class ReleasesUpdater {
 		];
 	}
 
+	public function getException() {
+		return $this->exception;
+	}
+
+	public function setException($exception) {
+		$this->exception = $exception;
+
+		return $this;
+	}
+
+	public function getEcho() {
+		return $this->echo;
+	}
+
+	public function setEcho($echo) {
+		$this->echo = $echo;
+
+		return $this;
+	}
 }

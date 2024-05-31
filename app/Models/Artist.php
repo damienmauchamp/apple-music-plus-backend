@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @property int $id
@@ -31,5 +33,25 @@ class Artist extends Model {
 
 	public function users() {
 		return $this->belongsToMany(User::class);
+	}
+
+	public static function getFromStoreId(string | int $storeId) {
+		$artist = Cache::remember(static::getCacheKey($storeId), 300, function () use ($storeId) {
+			Log::info("Caching artist: $storeId");
+
+			return static::where('storeId', $storeId)->get();
+		});
+
+		return $artist->first();
+	}
+
+	public static function getCacheKey(string | int $storeId): string {
+		return "artist-$storeId";
+	}
+
+	public static function removeCache(string | int $storeId) {
+		if (Cache::has(static::getCacheKey($storeId))) {
+			Cache::forget(static::getCacheKey($storeId));
+		}
 	}
 }
