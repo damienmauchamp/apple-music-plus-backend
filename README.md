@@ -12,7 +12,7 @@ Add the shortcut by filling your API token and base URL (starting with `https://
 
 ## See also
 
-- [Frontend](https://github.com/damienmauchamp/apple-music-plus-frontend)
+-   [Frontend](https://github.com/damienmauchamp/apple-music-plus-frontend)
 
 ## Installation
 
@@ -325,4 +325,12 @@ php artisan queue:work --daemon # --queue=update-artist
 php artisan queue:clear # --queue=update-artist
 ```
 
-### Logs
+## Common issues
+
+### SQLite
+
+If you are using SQLite, you'd maybe need to install php-sqlite3 or enable sqlite in your php.ini.
+
+```bash
+apt-get install php-sqlite3
+```
