@@ -17,8 +17,10 @@ class UpdateArtist implements ShouldQueue {
 	use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
 	public function __construct(
-		public Artist $artist
-	) {}
+		public Artist $artist,
+		public bool $echo = false
+	) {
+	}
 
 	public function uniqueId(): string {
 		return $this->artist->storeId;
@@ -42,9 +44,17 @@ class UpdateArtist implements ShouldQueue {
 	}
 
 	public function failed(?Throwable $exception): void {
+		if (!$this->echo) {
+			return;
+		}
+
 		echo "❌ {$this->artist->name} ({$this->artist->storeId}) - " . $exception->getMessage() . "\n";
 	}
 	public function passed(): void {
+		if (!$this->echo) {
+			return;
+		}
+
 		echo "✅ {$this->artist->name} ({$this->artist->storeId})\n";
 	}
 }

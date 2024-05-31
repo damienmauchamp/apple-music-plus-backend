@@ -23,7 +23,7 @@ class FetchAllArtistsReleases extends Command {
 		$this->info($job ? "Creating jobs for " . count($artists) . " artists" : "Fetching releases for " . count($artists) . " artists");
 
 		try {
-			$data = ReleasesUpdater::fromArtistArray($artists, (bool) $job);
+			$data = ReleasesUpdater::fromArtistArray($artists, (bool) $job, false, true);
 		} catch (Exception $exception) {
 			$this->error("Something went wrong : " . $exception->getMessage());
 

@@ -57,7 +57,7 @@ class AppleMusic extends AbstractAPI {
 	 * @link https://developer.apple.com/documentation/applemusicapi/get_a_catalog_artist
 	 * @return APIResponse
 	 */
-	public function getCalalogArtist($id, array $parameters = []): APIResponse {
+	public function getCatalogArtist($id, array $parameters = []): APIResponse {
 		return $this->get("/catalog/{$this->storefront}/artists/{$id}", $parameters);
 	}
 

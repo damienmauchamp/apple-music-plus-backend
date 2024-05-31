@@ -39,11 +39,14 @@ class ArtistRepository {
 
 		// search for artist by id via Apple Music API
 		try {
-			$catalogArtist = $api->getCalalogArtist($storeId, $request?->except('artist_id') ?? []);
+			$catalogArtist = $api->getCatalogArtist($storeId, $request?->except('artist_id') ?? []);
 		} catch (GuzzleException $exception) {
 			// todo : handle unauthorized ?
 			throw new CatalogArtistNotFoundException($exception->getMessage(), $exception->getCode(), $exception);
 		}
+
+		// removing artist cache
+		Artist::removeCache($storeId);
 
 		// add or update artist info in database
 		$data = $catalogArtist->getData()['data'][0];
