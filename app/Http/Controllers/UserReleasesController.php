@@ -6,13 +6,13 @@ use AppleMusicAPI\AppleMusic;
 use AppleMusicAPI\MusicKit;
 use App\Helpers\DBHelper;
 use App\Helpers\SystemHelper;
-use App\Http\Controllers\Controller;
 use App\Http\Resources\AlbumCollection;
 use App\Http\Resources\SongCollection;
 use App\Models\User;
 use App\Services\CacheHandler;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class UserReleasesController extends Controller {
 
@@ -394,10 +394,10 @@ class UserReleasesController extends Controller {
 					}
 
 					$songKey = sprintf('%s|%s|%s|%s',
-						$song->name,
-						$song->artistName,
-						$song->albumName,
-						$song->discNumber);
+                        mb_strtolower($song->name),
+                        $song->artistName,
+                        mb_strtolower($song->albumName),
+                        $song->discNumber);
 
 					if (in_array($contentRating, ['explicit', 'clean']) && ($contentRatingFilter[$songKey] ?? false) && $song->contentRating && $song->contentRating !== $contentRating) {
 						return false;
@@ -411,11 +411,30 @@ class UserReleasesController extends Controller {
 					['created_at', 'desc'],
 					['name', 'asc'],
 					['contentRating', $contentRating === 'clean' ? 'asc' : 'desc'],
-					// ['albumName', 'asc'],
-					// ['artistName', 'asc'],
 				])
 				->values();
 
+            // grouping songs by album
+            $groupedSongs = $songs->groupBy(fn ($song) => $song->albumId);
+
+            // ordering each song group by release date
+            $sortedGroups = $groupedSongs->map(function (Collection $albumSongs) use ($request) {
+                return $albumSongs->sortBy([
+                   [ DBHelper::parseSort($request->sort ?? 'releaseDate'), DBHelper::parseSortOrder($request->sort ?? null) ],
+                   ['created_at', 'desc'],
+                   ['name', 'asc'],
+               ])->values();
+            });
+
+            // ordering groups by latest release date
+            $sortedGroups = $sortedGroups->sortByDesc(function (Collection $albumSongs) {
+                return $albumSongs->max('releaseDate');
+            })->values();
+
+            // flattening groups
+            $songs = $sortedGroups->flatten(1);
+
+            // musickit check
 			if ($request->get('musickit', true)) {
 				// checking if the songs are added in the library
 				$musicKit = new MusicKit();
