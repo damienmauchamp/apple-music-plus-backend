@@ -12,7 +12,7 @@
         "arifhp86/laravel-clear-expired-cache-file": "^1.0",
         "firebase/php-jwt": "^6.10",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^11.0",
+        "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.8",
         "opcodesio/log-viewer": "^3.10",
