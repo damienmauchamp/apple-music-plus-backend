@@ -52,3 +52,4 @@ jobs:
             php artisan cache:clear
             php artisan queue:restart
             php artisan optimize
+            
