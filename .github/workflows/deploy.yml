@@ -61,4 +61,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.VPS_TARGET }}
-            echo "$(date '+%Y-%m-%d %H:%M:%S') - Commit: ${GITHUB_SHA} by ${GITHUB_ACTOR}" >> deployments.txt
+            export DEPLOY_DATE="$(date '+%Y-%m-%d %H:%M:%S %Z')"
+            echo "$DEPLOY_DATE" >> deployments.txt
