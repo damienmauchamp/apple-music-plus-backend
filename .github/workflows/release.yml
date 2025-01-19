@@ -1,4 +1,4 @@
-name: Deploy to Production Server
+name: Release to Production Server
 on:
   push:
     branches:
