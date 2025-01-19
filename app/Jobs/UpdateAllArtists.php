@@ -28,13 +28,11 @@ class UpdateAllArtists implements ShouldQueue {
 		ReleasesUpdater::fromArtistArray($artists, $this->useJob);
 	}
 
-    public function fail($exception = null): void
+    public function failed($exception = null): void
     {
         Log::channel('logs.artists-update')
             ->error("Job failed: {$exception->getMessage()}", [
                 'exception' => $exception,
             ]);
-
-        parent::fail($exception);
     }
 }

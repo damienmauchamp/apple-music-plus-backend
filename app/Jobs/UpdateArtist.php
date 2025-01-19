@@ -55,8 +55,6 @@ class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
         if ($this->echo) {
             echo "❌ {$this->artist->name} ({$this->artist->storeId}) - " . $exception->getMessage() . "\n";
         }
-
-        parent::failed($exception);
     }
 
     public function passed(): void
