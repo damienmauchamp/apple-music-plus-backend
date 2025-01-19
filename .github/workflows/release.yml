@@ -1,0 +1,81 @@
+name: Deploy to Production Server
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+
+      - name: Install Composer Dependencies
+        run: composer install --optimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install NPM Dependencies
+        run: npm install
+
+      - name: Build NPM Assets
+        run: npm run build
+
+      - name: Synchronize Files To Server
+        uses: easingthemes/ssh-deploy@v2.1.5
+        with:
+          REMOTE_HOST: ${{ secrets.VPS_HOST }}
+          REMOTE_USER: ${{ secrets.VPS_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SOURCE: "."
+          TARGET: ${{ secrets.VPS_TARGET }}/releases/new-release-$(date '+%Y-%m-%d-%H-%M-%S')
+
+      - name: Run Remote/Artisan Commands
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.VPS_TARGET }}/releases/new-release-$(date '+%Y-%m-%d-%H-%M-%S')
+            php artisan migrate --force
+            php artisan cache:clear
+            php artisan queue:restart
+            php artisan optimize
+
+      - name: Activate New Release
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.VPS_TARGET }}
+            # Point the 'current' symlink to the new release
+            ln -sfn ${{ secrets.VPS_TARGET }}/releases/new-release-$(date '+%Y-%m-%d-%H-%M-%S') current
+
+      - name: Purge Old Releases
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.VPS_TARGET }}/releases
+            # Keep only the last 4 releases
+            RELEASES_TO_KEEP=$(ls -1t | head -n 4)
+            for release in $(ls -1); do
+              if [[ ! " $RELEASES_TO_KEEP " =~ " $release " ]]; then
+                rm -rf "$release"
+              fi
+            done
