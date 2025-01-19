@@ -35,6 +35,15 @@ jobs:
         id: set_release_name
         run: echo "RELEASE_NAME=new-release-$(date '+%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
 
+      - name: Ensure Releases Directory Exists
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p ${{ secrets.VPS_TARGET }}/releases
+
       - name: Synchronize Files To Server
         uses: easingthemes/ssh-deploy@v2.1.5
         with:
