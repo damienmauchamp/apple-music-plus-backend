@@ -31,6 +31,10 @@ jobs:
       - name: Build NPM Assets
         run: npm run build
 
+      - name: Set Release Name
+        id: set_release_name
+        run: echo "RELEASE_NAME=new-release-$(date '+%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
+
       - name: Synchronize Files To Server
         uses: easingthemes/ssh-deploy@v2.1.5
         with:
@@ -38,7 +42,7 @@ jobs:
           REMOTE_USER: ${{ secrets.VPS_USER }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SOURCE: "."
-          TARGET: ${{ secrets.VPS_TARGET }}/releases/new-release-$(date '+%Y-%m-%d-%H-%M-%S')
+          TARGET: ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}
 
       - name: Run Remote/Artisan Commands
         uses: appleboy/ssh-action@v0.1.6
@@ -47,7 +51,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ${{ secrets.VPS_TARGET }}/releases/new-release-$(date '+%Y-%m-%d-%H-%M-%S')
+            cd ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}
             php artisan migrate --force
             php artisan cache:clear
             php artisan queue:restart
@@ -61,8 +65,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.VPS_TARGET }}
-            # Point the 'current' symlink to the new release
-            ln -sfn ${{ secrets.VPS_TARGET }}/releases/new-release-$(date '+%Y-%m-%d-%H-%M-%S') current
+            ln -sfn ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }} current
 
       - name: Purge Old Releases
         uses: appleboy/ssh-action@v0.1.6
@@ -72,7 +75,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.VPS_TARGET }}/releases
-            # Keep only the last 4 releases
             RELEASES_TO_KEEP=$(ls -1t | head -n 4)
             for release in $(ls -1); do
               if [[ ! " $RELEASES_TO_KEEP " =~ " $release " ]]; then
