@@ -30,3 +30,6 @@
 -   get user's artists in his library (firstly back : send music token then fetch / then front : fetch artists then display the list ?)
 
 ## Ideas
+
+- dockerise
+- seed db

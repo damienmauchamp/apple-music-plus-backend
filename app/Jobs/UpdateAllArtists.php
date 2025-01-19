@@ -19,14 +19,22 @@ class UpdateAllArtists implements ShouldQueue {
 	) {}
 
 	public function handle(): void {
-		Log::info("[UpdateAllArtists] Lauching job");
 
 		$artists = Artist::orderBy('name')->get();
 
-		Log::info("[UpdateAllArtists] Scheduling job", [
-			'artists' => count($artists),
-		]);
+        Log::channel('logs.artists-update')
+           ->info('Scheduling job for '.count($artists).' artists');
 
 		ReleasesUpdater::fromArtistArray($artists, $this->useJob);
 	}
+
+    public function fail($exception = null): void
+    {
+        Log::channel('logs.artists-update')
+            ->error("Job failed: {$exception->getMessage()}", [
+                'exception' => $exception,
+            ]);
+
+        parent::fail($exception);
+    }
 }

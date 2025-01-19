@@ -5,56 +5,67 @@ namespace App\Jobs;
 use App\Models\Artist;
 use App\Services\Core\ReleasesUpdater;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
-// todo : ShouldBeUniqueUntilProcessing
+class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-class UpdateArtist implements ShouldQueue {
-	use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    public function __construct(
+        public Artist $artist,
+        public bool $echo = false
+    )
+    {
+    }
 
-	public function __construct(
-		public Artist $artist,
-		public bool $echo = false
-	) {
-	}
+    public function uniqueId(): string
+    {
+        return $this->artist->storeId;
+    }
 
-	public function uniqueId(): string {
-		return $this->artist->storeId;
-	}
+    public function handle(): void
+    {
+        Log::channel('logs.artist-update')
+           ->info("[{$this->artist->storeId}] Updating artist {$this->artist->name}");
 
-	public function handle(): void {
+        $updater = new ReleasesUpdater($this->artist->storeId);
 
-		$updater = new ReleasesUpdater($this->artist->storeId);
+        // fetching artist info
+        $updater->updateArtist();
 
-		// fetching artist info
-		$updater->updateArtist();
+        // fetching albums & songs
+        $updater->update();
 
-		// fetching albums & songs
-		$updater->update();
+        $this->passed();
+    }
 
-		// todo : logs
+    public function failed(?Throwable $exception): void
+    {
+        Log::channel('logs.artist-update')
+           ->error("[{$this->artist->storeId}] ❌ Job failed: {$exception->getMessage()}", [
+               'exception' => $exception,
+           ]);
 
-		$this->passed();
+        if ($this->echo) {
+            echo "❌ {$this->artist->name} ({$this->artist->storeId}) - " . $exception->getMessage() . "\n";
+        }
 
-		return;
-	}
+        parent::failed($exception);
+    }
 
-	public function failed(?Throwable $exception): void {
-		if (!$this->echo) {
-			return;
-		}
+    public function passed(): void
+    {
+        Log::channel('logs.artist-update')
+           ->info("[{$this->artist->storeId}] ✅ Job passed");
 
-		echo "❌ {$this->artist->name} ({$this->artist->storeId}) - " . $exception->getMessage() . "\n";
-	}
-	public function passed(): void {
-		if (!$this->echo) {
-			return;
-		}
-
-		echo "✅ {$this->artist->name} ({$this->artist->storeId})\n";
-	}
+        if (!$this->echo) {
+            echo "✅ {$this->artist->name} ({$this->artist->storeId})\n";
+        }
+    }
 }

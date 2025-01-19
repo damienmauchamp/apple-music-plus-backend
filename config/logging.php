@@ -73,6 +73,34 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'jobs' => [
+            'artist-update' => [
+                'driver' => 'daily',
+                'path' => storage_path('logs/jobs/artist-update.log'),
+                'level' => env('LOG_LEVEL', 'debug'),
+                'days' => 7,
+                'replace_placeholders' => true,
+            ],
+
+            'artists-update' => [
+                'driver' => 'daily',
+                'path' => storage_path('logs/jobs/artists-update.log'),
+                'level' => env('LOG_LEVEL', 'debug'),
+                'days' => 7,
+                'replace_placeholders' => true,
+            ],
+        ],
+
+        'services' => [
+            'release-updater' => [
+                'driver' => 'daily',
+                'path' => storage_path('logs/services/release-updater.log'),
+                'level' => env('LOG_LEVEL', 'debug'),
+                'days' => 7,
+                'replace_placeholders' => true,
+            ],
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
