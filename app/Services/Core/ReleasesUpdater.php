@@ -114,9 +114,7 @@ class ReleasesUpdater
         $this->lastJob = null;
 
         Log::channel('services.release-updater')
-           ->info("[ReleaseUpdater] update " . now(), [
-               'name'     => $this->artist?->name,
-               'storeId'  => $this->artist?->storeId,
+           ->info("[{$this->artist?->storeId}] Update: {$this->artist?->name}" . ($this->job ? ' (job)': ''), [
                'job'      => $this->job,
                'dateTime' => $dateTime,
            ]);
@@ -385,10 +383,7 @@ class ReleasesUpdater
     public static function fromArtistArray($artists, bool $job = false, bool $exception = false, bool $echo = false)
     {
         Log::channel('services.release-updater')
-           ->info("[ReleaseUpdater] fromArtistArray " . now(), [
-               'artists' => count($artists),
-               'job'     => $job,
-           ]);
+           ->info("[FromArray] " . count($artists) . " artists" . ($job ? ' (job)'  :''));
 
         $results = [];
         $errors = [];
