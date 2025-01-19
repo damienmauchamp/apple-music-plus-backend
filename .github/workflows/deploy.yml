@@ -33,12 +33,12 @@ jobs:
 
       - name: Synchronize Files To Server
         uses: easingthemes/ssh-deploy@v2.1.5
-        env:
+        with:
           REMOTE_HOST: ${{ secrets.VPS_HOST }}
           REMOTE_USER: ${{ secrets.VPS_USER }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SOURCE: "."
-          TARGET: ${{ secrets.VPS_PATH }}
+          TARGET: ${{ secrets.VPS_TARGET }}
 
       - name: Run Remote/Artisan Commands
         uses: appleboy/ssh-action@v0.1.6
@@ -47,7 +47,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ${{ secrets.VPS_PATH }}
+            cd ${{ secrets.VPS_TARGET }}
             php artisan migrate --force
             php artisan cache:clear
             php artisan queue:restart
