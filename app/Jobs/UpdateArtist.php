@@ -31,7 +31,7 @@ class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
 
     public function handle(): void
     {
-        Log::channel('logs.artist-update')
+        Log::channel('jobs.artist-update')
            ->info("[{$this->artist->storeId}] Updating artist {$this->artist->name}");
 
         $updater = new ReleasesUpdater($this->artist->storeId);
@@ -47,7 +47,7 @@ class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
 
     public function failed(?Throwable $exception): void
     {
-        Log::channel('logs.artist-update')
+        Log::channel('jobs.artist-update')
            ->error("[{$this->artist->storeId}] ❌ Job failed: {$exception->getMessage()}", [
                'exception' => $exception,
            ]);
@@ -59,7 +59,7 @@ class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
 
     public function passed(): void
     {
-        Log::channel('logs.artist-update')
+        Log::channel('jobs.artist-update')
            ->info("[{$this->artist->storeId}] ✅ Job passed");
 
         if (!$this->echo) {

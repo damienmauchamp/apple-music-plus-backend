@@ -22,7 +22,7 @@ class UpdateAllArtists implements ShouldQueue {
 
 		$artists = Artist::orderBy('name')->get();
 
-        Log::channel('logs.artists-update')
+        Log::channel('jobs.artists-update')
            ->info('Scheduling job for '.count($artists).' artists');
 
 		ReleasesUpdater::fromArtistArray($artists, $this->useJob);
@@ -30,7 +30,7 @@ class UpdateAllArtists implements ShouldQueue {
 
     public function failed($exception = null): void
     {
-        Log::channel('logs.artists-update')
+        Log::channel('jobs.artists-update')
             ->error("Job failed: {$exception->getMessage()}", [
                 'exception' => $exception,
             ]);

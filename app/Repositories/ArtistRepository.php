@@ -42,6 +42,7 @@ class ArtistRepository {
 			$catalogArtist = $api->getCatalogArtist($storeId, $request?->except('artist_id') ?? []);
 		} catch (GuzzleException $exception) {
 			// todo : handle unauthorized ?
+			// todo : 404: remove artist ?
 			throw new CatalogArtistNotFoundException($exception->getMessage(), $exception->getCode(), $exception);
 		}
 
