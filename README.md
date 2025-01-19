@@ -127,14 +127,14 @@ Install supervisor
 sudo apt install supervisor
 ```
 
-#### Default queue
+#### Workers
 
 Create file `/etc/supervisor/conf.d/amplus-default.conf` and write :
 
 ```conf
-[program:default-worker]
+[program:amplus-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/laravel-example/artisan queue:work --sleep=3 --tries=3
+command=php <YOUR-PROJECT-DIR>/artisan queue:work --queue=low,default,high,update-artist --sleep=3 --tries=3
 autostart=true
 autorestart=true
 stopasgroup=true
@@ -142,26 +142,7 @@ killasgroup=true
 user=<YOUR-USER>
 numprocs=8
 redirect_stderr=true
-stdout_logfile=/var/www/laravel-example/storage/logs/default-worker.log
-stopwaitsecs=3600
-```
-
-#### Update artist
-
-Create file `/etc/supervisor/conf.d/amplus-update-artist.conf` and write :
-
-```conf
-[program:update-artist-worker]
-process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/laravel-example/artisan queue:work --queue=update-artist --sleep=3 --tries=3
-autostart=true
-autorestart=true
-stopasgroup=true
-killasgroup=true
-user=<YOUR-USER>
-numprocs=8
-redirect_stderr=true
-stdout_logfile=/var/www/laravel-example/storage/logs/update-artist-worker.log
+stdout_logfile=<YOUR-PROJECT-DIR>/storage/logs/worker.log
 stopwaitsecs=3600
 ```
 
@@ -172,8 +153,7 @@ Start supervisor
 ```bash
 sudo supervisorctl reread
 sudo supervisorctl update
-sudo supervisorctl start "default-worker:*"
-sudo supervisorctl start "update-artist-worker:*"
+sudo supervisorctl start "amplus-worker:*"
 ```
 
 ## Commands

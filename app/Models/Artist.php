@@ -37,8 +37,6 @@ class Artist extends Model {
 
 	public static function getFromStoreId(string | int $storeId) {
 		$artist = Cache::remember(static::getCacheKey($storeId), 300, function () use ($storeId) {
-			Log::info("Caching artist: $storeId");
-
 			return static::where('storeId', $storeId)->get();
 		});
 
