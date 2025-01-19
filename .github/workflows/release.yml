@@ -35,7 +35,7 @@ jobs:
         id: set_release_name
         run: echo "RELEASE_NAME=new-release-$(date '+%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
 
-      - name: Ensure Releases Directory Exists
+      - name: Ensure Releases Directories Exists
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -43,6 +43,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             mkdir -p ${{ secrets.VPS_TARGET }}/releases
+            mkdir -p ${{ secrets.VPS_TARGET }}/storage
 
       - name: Synchronize Files To Server
         uses: easingthemes/ssh-deploy@v2.1.5
@@ -52,6 +53,25 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SOURCE: "."
           TARGET: ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}
+
+      - name: Copy Files to Root of New Release
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cp -r ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}/path/to/your/files/* ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}
+
+      - name: Link Storage Folder to Shared Storage
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}
+            ln -sfn ${{ secrets.VPS_TARGET }}/storage storage
 
       - name: Run Remote/Artisan Commands
         uses: appleboy/ssh-action@v0.1.6
