@@ -52,3 +52,13 @@ jobs:
             php artisan cache:clear
             php artisan queue:restart
             php artisan optimize
+
+      - name: Record Deployment Info
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.VPS_PATH }}
+            echo "$(date '+%Y-%m-%d %H:%M:%S') - Commit: $GITHUB_SHA by $GITHUB_ACTOR" >> deployments.txt
