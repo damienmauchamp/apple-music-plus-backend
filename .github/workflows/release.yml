@@ -54,14 +54,14 @@ jobs:
           SOURCE: "."
           TARGET: ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}
 
-      - name: Copy Files to Root of New Release
+      - name: Copy .env to New Release
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cp -r ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}/path/to/your/files/* ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}
+            cp ${{ secrets.VPS_TARGET }}/.env ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}/.env
 
       - name: Link Storage Folder to Shared Storage
         uses: appleboy/ssh-action@v0.1.6
