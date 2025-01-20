@@ -71,6 +71,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}
+            rm storage
             ln -sfn ${{ secrets.VPS_TARGET }}/storage storage
 
       - name: Run Remote/Artisan Commands
