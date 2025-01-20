@@ -6,7 +6,6 @@ on:
 
 jobs:
   deploy:
-    if: secrets.DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
 
     steps:
