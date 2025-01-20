@@ -73,6 +73,9 @@ jobs:
             cd ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}
             rm storage
             ln -sfn ${{ secrets.VPS_TARGET }}/storage storage
+            cd ${{ secrets.VPS_TARGET }}/current
+            rm storage
+            ln -sfn ${{ secrets.VPS_TARGET }}/storage storage
 
       - name: Run Remote/Artisan Commands
         uses: appleboy/ssh-action@v0.1.6
