@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    if: secrets.DEPLOY_ENABLED == 'true' || secrets.DEPLOY_ENABLED == '1'
+    if: ${{ secrets.DEPLOY_ENABLED == 'true' || secrets.DEPLOY_ENABLED == '1' }}
     runs-on: ubuntu-latest
 
     steps:
