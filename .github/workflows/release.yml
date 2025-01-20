@@ -6,6 +6,7 @@ on:
 
 jobs:
   release:
+    if: secrets.RELEASE_ENABLED == 'true' || secrets.RELEASE_ENABLED == '1'
     runs-on: ubuntu-latest
 
     steps:
