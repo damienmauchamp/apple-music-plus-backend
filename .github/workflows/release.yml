@@ -104,12 +104,22 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.VPS_TARGET }}/releases
-            # List all releases, sort by date (newest first) and keep the 4 most recent ones
-            RELEASES_TO_KEEP=$(ls -1t | head -n 4)
-            # Loop through all releases
-            for release in $(ls -1); do
-              if [[ ! " ${RELEASES_TO_KEEP} " =~ " ${release} " ]]; then
-                echo "Removing release: $release"
-                rm -rf "$release"
-              fi
-            done
+            # List all releases, sort by date (newest first)
+            RELEASES=$(ls -1t)
+            # Count the number of releases
+            RELEASE_COUNT=$(echo "$RELEASES" | wc -l)
+
+            # Only keep the 4 most recent releases if there are more than 4
+            if [ $RELEASE_COUNT -gt 4 ]; then
+              # Keep the 4 most recent releases
+              RELEASES_TO_KEEP=$(echo "$RELEASES" | head -n 4)
+              # Loop through all releases
+              for release in $RELEASES; do
+                if [[ ! " ${RELEASES_TO_KEEP} " =~ " ${release} " ]]; then
+                  echo "Removing release: $release"
+                  rm -rf "$release"
+                fi
+              done
+            else
+              echo "Not enough releases to purge. Keeping all releases."
+            fi
