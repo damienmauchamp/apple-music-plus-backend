@@ -61,8 +61,8 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cp ${{ secrets.VPS_TARGET }}/.env ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}/.env
-
+            # cp ${{ secrets.VPS_TARGET }}/.env ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}/.env
+            ln -sfn ${{ secrets.VPS_TARGET }}/.env ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}/.env
       - name: Link Storage Folder to Shared Storage
         uses: appleboy/ssh-action@v0.1.6
         with:
