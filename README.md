@@ -129,6 +129,8 @@ sudo apt install supervisor
 
 #### Workers
 
+##### Default
+
 Create file `/etc/supervisor/conf.d/amplus-default.conf` and write :
 
 ```conf
@@ -146,6 +148,23 @@ stdout_logfile=<YOUR-PROJECT-DIR>/storage/logs/worker.log
 stopwaitsecs=3600
 ```
 
+##### Nightwatch
+
+Create file `/etc/supervisor/conf.d/amplus-nightwatch-agent.conf` and write :
+
+```conf
+[program:amplus-nightwatch-agent]
+process_name=%(program_name)s
+command=php <YOUR-PROJECT-DIR>/artisan nightwatch:agent
+autostart=true
+autorestart=true
+user=www-data
+#user=<YOUR-USER>
+numprocs=1
+redirect_stderr=true
+stdout_logfile=<YOUR-PROJECT-DIR>/storage/logs/nightwatch-agent.log
+```
+
 #### Start queues workers
 
 Start supervisor
@@ -154,6 +173,7 @@ Start supervisor
 sudo supervisorctl reread
 sudo supervisorctl update
 sudo supervisorctl start "amplus-worker:*"
+sudo supervisorctl start amplus-nightwatch-agent
 ```
 
 ## Commands
