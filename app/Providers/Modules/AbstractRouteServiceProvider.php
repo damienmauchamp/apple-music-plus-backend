@@ -11,6 +11,10 @@ abstract class AbstractRouteServiceProvider extends RouteServiceProvider
 
     public string $module = '';
 
+    public ?string $modulePrefix = null;
+
+    public ?string $moduleNamespace = null;
+
     public const string MODULE_SUFFIX = '';
 
     public function boot(): void
@@ -18,12 +22,13 @@ abstract class AbstractRouteServiceProvider extends RouteServiceProvider
         $module = $this->module ?: $this->resolveModuleName();
         $modulePrefix = sprintf(
             "api/%s",
-            config(
+            $this->modulePrefix ?: config(
                 "module::{$module}.route.prefix",
                 lcfirst($module) . static::MODULE_SUFFIX
             )
         );
-        $moduleNamespace = config("module::{$module}.module.namespace", "");
+        // $moduleNamespace = $this->moduleNamespace ?: config("module::{$module}.module.namespace", "");
+        $moduleNamespace = $this->moduleNamespace ?: config("module::{$module}.module.namespace", ucfirst($module));
 
         $this->routes(function () use ($module, $modulePrefix, $moduleNamespace) {
 

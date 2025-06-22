@@ -17,7 +17,8 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.8",
         "opcodesio/log-viewer": "^3.10",
-        "predis/predis": "^2.0"
+        "predis/predis": "^2.0",
+        "spatie/laravel-query-builder": "^6.3"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.0.0",

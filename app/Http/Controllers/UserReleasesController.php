@@ -149,7 +149,7 @@ class UserReleasesController extends Controller {
 					if ($request->hide_albums ?? false) {
 						if (!str_ends_with($release->name, ' - EP')
 							&& !str_ends_with($release->name, ' - Single')
-							&& !$release->isSingle
+							// && !$release->isSingle
 						) {
 							return false;
 						}

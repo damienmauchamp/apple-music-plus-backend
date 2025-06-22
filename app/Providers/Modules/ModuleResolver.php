@@ -10,8 +10,7 @@ trait ModuleResolver
     . DIRECTORY_SEPARATOR . '..'
     . DIRECTORY_SEPARATOR . '..'
     . DIRECTORY_SEPARATOR . '..'
-    . DIRECTORY_SEPARATOR . 'modules'
-    . DIRECTORY_SEPARATOR;
+    . DIRECTORY_SEPARATOR . 'modules';
 
     public function resolveModuleName():string
     {
@@ -34,7 +33,8 @@ trait ModuleResolver
         $module = ucfirst($module);
 
         if (!is_dir("$this->modulesDirectory/$module")) {
-            throw new RuntimeException("Module directory does not exist: $this->modulesDirectory/$module");
+            throw new RuntimeException("Module directory does not exist: $this->modulesDirectory/$module"
+            . ' - ' . realpath("$this->modulesDirectory/$module"));
         }
 
         return "$this->modulesDirectory/$module/$path";

@@ -2,9 +2,12 @@
 
 namespace Modules\Song\Models;
 
+use App\Support\Releasable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Modules\Album\Models\Album;
 use Modules\Artist\Models\Artist;
 
@@ -26,6 +29,7 @@ use Modules\Artist\Models\Artist;
  * @property Carbon $updated_at
  */
 class Song extends Model {
+    use Releasable;
 	use HasFactory;
 
 	protected $fillable = [
@@ -43,11 +47,11 @@ class Song extends Model {
 		'custom',
 	];
 
-	public function artists() {
+	public function artists():BelongsToMany {
 		return $this->belongsToMany(Artist::class);
 	}
 
-	public function album() {
+	public function album():BelongsTo {
 		return $this->belongsTo(Album::class, 'albumId', 'storeId');
 	}
 }
