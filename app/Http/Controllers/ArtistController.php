@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Exceptions\ArtistUpdateException;
 use App\Exceptions\CatalogArtistNotFoundException;
 use App\Helpers\DBHelper;
-use App\Models\Artist;
 use App\Repositories\ArtistRepository;
 use App\Services\Core\ReleasesUpdater;
 use Exception;
 use Illuminate\Http\Request;
+use Modules\Artist\Models\Artist;
 
 class ArtistController extends Controller {
 

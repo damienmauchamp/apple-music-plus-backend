@@ -7,7 +7,6 @@ use App\Http\Controllers\MusicKitController;
 use App\Http\Controllers\UserArtistsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserReleasesController;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

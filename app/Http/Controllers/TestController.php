@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\SystemHelper;
+use App\Models\User;
 use AppleMusicAPI\AppleMusic;
 use AppleMusicAPI\iTunesAPI;
 use AppleMusicAPI\iTunesScrappedAPI;
 use AppleMusicAPI\MusicKit;
-use App\Helpers\SystemHelper;
-use App\Models\Album;
-use App\Models\Artist;
-use App\Models\Song;
-use App\Models\User;
 use Illuminate\Http\Request;
+use Modules\Album\Models\Album;
+use Modules\Artist\Models\Artist;
+use Modules\Song\Models\Song;
 
 class TestController extends Controller {
 

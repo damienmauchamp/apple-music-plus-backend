@@ -2,21 +2,21 @@
 
 namespace App\Services\Core;
 
-use AppleMusicAPI\AppleMusic;
-use AppleMusicAPI\MusicKit;
 use App\Exceptions\ArtistUpdateException;
 use App\Exceptions\CatalogArtistNotFoundException;
 use App\Helpers\SystemHelper;
 use App\Jobs\UpdateArtist;
-use App\Models\Album;
-use App\Models\Artist;
-use App\Models\Song;
 use App\Repositories\ArtistRepository;
+use AppleMusicAPI\AppleMusic;
+use AppleMusicAPI\MusicKit;
 use DateTime;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Support\Facades\Log;
+use Modules\Album\Models\Album;
+use Modules\Artist\Models\Artist;
+use Modules\Song\Models\Song;
 
 /**
  * @todo : logs
@@ -376,7 +376,7 @@ class ReleasesUpdater
     /**
      * Undocumented function
      *
-     * @param Artist[] $artists
+     * @param \Modules\Artist\Models\Artist[] $artists
      *
      * @return void
      */

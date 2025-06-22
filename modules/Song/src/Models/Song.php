@@ -1,52 +1,53 @@
 <?php
 
-namespace App\Models;
+namespace Modules\Song\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Album\Models\Album;
+use Modules\Artist\Models\Artist;
 
 /**
  * @property int $id
  * @property string $storeId
  * @property string $name
+ * @property string $albumId
+ * @property string $albumName
  * @property string $artistName
  * @property string $artworkUrl
  * @property string $releaseDate
  * @property string $contentRating
- * @property int $trackCount
- * @property boolean $isSingle
- * @property boolean $isCompilation
- * @property boolean $isComplete
- * @property string $upc
+ * @property int $discNumber
+ * @property int $durationInMillis
+ * @property string $previewUrl
  * @property boolean $custom
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-class Album extends Model {
+class Song extends Model {
 	use HasFactory;
 
 	protected $fillable = [
 		'storeId',
 		'name',
+		'albumId',
+		'albumName',
 		'artistName',
 		'artworkUrl',
 		'releaseDate',
 		'contentRating',
-		'trackCount',
-		'isSingle',
-		'isCompilation',
-		'isComplete',
-		'upc',
+		'discNumber',
+		'durationInMillis',
+		'previewUrl',
 		'custom',
-		'disabled',
 	];
 
 	public function artists() {
 		return $this->belongsToMany(Artist::class);
 	}
 
-	public function songs() {
-		// albums.id -> song.albumId
-		return $this->hasMany(Song::class, 'albumId', 'storeId');
+	public function album() {
+		return $this->belongsTo(Album::class, 'albumId', 'storeId');
 	}
 }

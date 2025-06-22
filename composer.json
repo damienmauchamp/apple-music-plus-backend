@@ -38,7 +38,11 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "AppleMusicAPI\\": "app/Services/AppleMusicAPI"
+            "AppleMusicAPI\\": "app/Services/AppleMusicAPI",
+            "Modules\\": "modules/",
+            "Modules\\Album\\": "modules/Album/src/",
+            "Modules\\Artist\\": "modules/Artist/src/",
+            "Modules\\Song\\": "modules/Song/src/"
         }
     },
     "autoload-dev": {

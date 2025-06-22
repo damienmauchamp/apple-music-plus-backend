@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Artist;
 use App\Services\Core\ReleasesUpdater;
 use Exception;
 use Illuminate\Console\Command;
+use Modules\Artist\Models\Artist;
 
 class FetchAllArtistsReleases extends Command {
 

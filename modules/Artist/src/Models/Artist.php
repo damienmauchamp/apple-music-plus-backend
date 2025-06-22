@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace Modules\Artist\Models;
 
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
+use Modules\Album\Models\Album;
 
 /**
  * @property int $id
@@ -28,7 +30,7 @@ class Artist extends Model {
 	}
 
 	public function songs() {
-		return $this->belongsToMany(Song::class);
+		return $this->belongsToMany(\Modules\Song\Models\Song::class);
 	}
 
 	public function users() {
