@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Album\Enum\AlbumType;
+use Modules\Album\Enum\ContentRating;
 use Modules\Artist\Models\Artist;
 use Modules\Song\Models\Song;
 
@@ -66,10 +67,6 @@ class Album extends Model
         return $this->belongsToMany(Artist::class);
     }
 
-	public function songs() {
-		// albums.id -> song.albumId
-		return $this->hasMany(\Modules\Song\Models\Song::class, 'albumId', 'storeId');
-	}
     public function songs(): HasMany
     {
         // albums.id -> song.albumId
@@ -184,6 +181,31 @@ class Album extends Model
             )->orWhere("isComplete", !$value);
     }
 
+    public function getUniqueNameKey(): string
+    {
+        return sprintf('%s-%s',
+           mb_strtolower($this->name),
+           $this->artistName
+        );
+    }
 
+    //
+
+    // public function scopeWithContentRatingDeduplicated(Builder $query, ?string $preferred = null): Builder
+    // {
+    //     $preferred = $preferred ?? config('music.default_content_rating', ContentRating::EXPLICIT->value);
+    //     $fallback = $preferred === ContentRating::EXPLICIT->value ? ContentRating::CLEAN->value : ContentRating::EXPLICIT->value;
+    //
+    //     return $query->selectRaw('albums.*,
+    //     ROW_NUMBER() OVER (
+    //         PARTITION BY name, artistName
+    //         ORDER BY
+    //             CASE contentRating
+    //                 WHEN ? THEN 1
+    //                 WHEN ? THEN 2
+    //                 ELSE 3
+    //             END
+    //     ) as row_num', [$preferred, $fallback]);
+    // }
 
 }
