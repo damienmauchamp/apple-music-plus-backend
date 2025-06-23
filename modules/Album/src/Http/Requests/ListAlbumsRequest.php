@@ -3,7 +3,6 @@
 namespace Modules\Album\Http\Requests;
 
 use App\Http\Requests\ListReleasableRequest;
-use Modules\Album\Enum\AlbumType;
 use Modules\Album\Filters\AlbumTypeFilter;
 use Spatie\QueryBuilder\AllowedFilter;
 
@@ -36,7 +35,6 @@ class ListAlbumsRequest extends ListReleasableRequest
     {
         return array_merge(parent::getFIlters(), [
             // type
-            // todo: apply (hide_albums, hide_eps, hide_singles)
             AllowedFilter::custom('type', new AlbumTypeFilter),
         ]);
     }

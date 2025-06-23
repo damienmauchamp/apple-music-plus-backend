@@ -21,6 +21,12 @@ class ListReleasableRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        // Handle weekly releases and date range if applicable
+        WeeklyReleaseService::fromRequest($this)->handle();
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -28,20 +34,20 @@ class ListReleasableRequest extends FormRequest
      */
     public function rules(): array
     {
-        // Handle weekly releases and date range if applicable
-        WeeklyReleaseService::fromRequest($this)->handle();
 
         return [
-            'sort'          => [ 'string', 'max:255' ],
-            'filter'        => [ 'array' ],
-            'filter.from'   => [ 'date', 'nullable', 'date_format:Y-m-d' ],
-            'filter.to'     => [ 'date', 'nullable', 'date_format:Y-m-d' ],
-            'filter.weekly' => [ 'boolean' ],
-            // 'filter.content_rating' => [],
-            // 'filter.include_empty_content_rating' => [],
-            // 'filter.artists_id' => [],
-            // 'filter.artists_store_id' => [],
-            // 'filter.upcoming' => [],
+            'sort'                                => [ 'string', 'max:255' ],
+            'filter'                              => [ 'array' ],
+            'filter.from'                         => [ 'date', 'nullable', 'date_format:Y-m-d' ],
+            'filter.to'                           => [ 'date', 'nullable', 'date_format:Y-m-d' ],
+            'filter.weekly'                       => [ 'boolean' ],
+            'filter.weeks'                        => [ 'integer', 'nullable' ],
+            // 'filter.content_rating'               => [],
+            'filter.include_empty_content_rating' => [ 'boolean', 'nullable' ],
+            'filter.use_content_rating_priority'  => [ 'boolean', 'nullable' ],
+            'filter.artists_id'                   => [ 'integer', 'nullable' ],
+            // 'filter.artists_store_id'             => [ 'integer', 'nullable' ],
+            'filter.upcoming'                     => [ 'boolean', 'nullable' ],
         ];
     }
 
@@ -53,11 +59,12 @@ class ListReleasableRequest extends FormRequest
     public function getFilters(): array
     {
         return [
-            // release date (from, to)
+            // release date (from -> to)
             AllowedFilter::scope('from', 'releasedAfter'),
             AllowedFilter::scope('to', 'releasedBefore'),
             // weekly
             AllowedFilter::callback('weekly', fn (Builder $query) => $query),
+            AllowedFilter::callback('weeks', fn (Builder $query) => $query),
             // type
             // AllowedFilter::custom('type', new SongTypeFilter),
             // content_rating
@@ -68,7 +75,6 @@ class ListReleasableRequest extends FormRequest
             AllowedFilter::exact('artists_id', 'artists.id'),
             AllowedFilter::exact('artists_store_id', 'artists.storeId'),
             // upcoming
-            // todo: apply(hide_upcoming, only_upcoming)
             // AllowedFilter::custom('upcoming', new UpcomingFilter),
             AllowedFilter::scope('upcoming', 'isUpcoming'),
             // todo: cache

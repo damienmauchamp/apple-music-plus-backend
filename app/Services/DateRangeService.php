@@ -24,4 +24,16 @@ class DateRangeService
             'to'   => $endOfWeek->endOfDay()->toDateString(),
         ];
     }
+
+    public static function resolveWeekWithOffset(int $weeks = 0, string $startDay = 'friday'): array
+    {
+        $start = now()->startOfDay()->previous($startDay)->addWeeks($weeks);
+        $end = $start->copy()->addDays(6);
+
+        return [
+            'from' => $start->format('Y-m-d'),
+            'to'   => $end->format('Y-m-d'),
+        ];
+    }
+
 }

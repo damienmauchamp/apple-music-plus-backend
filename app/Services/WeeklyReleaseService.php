@@ -11,7 +11,7 @@ class WeeklyReleaseService
     private string $startDay;
 
     public function __construct(
-        private Request $request,
+        private readonly Request $request,
         private readonly string $key = 'filter',
     )
     {
@@ -27,26 +27,39 @@ class WeeklyReleaseService
 
     public function handle(): void
     {
-        if ($this->weekly && !empty($this->filters['from'])) {
-            $range = DateRangeService::resolveWeeklyRange($this->filters['from'], $this->startDay);
-
-            $filter = array_merge($this->filters, [
-                'from' => $range['from'],
-                'to'   => $range['to'],
-            ]);
-
-            $this->applyFilters($filter);
+        if (!$this->weekly) {
+            return;
         }
+
+        $range = $this->getDateRange();
+
+        $filter = array_merge($this->filters, [
+            'from' => $range['from'],
+            'to'   => $range['to'],
+        ]);
+
+        $this->applyFilters($filter);
+    }
+
+    private function getDateRange(): array
+    {
+        if (!empty($this->filters['from'])) {
+            return DateRangeService::resolveWeeklyRange($this->filters['from'], $this->startDay);
+        }
+
+        // Sinon on utilise weeks + startDay
+        $weeks = (int) ($this->filters['weeks'] ?? 0);
+
+        return DateRangeService::resolveWeekWithOffset($weeks, $this->startDay);
     }
 
     private function applyFilters(array $filter): void
     {
-        request()->merge([
-             'filter' => array_merge($this->filters, $filter),
-        ]);
+        $data = [ 'filter' => array_merge($this->filters, $filter)];
 
-        $this->request->merge([
-            'filter' => array_merge($this->filters, $filter),
-        ]);
+        $this->request->merge($data);
+
+        request()->merge($data);
+        // request()->replace($this->request->all());
     }
 }
