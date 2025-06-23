@@ -3,26 +3,31 @@
 namespace Modules\Album\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Services\ContentRatingService;
 use Modules\Album\Http\Requests\ListAlbumsRequest;
 use Modules\Album\Models\Album;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ListAlbumsController extends Controller
 {
+    public function __construct(
+        protected ContentRatingService $contentRatingService,
+    ) { }
+
     public function __invoke(ListAlbumsRequest $request)
     {
-        return QueryBuilder::for(Album::class)
+        $query = QueryBuilder::for(Album::class)
             ->with('artists:id,name,storeId')
             ->allowedFilters($request->getFilters())
-            ->allowedFilters($request->getSorts())
-            // todo: content_rating_priority
-            ->defaultSort('-releaseDate')
-            // ->paginate($request->input('limit', 15));
-            // ->withContentRatingPriority()
-            // ->fromSub(function ($sub) {
-            //     $sub->from('albums')->withContentRatingPriority();
-            // }, 'ranked_albums')
-            // ->where('row_num', 1)
-          ->get();
+            ->allowedSorts($request->getSorts())
+            ->defaultSort('-releaseDate');
+
+        $albums = $query->get();
+
+        if ($request->boolean('filter.use_content_rating_priority')) {
+            return $this->contentRatingService->filterContentRatingPriority($albums);
+        }
+
+        return $query->get();
     }
 }

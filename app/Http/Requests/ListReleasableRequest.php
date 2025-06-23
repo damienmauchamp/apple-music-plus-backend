@@ -63,7 +63,7 @@ class ListReleasableRequest extends FormRequest
             // content_rating
             AllowedFilter::custom('content_rating', new ContentRatingFilter()),
             AllowedFilter::callback('include_empty_content_rating', fn (Builder $query) => $query),
-            // todo: content_rating_priority
+            AllowedFilter::callback('use_content_rating_priority', fn (Builder $query) => $query),
             // artists
             AllowedFilter::exact('artists_id', 'artists.id'),
             AllowedFilter::exact('artists_store_id', 'artists.storeId'),

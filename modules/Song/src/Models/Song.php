@@ -54,4 +54,14 @@ class Song extends Model {
 	public function album():BelongsTo {
 		return $this->belongsTo(Album::class, 'albumId', 'storeId');
 	}
+
+    public function getUniqueNameKey(): string
+    {
+        return sprintf('%s-%s-%s-%s',
+        mb_strtolower($this->name),
+                $this->artistName,
+                mb_strtolower($this->albumName),
+                $this->discNumber
+        );
+    }
 }

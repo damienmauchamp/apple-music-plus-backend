@@ -35,4 +35,19 @@ trait Releasable
         return $query;
     }
 
+    public function scopeIsUpcoming(Builder $query, ?bool $value = null): Builder
+    {
+        if ($value === null) {
+            return $query;
+        }
+
+        $today = Carbon::now()->format('Y-m-d');
+
+        return $query->where('releaseDate', $value ? '>' : '<=', $today);
+    }
+
+    public function getUniqueNameKey(): string
+    {
+        return $this->name;
+    }
 }
