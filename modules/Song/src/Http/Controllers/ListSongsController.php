@@ -3,6 +3,7 @@
 namespace Modules\Song\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SongCollection;
 use App\Services\ContentRatingService;
 use Modules\Song\Http\Requests\ListSongsRequest;
 use Modules\Song\Models\Song;
@@ -25,9 +26,9 @@ class ListSongsController extends Controller
         $songs = $query->get();
 
         if ($request->boolean('filter.use_content_rating_priority')) {
-            return $this->contentRatingService->filterContentRatingPriority($songs);
+            $songs = $this->contentRatingService->filterContentRatingPriority($songs);
         }
 
-        return $query->get();
+        return new SongCollection($songs);
     }
 }

@@ -3,6 +3,7 @@
 namespace Modules\Album\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AlbumCollection;
 use App\Services\ContentRatingService;
 use Modules\Album\Http\Requests\ListAlbumsRequest;
 use Modules\Album\Models\Album;
@@ -25,9 +26,9 @@ class ListAlbumsController extends Controller
         $albums = $query->get();
 
         if ($request->boolean('filter.use_content_rating_priority')) {
-            return $this->contentRatingService->filterContentRatingPriority($albums);
+            $albums = $this->contentRatingService->filterContentRatingPriority($albums);
         }
 
-        return $query->get();
+        return new AlbumCollection($albums);
     }
 }
