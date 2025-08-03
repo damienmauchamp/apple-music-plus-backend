@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Log;
  */
 class Artist extends Model {
 	use HasFactory;
+    use SoftDeletes;
 
 	protected $fillable = [
 		'storeId',
