@@ -6,6 +6,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Modules\Album\Models\Album;
 
@@ -18,6 +19,7 @@ use Modules\Album\Models\Album;
  */
 class Artist extends Model {
 	use HasFactory;
+    use SoftDeletes;
 
 	protected $fillable = [
 		'storeId',

@@ -11,28 +11,39 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Modules\Artist\Models\Artist;
 
-class UpdateAllArtists implements ShouldQueue {
-	use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+class UpdateAllArtists implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-	public function __construct(
-		public bool $useJob = true
-	) {}
+    private readonly bool $enableLogging;
 
-	public function handle(): void {
+    public function __construct(
+        public bool $useJob = true
+    )
+    {
+        $this->enableLogging = config('app.releases_updater.enable_logs', false);
+    }
 
-		$artists = Artist::orderBy('name')->get();
+    public function handle(): void
+    {
 
-        Log::channel('jobs.artists-update')
-           ->info('Scheduling job for '.count($artists).' artists');
+        $artists = Artist::orderBy('name')->get();
 
-		ReleasesUpdater::fromArtistArray($artists, $this->useJob);
-	}
+        if ($this->enableLogging) {
+            Log::channel('jobs.artists-update')
+                ->info('Scheduling job for ' . count($artists) . ' artists');
+        }
+
+        ReleasesUpdater::fromArtistArray($artists, $this->useJob);
+    }
 
     public function failed($exception = null): void
     {
-        Log::channel('jobs.artists-update')
-            ->error("Job failed: {$exception->getMessage()}", [
-                'exception' => $exception,
-            ]);
+        if ($this->enableLogging) {
+            Log::channel('jobs.artists-update')
+                ->error("Job failed: {$exception->getMessage()}", [
+                    'exception' => $exception,
+                ]);
+        }
     }
 }

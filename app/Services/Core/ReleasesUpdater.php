@@ -50,6 +50,8 @@ class ReleasesUpdater
 
     private int $songsFiltered = 0;
 
+    private readonly bool $enableLogging;
+
     public function __construct($artistStoreId = null, bool $job = false, bool $exception = false, bool $echo = false)
     {
         $this->api = new AppleMusic();
@@ -59,6 +61,7 @@ class ReleasesUpdater
         $this->exception = $exception;
         $this->echo = $echo;
 
+        $this->enableLogging = config('app.releases_updater.enable_logs', false);
         return $this;
     }
 
@@ -68,7 +71,7 @@ class ReleasesUpdater
             // we're not fetching artist info, we'll do that when the job is executed
             $this->artist = $artist;
         } else {
-            $this->artist = ( new ArtistRepository() )->updateArtistByStoreId($artist->storeId);
+            $this->artist = (new ArtistRepository())->updateArtistByStoreId($artist->storeId);
         }
 
         return $this;
@@ -113,11 +116,10 @@ class ReleasesUpdater
     {
         $this->lastJob = null;
 
-        Log::channel('services.release-updater')
-           ->info("[{$this->artist?->storeId}] Update: {$this->artist?->name}" . ($this->job ? ' (job)': ''), [
-               'job'      => $this->job,
-               'dateTime' => $dateTime,
-           ]);
+        $this->log("[{$this->artist?->storeId}] Update: {$this->artist?->name}" . ($this->job ? ' (job)' : ''), [
+            'job' => $this->job,
+            'dateTime' => $dateTime,
+        ]);
 
         if ($this->job) {
             return $this->dispatch($dateTime);
@@ -136,8 +138,8 @@ class ReleasesUpdater
     public function dispatch(?DateTime $dateTime = null)
     {
         $this->lastJob = UpdateArtist::dispatch($this->artist, $this->echo)
-                                     ->delay($dateTime ?? now())
-                                     ->onQueue('update-artist');
+            ->delay($dateTime ?? now())
+            ->onQueue('update-artist');
 
         // dd('dispatch', $this->artist);
 
@@ -148,34 +150,34 @@ class ReleasesUpdater
     {
 
         return [
-            'id'       => $this->artist->id,
-            'artist'   => $this->artist,
-            'albums'   => $this->artist->albums()->get(),
-            'songs'    => $this->artist->songs()->get(),
+            'id' => $this->artist->id,
+            'artist' => $this->artist,
+            'albums' => $this->artist->albums()->get(),
+            'songs' => $this->artist->songs()->get(),
             // 'count' => [
             // 	'albums' => count($albumsResults),
             // 	'songs' => count($songsResults),
             // ],
-            'results'  => [
+            'results' => [
                 'albums' => $this->albumsResults,
-                'songs'  => $this->songsResults,
+                'songs' => $this->songsResults,
             ],
-            'deleted'  => [
+            'deleted' => [
                 'albums' => $this->albumsDeleted,
-                'songs'  => $this->songsDeleted,
+                'songs' => $this->songsDeleted,
             ],
             'filtered' => [
                 'albums' => $this->albumsFiltered,
-                'songs'  => $this->songsFiltered,
+                'songs' => $this->songsFiltered,
             ],
-            'minDate'  => SystemHelper::minReleaseDate(),
-            'job'      => $this->lastJob,
+            'minDate' => SystemHelper::minReleaseDate(),
+            'job' => $this->lastJob,
         ];
     }
 
     public function updateArtist()
     {
-        $this->artist = ( new ArtistRepository() )->updateArtistByStoreId($this->artist->storeId);
+        $this->artist = (new ArtistRepository())->updateArtistByStoreId($this->artist->storeId);
     }
 
     public function updateAlbums()
@@ -202,19 +204,19 @@ class ReleasesUpdater
             $attributes = $data['attributes'];
 
             // create or update album
-            $album = Album::updateOrCreate([ 'storeId' => $data['id'] ], [
-                'name'          => $attributes['name'],
-                'artistName'    => $attributes['artistName'],
-                'artworkUrl'    => $attributes['artwork']['url'] ?? '',
-                'releaseDate'   => $attributes['releaseDate'],
+            $album = Album::updateOrCreate(['storeId' => $data['id']], [
+                'name' => $attributes['name'],
+                'artistName' => $attributes['artistName'],
+                'artworkUrl' => $attributes['artwork']['url'] ?? '',
+                'releaseDate' => $attributes['releaseDate'],
                 'contentRating' => $attributes['contentRating'] ?? '',
-                'trackCount'    => $attributes['trackCount'],
-                'isSingle'      => $attributes['isSingle'],
+                'trackCount' => $attributes['trackCount'],
+                'isSingle' => $attributes['isSingle'],
                 'isCompilation' => $attributes['isCompilation'],
-                'isComplete'    => $attributes['isComplete'],
-                'upc'           => $attributes['upc'],
-                'custom'        => false,
-                'disabled'      => false,
+                'isComplete' => $attributes['isComplete'],
+                'upc' => $attributes['upc'],
+                'custom' => false,
+                'disabled' => false,
             ]);
 
             // link album to artist
@@ -235,7 +237,7 @@ class ReleasesUpdater
 
         try {
             $this->songsResults = $this->api->fetchCatalogArtistsRelationshipByReleaseDate($this->artist->storeId, 'songs', [
-                'limit'          => 20,
+                'limit' => 20,
                 'include[songs]' => 'albums',
             ]);
         } catch (ClientException $e) {
@@ -252,19 +254,19 @@ class ReleasesUpdater
             $attributes = $data['attributes'];
 
             // create or update song
-            $song = Song::updateOrCreate([ 'storeId' => $data['id'] ], [
-                'name'             => $attributes['name'],
-                'albumId'          => $attributes['albumId'],
-                'albumName'        => $attributes['albumName'],
-                'artistName'       => $attributes['artistName'],
-                'artworkUrl'       => $attributes['artwork']['url'] ?? '',
-                'releaseDate'      => $attributes['releaseDate'],
-                'contentRating'    => $attributes['contentRating'] ?? '',
-                'discNumber'       => $attributes['discNumber'],
+            $song = Song::updateOrCreate(['storeId' => $data['id']], [
+                'name' => $attributes['name'],
+                'albumId' => $attributes['albumId'],
+                'albumName' => $attributes['albumName'],
+                'artistName' => $attributes['artistName'],
+                'artworkUrl' => $attributes['artwork']['url'] ?? '',
+                'releaseDate' => $attributes['releaseDate'],
+                'contentRating' => $attributes['contentRating'] ?? '',
+                'discNumber' => $attributes['discNumber'],
                 'durationInMillis' => $attributes['durationInMillis'],
-                'previewUrl'       => $attributes['previews'][0]['url'] ?? '',
-                'custom'           => false,
-                'disabled'         => false,
+                'previewUrl' => $attributes['previews'][0]['url'] ?? '',
+                'custom' => false,
+                'disabled' => false,
             ]);
 
             // link song to artist
@@ -294,10 +296,10 @@ class ReleasesUpdater
     public function filterAlbums()
     {
         $albumStoreIds = $this->artist->fresh()
-                                      ->albums()
-                                      ->where('custom', false)
-                                      ->pluck('storeId')
-                                      ->toArray();
+            ->albums()
+            ->where('custom', false)
+            ->pluck('storeId')
+            ->toArray();
 
         if (!$albumStoreIds) {
             return $this;
@@ -320,11 +322,11 @@ class ReleasesUpdater
 
         // enabling/disabling albums
         Album::whereIn('storeId', $enabledStoreIds)
-             ->where('disabled', true)
-             ->update([ 'disabled' => false ]);
+            ->where('disabled', true)
+            ->update(['disabled' => false]);
         Album::whereIn('storeId', $disabledStoreIds)
-             ->where('disabled', false)
-             ->update([ 'disabled' => true ]);
+            ->where('disabled', false)
+            ->update(['disabled' => true]);
 
         // count
         $this->albumsFiltered += count($disabledStoreIds);
@@ -335,10 +337,10 @@ class ReleasesUpdater
     public function filterSongs()
     {
         $songsStoreIds = $this->artist->fresh()
-                                      ->songs()
-                                      ->where('custom', false)
-                                      ->pluck('storeId')
-                                      ->toArray();
+            ->songs()
+            ->where('custom', false)
+            ->pluck('storeId')
+            ->toArray();
 
         if (!$songsStoreIds) {
             return $this;
@@ -362,10 +364,10 @@ class ReleasesUpdater
         // enabling/disabling songs
         Song::whereIn('storeId', $enabledStoreIds)
             ->where('disabled', true)
-            ->update([ 'disabled' => false ]);
+            ->update(['disabled' => false]);
         Song::whereIn('storeId', $disabledStoreIds)
             ->where('disabled', false)
-            ->update([ 'disabled' => true ]);
+            ->update(['disabled' => true]);
 
         // count
         $this->songsFiltered += count($disabledStoreIds);
@@ -382,14 +384,12 @@ class ReleasesUpdater
      */
     public static function fromArtistArray($artists, bool $job = false, bool $exception = false, bool $echo = false)
     {
-        Log::channel('services.release-updater')
-           ->info("[FromArray] " . count($artists) . " artists" . ($job ? ' (job)'  :''));
-
         $results = [];
         $errors = [];
 
         set_time_limit(0);
         $updater = new ReleasesUpdater();
+        $updater->log("[FromArray] " . count($artists) . " artists" . ($job ? ' (job)' : ''));
         $updater->setJob($job);
         $updater->setException($exception);
         $updater->setEcho($echo);
@@ -411,16 +411,16 @@ class ReleasesUpdater
                 $updater->update($date);
             } catch (CatalogArtistNotFoundException|ArtistUpdateException $exception) {
                 $errors[] = [
-                    'error'   => $exception->getMessage(),
+                    'error' => $exception->getMessage(),
                     'message' => 'Something went wrong (1)',
-                    'artist'  => $artist,
+                    'artist' => $artist,
                 ];
                 continue;
             } catch (Exception $exception) {
                 $errors[] = [
-                    'error'   => $exception->getMessage(),
+                    'error' => $exception->getMessage(),
                     'message' => 'Something went wrong (2)',
-                    'artist'  => $artist,
+                    'artist' => $artist,
                 ];
 
                 if (!$updater->exception) {
@@ -430,25 +430,25 @@ class ReleasesUpdater
 
             $data = $updater->toArray();
             $result = [
-                'id'           => $data['artist']->id,
-                'storeId'      => $data['artist']->storeId,
-                'artist'       => $data['artist']->name,
+                'id' => $data['artist']->id,
+                'storeId' => $data['artist']->storeId,
+                'artist' => $data['artist']->name,
                 'last_updated' => $data['artist']->last_updated,
             ];
             if ($updater->job) {
                 $result['job'] = [
                     'date' => $date,
-                    'job'  => $data['job'],
+                    'job' => $data['job'],
                 ];
             }
             $results[] = $result;
         }
 
         return [
-            'results'       => $results,
-            'errors'        => $errors,
+            'results' => $results,
+            'errors' => $errors,
             'results_count' => count($results),
-            'errors_count'  => count($errors),
+            'errors_count' => count($errors),
         ];
     }
 
@@ -474,5 +474,12 @@ class ReleasesUpdater
         $this->echo = $echo;
 
         return $this;
+    }
+
+    protected function log($message, array $context = []): void
+    {
+        if ($this->enableLogging) {
+            Log::channel('services.release-updater')->info($message, $context);
+        }
     }
 }
