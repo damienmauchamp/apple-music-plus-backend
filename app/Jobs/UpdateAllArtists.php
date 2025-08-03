@@ -21,7 +21,6 @@ class UpdateAllArtists implements ShouldQueue
         public bool $useJob = true
     )
     {
-        $this->enableLogging = config('app.releases_updater.enable_logs', false);
     }
 
     public function handle(): void
@@ -29,7 +28,7 @@ class UpdateAllArtists implements ShouldQueue
 
         $artists = Artist::orderBy('name')->get();
 
-        if ($this->enableLogging) {
+        if (config('app.releases_updater.enable_logs', false)) {
             Log::channel('jobs.artists-update')
                 ->info('Scheduling job for ' . count($artists) . ' artists');
         }
@@ -39,7 +38,7 @@ class UpdateAllArtists implements ShouldQueue
 
     public function failed($exception = null): void
     {
-        if ($this->enableLogging) {
+        if (config('app.releases_updater.enable_logs', false)) {
             Log::channel('jobs.artists-update')
                 ->error("Job failed: {$exception->getMessage()}", [
                     'exception' => $exception,

@@ -16,15 +16,12 @@ use Throwable;
 class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    private readonly bool $enableLogging;
-
+    
     public function __construct(
         public Artist $artist,
         public bool $echo = false
     )
     {
-        $this->enableLogging = config('app.releases_updater.enable_logs', false);
     }
 
     public function uniqueId(): string
@@ -50,7 +47,7 @@ class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
 
     public function failed(?Throwable $exception): void
     {
-        if ($this->enableLogging) {
+        if (config('app.releases_updater.enable_logs', false)) {
             Log::channel('jobs.artist-update')
                 ->error("({$this->artist->storeId}) {$this->artist->name}: ❌ Job failed - {$exception->getMessage()}", [
                     'exception' => $exception,
@@ -64,7 +61,7 @@ class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
 
     public function passed(): void
     {
-        if ($this->enableLogging) {
+        if (config('app.releases_updater.enable_logs', false)) {
             Log::channel('jobs.artist-update')
                 ->info("({$this->artist->storeId}) {$this->artist->name}: Updated");
         }
