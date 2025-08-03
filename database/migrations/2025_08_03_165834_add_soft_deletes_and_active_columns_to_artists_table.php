@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('artists', function (Blueprint $table) {
-            $table->boolean('active')->default(true)->change();
+            $table->boolean('active')->default(true)->after('name');
             $table->softDeletes();
         });
     }
