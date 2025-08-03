@@ -185,4 +185,8 @@ return [
 		// 'Example' => App\Facades\Example::class,
 	])->toArray(),
 
+    'releases_updater' => [
+        'enable_logs' => env('RELEASES_UPDATER_ENABLE_LOGS', false),
+    ],
+
 ];
