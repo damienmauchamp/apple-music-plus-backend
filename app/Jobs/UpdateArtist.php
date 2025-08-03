@@ -17,11 +17,14 @@ class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private readonly bool $enableLogging;
+
     public function __construct(
         public Artist $artist,
         public bool $echo = false
     )
     {
+        $this->enableLogging = config('app.releases_updater.enable_logs', false);
     }
 
     public function uniqueId(): string
@@ -47,10 +50,12 @@ class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
 
     public function failed(?Throwable $exception): void
     {
-        Log::channel('jobs.artist-update')
-           ->error("({$this->artist->storeId}) {$this->artist->name}: ❌ Job failed - {$exception->getMessage()}", [
-               'exception' => $exception,
-           ]);
+        if ($this->enableLogging) {
+            Log::channel('jobs.artist-update')
+                ->error("({$this->artist->storeId}) {$this->artist->name}: ❌ Job failed - {$exception->getMessage()}", [
+                    'exception' => $exception,
+                ]);
+        }
 
         if ($this->echo) {
             echo "❌ {$this->artist->name} ({$this->artist->storeId}) - " . $exception->getMessage() . "\n";
@@ -59,8 +64,10 @@ class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
 
     public function passed(): void
     {
-        Log::channel('jobs.artist-update')
-           ->info("({$this->artist->storeId}) {$this->artist->name}: Updated");
+        if ($this->enableLogging) {
+            Log::channel('jobs.artist-update')
+                ->info("({$this->artist->storeId}) {$this->artist->name}: Updated");
+        }
 
         if (!$this->echo) {
             echo "✅ {$this->artist->name} ({$this->artist->storeId})\n";
