@@ -18,7 +18,8 @@
         "laravel/tinker": "^2.8",
         "opcodesio/log-viewer": "^3.10",
         "predis/predis": "^2.0",
-        "spatie/laravel-query-builder": "^6.3"
+        "spatie/laravel-query-builder": "^6.3",
+        "ext-openssl": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.0.0",
@@ -27,7 +28,7 @@
         "laravel/sail": "^1.43",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^8.1",
-        "phpunit/phpunit": "^11.0",
+        "pestphp/pest": "^3.8",
         "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
@@ -43,6 +44,7 @@
             "Modules\\": "modules/",
             "Modules\\Album\\": "modules/Album/src/",
             "Modules\\Artist\\": "modules/Artist/src/",
+            "Modules\\Auth\\": "modules/Auth/src/",
             "Modules\\Song\\": "modules/Song/src/"
         }
     },

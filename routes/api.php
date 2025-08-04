@@ -1,34 +1,22 @@
 <?php
 
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DeveloperTokenController;
 use App\Http\Controllers\ArtistController;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MusicKitController;
 use App\Http\Controllers\UserArtistsController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserReleasesController;
+use App\Services\DeveloperTokenService\Middlewares\CheckOriginMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// auth
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login', [AuthController::class, 'login']);
-// Route::middleware('auth:sanctum')->group(function () {
-Route::post('/auth/logout', [AuthController::class, 'logout']);
+Route::middleware(CheckOriginMiddleware::class)->group(function () {
+    Route::get('/developer_token', DeveloperTokenController::class);
+});
 
-// Route::get('/user', function(Request $request) {
-
-// 	return User::find(3);
-// })
-Route::get('/user', [UserController::class, 'index'])
-	->middleware('auth:sanctum');
-// });
 
 // todo : master token middleware ?
 // region master
 
-// Developer token
-Route::get('/developer_token', [AdminController::class, 'developerToken']);
 
 // endregion master
 
