@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use AppleMusicAPI\AppleMusic;
 use App\Exceptions\ArtistUpdateException;
 use App\Exceptions\CatalogArtistNotFoundException;
 use App\Helpers\DBHelper;
-use App\Models\User;
 use App\Repositories\ArtistRepository;
 use App\Services\Core\ReleasesUpdater;
+use AppleMusicAPI\AppleMusic;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +16,7 @@ class UserArtistsController extends Controller {
 
 	public function list(Request $request) {
 		$request->validate([
-			'sort' => 'string|max:255|in:name,-name,store_id,-store_id,label,-label,last_updated,-last_updated,last_created,-last_created',
+            'sort' => 'string|max:255|in:name,-name,store_id,-store_id,label,-label,updated_at,-updated_at,last_created,-last_created',
 			'page' => 'integer|min:1',
 			'limit' => 'integer|min:5|max:1000',
 		]);
@@ -56,7 +55,7 @@ class UserArtistsController extends Controller {
 			// 'extend' => 'string',
 		]);
 
-		/** @var User $user */
+		/** @var \App\Models\User $user */
 		$user = Auth::user();
 
 		try {
@@ -112,7 +111,7 @@ class UserArtistsController extends Controller {
 			'artist_id' => 'required|integer',
 		]);
 
-		/** @var User $user */
+		/** @var \App\Models\User $user */
 		$user = Auth::user();
 
 		// check if artist is subscribed
@@ -138,7 +137,7 @@ class UserArtistsController extends Controller {
 			'job' => 'boolean',
 		]);
 
-		/** @var User $user */
+		/** @var \App\Models\User $user */
 		$user = Auth::user();
 		$artists = $user->artists()->orderBy('name')->get();
 

@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Exceptions\ArtistUpdateException;
 use App\Exceptions\CatalogArtistNotFoundException;
 use App\Helpers\DBHelper;
-use App\Models\Artist;
 use App\Repositories\ArtistRepository;
 use App\Services\Core\ReleasesUpdater;
 use Exception;
 use Illuminate\Http\Request;
+use Modules\Artist\Models\Artist;
 
 class ArtistController extends Controller {
 
@@ -32,7 +32,7 @@ class ArtistController extends Controller {
 
 	public function listArtists(Request $request) {
 		$request->validate([
-			'sort' => 'string|max:255|in:name,-name,store_id,-store_id,label,-label,last_updated,-last_updated,last_created,-last_created',
+            'sort' => 'string|max:255|in:name,-name,store_id,-store_id,label,-label,updated_at,-updated_at,last_created,-last_created',
 			'page' => 'integer|min:1',
 			'limit' => 'integer|min:5|max:1000',
 		]);

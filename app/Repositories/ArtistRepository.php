@@ -2,13 +2,13 @@
 
 namespace App\Repositories;
 
-use AppleMusicAPI\AppleMusic;
 use App\Exceptions\ArtistUpdateException;
 use App\Exceptions\CatalogArtistNotFoundException;
-use App\Models\Artist;
+use AppleMusicAPI\AppleMusic;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
+use Modules\Artist\Models\Artist;
 
 class ArtistRepository {
 

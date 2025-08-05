@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use AppleMusicAPI\AppleMusic;
-use AppleMusicAPI\MusicKit;
 use App\Helpers\DBHelper;
 use App\Helpers\SystemHelper;
 use App\Http\Resources\AlbumCollection;
 use App\Http\Resources\SongCollection;
-use App\Models\User;
 use App\Services\CacheHandler;
+use AppleMusicAPI\AppleMusic;
+use AppleMusicAPI\MusicKit;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -38,7 +37,7 @@ class UserReleasesController extends Controller {
 			'musickit' => 'boolean',
 		]);
 
-		/** @var User $user */
+		/** @var \App\Models\User $user */
 		$user = $request->user();
 
 		// getting all albums from users' artists within last week
@@ -150,7 +149,7 @@ class UserReleasesController extends Controller {
 					if ($request->hide_albums ?? false) {
 						if (!str_ends_with($release->name, ' - EP')
 							&& !str_ends_with($release->name, ' - Single')
-							&& !$release->isSingle
+							// && !$release->isSingle
 						) {
 							return false;
 						}
@@ -279,7 +278,7 @@ class UserReleasesController extends Controller {
 			'musickit' => 'boolean',
 		]);
 
-		/** @var User $user */
+		/** @var \App\Models\User $user */
 		$user = $request->user();
 
 		// getting all albums from users' artists within last week
