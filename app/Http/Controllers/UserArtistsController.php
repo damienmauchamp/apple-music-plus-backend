@@ -16,7 +16,7 @@ class UserArtistsController extends Controller {
 
 	public function list(Request $request) {
 		$request->validate([
-			'sort' => 'string|max:255|in:name,-name,store_id,-store_id,label,-label,last_updated,-last_updated,last_created,-last_created',
+            'sort' => 'string|max:255|in:name,-name,store_id,-store_id,label,-label,updated_at,-updated_at,last_created,-last_created',
 			'page' => 'integer|min:1',
 			'limit' => 'integer|min:5|max:1000',
 		]);

@@ -223,7 +223,6 @@ class ReleasesUpdater
             $this->artist->albums()->syncWithoutDetaching($album->id);
         }
 
-        $this->artist->last_updated = now();
         $this->artist->save();
 
         return $this;
@@ -273,7 +272,6 @@ class ReleasesUpdater
             $this->artist->songs()->syncWithoutDetaching($song->id);
         }
 
-        $this->artist->last_updated = now();
         $this->artist->save();
 
         return $this;
@@ -378,11 +376,9 @@ class ReleasesUpdater
     /**
      * Undocumented function
      *
-     * @param \Modules\Artist\Models\Artist[] $artists
-     *
-     * @return void
+     * @param Artist[] $artists
      */
-    public static function fromArtistArray($artists, bool $job = false, bool $exception = false, bool $echo = false)
+    public static function fromArtistArray($artists, bool $job = false, bool $exception = false, bool $echo = false): array
     {
         $results = [];
         $errors = [];
@@ -433,7 +429,6 @@ class ReleasesUpdater
                 'id' => $data['artist']->id,
                 'storeId' => $data['artist']->storeId,
                 'artist' => $data['artist']->name,
-                'last_updated' => $data['artist']->last_updated,
             ];
             if ($updater->job) {
                 $result['job'] = [

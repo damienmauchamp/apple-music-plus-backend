@@ -211,7 +211,8 @@ php artisan app:fetch-artist {Artist.storeId} {job=0}
 -   POST /api/artist : update artist
     -   artist_id\* (int : storeId)
 -   GET /api/artist/list : list all artists (pagination & limit)
-    -   sort (string : name | -name | store_id | -store_id | label | -label | last_updated | -last_updated | last_created | -last_created)
+    - sort (string : name | -name | store_id | -store_id | label | -label | updated_at | -updated_at | last_created |
+      -last_created)
     -   page (integer : >= 1)
     -   limit (integer : 5 >= 1000)
 -   POST /api/artist/fetch : fetch artist's releases
@@ -226,7 +227,8 @@ Use token as Bearer token.
 
 -   GET /api/user
 -   GET /api/user/artists
-    -   sort (string : name | -name | store_id | -store_id | label | -label | last_updated | -last_updated | last_created | -last_created)
+    - sort (string : name | -name | store_id | -store_id | label | -label | updated_at | -updated_at | last_created |
+      -last_created)
     -   page (integer : >= 1)
     -   limit (integer : 5 >= 1000)
 -   GET /api/user/artists/search
