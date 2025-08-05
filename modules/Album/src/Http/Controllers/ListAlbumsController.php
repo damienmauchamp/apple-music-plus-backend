@@ -3,7 +3,7 @@
 namespace Modules\Album\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\AlbumCollection;
+use App\Http\Resources\LegacyAlbumCollection;
 use App\Services\ContentRatingService;
 use Modules\Album\Http\Requests\ListAlbumsRequest;
 use Modules\Album\Models\Album;
@@ -29,6 +29,6 @@ class ListAlbumsController extends Controller
             $albums = $this->contentRatingService->filterContentRatingPriority($albums);
         }
 
-        return new AlbumCollection($albums);
+        return new LegacyAlbumCollection($albums);
     }
 }

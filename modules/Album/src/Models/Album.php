@@ -10,27 +10,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Album\Casts\AlbumTypeCast;
 use Modules\Album\Enum\AlbumType;
 use Modules\Album\Enum\ContentRating;
 use Modules\Artist\Models\Artist;
 use Modules\Song\Models\Song;
 
 /**
- * @property int     $id
- * @property string  $storeId
- * @property string  $name
- * @property string  $artistName
- * @property string  $artworkUrl
- * @property string  $releaseDate
- * @property string  $contentRating
- * @property int     $trackCount
- * @property boolean $isSingle
- * @property boolean $isCompilation
- * @property boolean $isComplete
- * @property string  $upc
- * @property boolean $custom
- * @property Carbon  $created_at
- * @property Carbon  $updated_at
+ * @property-read AlbumType $type
  */
 class Album extends Model
 {
@@ -53,14 +40,16 @@ class Album extends Model
         'disabled',
     ];
 
-    // protected $casts = [
-    //     'isSingle' => 'boolean',
-    //     'isCompilation' => 'boolean',
-    //     'isComplete' => 'boolean',
-    //     'custom' => 'boolean',
-    //     'disabled' => 'boolean',
-    //     'releaseDate' => 'date:Y-m-d',
-    // ];
+    protected $casts = [
+//        'releaseDate' => 'date:Y-m-d',
+        'isSingle' => 'boolean',
+        'isCompilation' => 'boolean',
+        'isComplete' => 'boolean',
+        'custom' => 'boolean',
+        'disabled' => 'boolean',
+        'contentRating' => ContentRating::class,
+        'type' => AlbumTypeCast::class,
+    ];
 
     public function artists(): BelongsToMany
     {
@@ -69,36 +58,12 @@ class Album extends Model
 
     public function songs(): HasMany
     {
-        // albums.id -> song.albumId
         return $this->hasMany(Song::class, 'albumId', 'storeId');
     }
 
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_albums', 'album_id', 'user_id');
-    }
-
-    // Casts
-
-    public function getTypeAttribute(): AlbumType
-    {
-        if ($this->isSingle) {
-            return AlbumType::SINGLE;
-        }
-
-        // if ($this->isCompilation) {
-        //     return 'compilation';
-        // }
-
-        if (str_ends_with($this->name, ' - EP')) {
-            return AlbumType::EP;
-        }
-
-        if (str_ends_with($this->name, ' - Single')) {
-            return AlbumType::SINGLE;
-        }
-
-        return AlbumType::ALBUM;
     }
 
     // Scopes

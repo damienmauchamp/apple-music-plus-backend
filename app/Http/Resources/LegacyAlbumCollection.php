@@ -4,8 +4,13 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Album\Models\Album;
 
-class AlbumCollection extends ResourceCollection {
+/**
+ * @extends ResourceCollection<int, Album>
+ */
+class LegacyAlbumCollection extends ResourceCollection
+{
 	/**
 	 * @return array<int|string, mixed>
 	 */

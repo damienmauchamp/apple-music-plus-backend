@@ -4,7 +4,7 @@ use App\Http\Controllers\DeveloperTokenController;
 use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\MusicKitController;
 use App\Http\Controllers\UserArtistsController;
-use App\Http\Controllers\UserReleasesController;
+use App\Http\Controllers\LegacyReleasesController;
 use App\Services\DeveloperTokenService\Middlewares\CheckOriginMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -13,12 +13,9 @@ Route::middleware(CheckOriginMiddleware::class)->group(function () {
     Route::get('/developer_token', DeveloperTokenController::class);
 });
 
+// legacy routes
 
 // todo : master token middleware ?
-// region master
-
-
-// endregion master
 
 // region /artist
 Route::prefix('artist')->group(function () {
@@ -62,14 +59,14 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::post('/artists/unsubscribe', [UserArtistsController::class, 'unsubscribe']);
 
 		// /user/releases
-		Route::get('/releases', [UserReleasesController::class, 'list']);
-		Route::get('/releases/albums', [UserReleasesController::class, 'albums']);
-		Route::get('/releases/singles', [UserReleasesController::class, 'singles']);
-		Route::get('/releases/eps', [UserReleasesController::class, 'eps']);
-		Route::get('/releases/projects', [UserReleasesController::class, 'projects']);
+        Route::get('/releases', [LegacyReleasesController::class, 'list']);
+        Route::get('/releases/albums', [LegacyReleasesController::class, 'albums']);
+        Route::get('/releases/singles', [LegacyReleasesController::class, 'singles']);
+        Route::get('/releases/eps', [LegacyReleasesController::class, 'eps']);
+        Route::get('/releases/projects', [LegacyReleasesController::class, 'projects']);
 
 		// /user/releases/songs
-		Route::get('/releases/songs', [UserReleasesController::class, 'songs']);
+        Route::get('/releases/songs', [LegacyReleasesController::class, 'songs']);
 
 		// /user/token
 		Route::prefix('token')->group(function () {

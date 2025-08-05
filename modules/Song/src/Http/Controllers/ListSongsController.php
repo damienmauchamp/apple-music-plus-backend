@@ -3,7 +3,7 @@
 namespace Modules\Song\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\SongCollection;
+use App\Http\Resources\LegacySongCollection;
 use App\Services\ContentRatingService;
 use Modules\Song\Http\Requests\ListSongsRequest;
 use Modules\Song\Models\Song;
@@ -29,6 +29,6 @@ class ListSongsController extends Controller
             $songs = $this->contentRatingService->filterContentRatingPriority($songs);
         }
 
-        return new SongCollection($songs);
+        return new LegacySongCollection($songs);
     }
 }

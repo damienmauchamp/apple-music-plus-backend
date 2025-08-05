@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Modules\Album\Enum\ContentRating;
 use Modules\Album\Models\Album;
 use Modules\Artist\Models\Artist;
 
@@ -46,6 +47,15 @@ class Song extends Model {
 		'previewUrl',
 		'custom',
 	];
+
+    protected $casts = [
+//        'releaseDate' => 'date:Y-m-d',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'custom' => 'boolean',
+        'disabled' => 'boolean',
+        'contentRating' => ContentRating::class,
+    ];
 
 	public function artists():BelongsToMany {
 		return $this->belongsToMany(Artist::class);

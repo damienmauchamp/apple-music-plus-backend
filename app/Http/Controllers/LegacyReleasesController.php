@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Helpers\DBHelper;
 use App\Helpers\SystemHelper;
-use App\Http\Resources\AlbumCollection;
-use App\Http\Resources\SongCollection;
+use App\Http\Resources\LegacyAlbumCollection;
+use App\Http\Resources\LegacySongCollection;
 use App\Services\CacheHandler;
 use AppleMusicAPI\AppleMusic;
 use AppleMusicAPI\MusicKit;
@@ -13,7 +13,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
-class UserReleasesController extends Controller {
+class LegacyReleasesController extends Controller
+{
 
 	public function list(Request $request, bool $returnRaw = false) {
 
@@ -212,7 +213,7 @@ class UserReleasesController extends Controller {
 			$cacheHandler->save($releases);
 		}
 
-		return $returnRaw ? $releases : new AlbumCollection($releases);
+        return $returnRaw ? $releases : new LegacyAlbumCollection($releases);
 	}
 
 	public function albums(Request $request) {
@@ -471,7 +472,7 @@ class UserReleasesController extends Controller {
 			$cacheHandler->save($songs);
 		}
 
-		return new SongCollection($songs);
+        return new LegacySongCollection($songs);
 	}
 
 }

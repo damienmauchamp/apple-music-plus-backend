@@ -4,15 +4,19 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Artist\Models\Artist;
 
-class ReleaseArtistResource extends JsonResource {
+/**
+ * @mixin Artist
+ */
+class LegacyArtistResource extends JsonResource
+{
 	/**
 	 * Transform the resource into an array.
 	 *
 	 * @return array<string, mixed>
 	 */
 	public function toArray(Request $request): array {
-		// return parent::toArray($request);
 		return [
 			'id' => $this->id,
 			'storeId' => $this->storeId,

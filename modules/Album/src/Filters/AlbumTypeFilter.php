@@ -4,9 +4,9 @@ namespace Modules\Album\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Album\Enum\AlbumType;
+use Modules\Album\Models\Album;
 use Spatie\QueryBuilder\Filters\Filter;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 class AlbumTypeFilter implements Filter
 {
@@ -21,11 +21,14 @@ class AlbumTypeFilter implements Filter
                     continue;
                 }
 
+                /**
+                 * @var Builder<Album> $q
+                 */
                 match ($albumType) {
-                    AlbumType::ALBUM => $q->orWhere(fn ($sub) => $sub->isAlbum()),
-                    AlbumType::SINGLE => $q->orWhere(fn ($sub) => $sub->isSingle()),
-                    AlbumType::EP => $q->orWhere(fn ($sub) => $sub->isEP()),
-                    AlbumType::COMPILATION => $q->orWhere(fn ($sub) => $sub->sCompilation()),
+                    AlbumType::ALBUM => $q->orWhere(fn(Builder $sub) => $sub->isAlbum()),
+                    AlbumType::SINGLE => $q->orWhere(fn(Builder $sub) => $sub->isSingle()),
+                    AlbumType::EP => $q->orWhere(fn(Builder $sub) => $sub->isEP()),
+                    AlbumType::COMPILATION => $q->orWhere(fn(Builder $sub) => $sub->isCompilation()),
                     default => null,
                 };
             }

@@ -4,8 +4,13 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Album\Models\Album;
 
-class SongResource extends JsonResource {
+/**
+ * @mixin Album
+ */
+class LegacyAlbumResource extends JsonResource
+{
 	/**
 	 * @return array<string, mixed>
 	 */
@@ -14,26 +19,23 @@ class SongResource extends JsonResource {
 			'id' => $this->id,
 			'storeId' => $this->storeId,
 			'name' => $this->name,
-			'albumId' => $this->albumId,
-			'albumName' => $this->albumName,
-			'album' => $this->album,
 			'artistName' => $this->artistName,
-			'artists' => ReleaseArtistResource::collection($this->artists),
+            'artists' => LegacyArtistResource::collection($this->artists),
 			'artworkUrl' => $this->artworkUrl,
 			'releaseDate' => $this->releaseDate,
 			'contentRating' => $this->contentRating,
-			'discNumber' => $this->discNumber,
-			'durationInMillis' => $this->durationInMillis,
-			'previewUrl' => $this->previewUrl,
+			'trackCount' => $this->trackCount,
+			'isSingle' => $this->isSingle,
+			'isCompilation' => $this->isCompilation,
+			'isComplete' => $this->isComplete,
 			'inLibrary' => !isset($this->api) || !isset($this->api['library']) ? null : ($this->api && ($this->api['library'] ?? []) !== []),
+			'upc' => $this->upc,
 			'api' => !isset($this->api) ? null : ($this->api ?? []),
 			'custom' => $this->custom,
 			'disabled' => $this->disabled,
-			'artists' => $this->artists,
+            'type' => $this->type,
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,
 		];
-
-		return parent::toArray($request);
 	}
 }
