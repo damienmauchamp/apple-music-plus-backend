@@ -84,8 +84,8 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # cd ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}
-            cd ${{ secrets.VPS_TARGET }}/current
+            cd ${{ secrets.VPS_TARGET }}/releases/${{ env.RELEASE_NAME }}
+            # cd ${{ secrets.VPS_TARGET }}/current
             composer install --optimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist
             php artisan migrate --force
             php artisan cache:clear
