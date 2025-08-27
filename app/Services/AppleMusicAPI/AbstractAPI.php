@@ -2,7 +2,7 @@
 
 namespace AppleMusicAPI;
 
-use App\Services\DeveloperTokenService\DeveloperTokenService;
+use App\Services\DeveloperTokenService\Facades\DeveloperTokenService;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
