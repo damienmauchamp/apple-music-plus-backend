@@ -16,9 +16,6 @@ Route::middleware(CheckOriginMiddleware::class)->group(function () {
 });
 
 // legacy routes
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/logout', [AuthController::class, 'logout']);
 Route::get('/user', [AuthUserController::class, 'index'])->middleware('auth:sanctum');
 
 // todo : master token middleware ?

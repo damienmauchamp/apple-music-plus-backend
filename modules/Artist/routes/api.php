@@ -1,2 +1,5 @@
 <?php
 
+/**
+ * @routeUrlPrefix("/api/artists")
+ */
