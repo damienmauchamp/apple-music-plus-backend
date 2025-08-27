@@ -39,9 +39,10 @@ class SystemHelper {
 		return $from ?: now()->subWeek()->format('Y-m-d');
 	}
 
-	public static function storeFrontdateTime(?string $date = null) {
-		$date = new Carbon($date ?? now(), new DateTimeZone(env('TIMEZONE')));
-		$date->setTimezone(new DateTimeZone(env('AM_STOREFRONT_TIMEZONE')));
+    public static function storeFrontdateTime(?string $date = null): Carbon
+    {
+        $date = new Carbon($date ?? now(), new DateTimeZone(env('TIMEZONE', 'America/New_York')));
+        $date->setTimezone(new DateTimeZone(env('AM_STOREFRONT_TIMEZONE', 'Europe/Paris')));
 
 		return $date;
 	}
