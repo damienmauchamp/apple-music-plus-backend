@@ -8,12 +8,18 @@ use App\Http\Controllers\LegacyReleasesController;
 use App\Services\DeveloperTokenService\Middlewares\CheckOriginMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Modules\Auth\Http\Controllers\AuthController;
+use Modules\Auth\Http\Controllers\AuthUserController;
 
 Route::middleware(CheckOriginMiddleware::class)->group(function () {
     Route::get('/developer_token', DeveloperTokenController::class);
 });
 
 // legacy routes
+Route::post('/auth/register', [AuthController::class, 'register']);
+Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/logout', [AuthController::class, 'logout']);
+Route::get('/user', [AuthUserController::class, 'index'])->middleware('auth:sanctum');
 
 // todo : master token middleware ?
 
