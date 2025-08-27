@@ -155,7 +155,7 @@ class AbstractAPI {
                 'uri' => $uri,
                 'parameters' => $parameters,
                 'options' => $options,
-                'class' => self::class->getName(),
+                'class' => self::class,
                 'trace' => $e->getTraceAsString(),
             ]);
 			if ($this->token_expiracy_status && $this->token_expiracy_status === $e->getCode()) {
@@ -182,7 +182,7 @@ class AbstractAPI {
                 'uri' => $uri,
                 'parameters' => $parameters,
                 'options' => $options,
-                'class' => self::class->getName(),
+                'class' => self::class,
                 'trace' => $e->getTraceAsString(),
             ]);
 			if ($this->token_expiracy_status && $this->token_expiracy_status === $e->getCode()) {
