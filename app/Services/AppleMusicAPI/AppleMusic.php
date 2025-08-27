@@ -16,7 +16,7 @@ class AppleMusic extends AbstractAPI {
 	}
 
 	public function getDefaultStorefront(): string {
-		return env('AM_DEFAULT_STOREFRONT', 'us');
+        return config('musickit.apple.default_storefront');
 	}
 
 	private function handlePagination(array &$parameters): void {

@@ -144,7 +144,10 @@ class AbstractAPI {
 	protected function get($uri, array $parameters = [], array $options = [], bool $retrying = false): APIResponse {
 
 		$this->prepare($retrying);
-		$this->setUrl($uri, $parameters);
+
+        if (!$retrying) {
+            $this->setUrl($uri, $parameters);
+        }
 
 		try {
 			$request = new APIRequest($this->client, 'GET', $uri, $parameters, $options, $retrying, $this->scrapped);
@@ -171,7 +174,10 @@ class AbstractAPI {
 	protected function post($uri, array $parameters = [], array $options = [], bool $retrying = false): APIResponse {
 
 		$this->prepare($retrying);
-		$this->setUrl($uri, $parameters);
+
+        if (!$retrying) {
+            $this->setUrl($uri, $parameters);
+        }
 
 		try {
 			$request = new APIRequest($this->client, 'POST', $uri, $parameters, $options, $retrying, $this->scrapped);

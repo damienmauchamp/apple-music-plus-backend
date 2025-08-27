@@ -10,6 +10,8 @@ return [
         'key_id' => env('APPLE_KEY_ID', ''),
         'developer_token' => env('AM_DEVELOPER_TOKEN', ''),
 
+        'default_storefront' => env('AM_DEFAULT_STOREFRONT', 'us'),
+
         // default 180 days (15,552,000 seconds)
         'token_default_expiration' => env('AM_DEVELOPER_TOKEN_EXPIRATION', 15_552_000),
 
