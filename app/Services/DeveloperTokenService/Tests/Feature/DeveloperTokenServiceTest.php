@@ -2,7 +2,6 @@
 
 use App\Services\DeveloperTokenService\DeveloperTokenService;
 use App\Services\DeveloperTokenService\Dto\DeveloperTokenDto;
-use App\Services\DeveloperTokenService\Exceptions\DeveloperTokenCreationFailedException;
 use App\Services\DeveloperTokenService\Exceptions\MissingDeveloperTokenConfigurationException;
 use App\Services\DeveloperTokenService\Models\DeveloperToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
