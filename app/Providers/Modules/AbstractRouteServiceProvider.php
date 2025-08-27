@@ -68,8 +68,8 @@ abstract class AbstractRouteServiceProvider extends RouteServiceProvider
         );
 
         if (file_exists($apiRoutesPath)) {
-            Route::name("{$namespace}::")
-                 ->prefix($prefix)
+//            Route::name("{$namespace}::")
+            Route::prefix($prefix)
                  ->namespace($namespace)
                  ->middleware('api')
                  ->group($apiRoutesPath);

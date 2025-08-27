@@ -39,10 +39,12 @@ abstract class AbstractServiceProvider extends ServiceProvider
         );
 
         // Load resources
-        $this->loadViewsFrom(
-            $this->resolveModulePath('resources/views', $module),
-            config("module::{$lowerModule}.namespace", $lowerModule)
-        );
+        if (is_dir($viewsPath = $this->resolveModulePath('resources/views', $module))) {
+            $this->loadViewsFrom(
+                $viewsPath,
+                config("module::{$lowerModule}.namespace", $lowerModule)
+            );
+        }
 
         if ($this->routeServiceProvider) {
             // Load the service provider for routes
