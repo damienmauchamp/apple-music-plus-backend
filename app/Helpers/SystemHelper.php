@@ -46,23 +46,23 @@ class SystemHelper {
 		return $date;
 	}
 
-	public static function getCacheKeys() {
-		/** @var \Illuminate\Cache\FileStore $storage  */
-		$storage = Cache::getStore();
-		if (!method_exists($storage, 'getFilesystem')) {
-			return [];
-		}
-		$filesystem = $storage->getFilesystem();
-		$dir = (Cache::getDirectory());
-		$keys = [];
-		foreach ($filesystem->allFiles($dir) as $file1) {
-			if (is_dir($file1->getPath())) {
-				foreach ($filesystem->allFiles($file1->getPath()) as $file2) {
-					$keys = array_merge($keys, [$file2->getRealpath() => unserialize(substr(File::get($file2->getRealpath()), 10))]);
-				}
-			}
-		}
-
-		return $keys;
-	}
+//	public static function getCacheKeys() {
+//		/** @var \Illuminate\Cache\FileStore $storage  */
+//		$storage = Cache::getStore();
+//		if (!method_exists($storage, 'getFilesystem')) {
+//			return [];
+//		}
+//		$filesystem = $storage->getFilesystem();
+//		$dir = (Cache::getDirectory());
+//		$keys = [];
+//		foreach ($filesystem->allFiles($dir) as $file1) {
+//			if (is_dir($file1->getPath())) {
+//				foreach ($filesystem->allFiles($file1->getPath()) as $file2) {
+//					$keys = array_merge($keys, [$file2->getRealpath() => unserialize(substr(File::get($file2->getRealpath()), 10))]);
+//				}
+//			}
+//		}
+//
+//		return $keys;
+//	}
 }

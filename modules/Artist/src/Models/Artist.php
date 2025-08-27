@@ -6,9 +6,11 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Modules\Album\Models\Album;
+use Modules\Song\Models\Song;
 
 /**
  * @property int $id
@@ -27,33 +29,33 @@ class Artist extends Model {
 		'artworkUrl',
 	];
 
-	public function albums() {
+    public function albums(): BelongsToMany
+    {
 		return $this->belongsToMany(Album::class);
 	}
 
-	public function songs() {
-		return $this->belongsToMany(\Modules\Song\Models\Song::class);
+    public function songs(): BelongsToMany
+    {
+        return $this->belongsToMany(Song::class);
 	}
 
-	public function users() {
+    public function users(): BelongsToMany
+    {
 		return $this->belongsToMany(User::class);
 	}
 
-	public static function getFromStoreId(string | int $storeId) {
-		$artist = Cache::remember(static::getCacheKey($storeId), 300, function () use ($storeId) {
-			return static::where('storeId', $storeId)->get();
-		});
-
-		return $artist->first();
+    public static function fromStoreId(string|int $storeId): Artist
+    {
+        return static::where('storeId', $storeId)->first();
 	}
 
-	public static function getCacheKey(string | int $storeId): string {
-		return "artist-$storeId";
-	}
+//	public static function getCacheKey(string | int $storeId): string {
+//		return "artist-$storeId";
+//	}
 
-	public static function removeCache(string | int $storeId) {
-		if (Cache::has(static::getCacheKey($storeId))) {
-			Cache::forget(static::getCacheKey($storeId));
-		}
-	}
+//	public static function removeCache(string | int $storeId) {
+//		if (Cache::has(static::getCacheKey($storeId))) {
+//			Cache::forget(static::getCacheKey($storeId));
+//		}
+//	}
 }

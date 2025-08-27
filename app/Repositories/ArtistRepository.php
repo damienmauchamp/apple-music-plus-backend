@@ -46,8 +46,8 @@ class ArtistRepository {
 			throw new CatalogArtistNotFoundException($exception->getMessage(), $exception->getCode(), $exception);
 		}
 
-		// removing artist cache
-		Artist::removeCache($storeId);
+//		// removing artist cache
+//		Artist::removeCache($storeId);
 
 		// add or update artist info in database
 		$data = $catalogArtist->getData()['data'][0];

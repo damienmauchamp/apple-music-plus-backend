@@ -80,7 +80,7 @@ class ReleasesUpdater
     public function setArtistByStoreId($artistStoreId)
     {
         if ($artistStoreId) {
-            $artist = Artist::getFromStoreId($artistStoreId);
+            $artist = Artist::fromStoreId($artistStoreId);
             if (!$artist) {
                 throw new ArtistUpdateException("Artist not found {$artistStoreId}", 404);
             }
