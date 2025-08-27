@@ -2,7 +2,7 @@
 
 namespace AppleMusicAPI;
 
-use App\Services\Token\DeveloperToken;
+use App\Services\DeveloperTokenService\Facades\DeveloperTokenService;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -123,7 +123,7 @@ class AbstractAPI {
 			return;
 		}
 
-		$this->developer_token = (new DeveloperToken($renew))->getToken();
+        $this->developer_token = DeveloperTokenService::getFirstOrCreate($renew);
 	}
 
 	protected function initMusicKitToken(): void {

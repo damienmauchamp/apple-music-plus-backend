@@ -2,21 +2,21 @@
 
 namespace App\Services\Core;
 
-use AppleMusicAPI\AppleMusic;
-use AppleMusicAPI\MusicKit;
 use App\Exceptions\ArtistUpdateException;
 use App\Exceptions\CatalogArtistNotFoundException;
 use App\Helpers\SystemHelper;
 use App\Jobs\UpdateArtist;
-use App\Models\Album;
-use App\Models\Artist;
-use App\Models\Song;
 use App\Repositories\ArtistRepository;
+use AppleMusicAPI\AppleMusic;
+use AppleMusicAPI\MusicKit;
 use DateTime;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Support\Facades\Log;
+use Modules\Album\Models\Album;
+use Modules\Artist\Models\Artist;
+use Modules\Song\Models\Song;
 
 /**
  * @todo : logs
@@ -223,7 +223,6 @@ class ReleasesUpdater
             $this->artist->albums()->syncWithoutDetaching($album->id);
         }
 
-        $this->artist->last_updated = now();
         $this->artist->save();
 
         return $this;
@@ -273,7 +272,6 @@ class ReleasesUpdater
             $this->artist->songs()->syncWithoutDetaching($song->id);
         }
 
-        $this->artist->last_updated = now();
         $this->artist->save();
 
         return $this;
@@ -379,10 +377,8 @@ class ReleasesUpdater
      * Undocumented function
      *
      * @param Artist[] $artists
-     *
-     * @return void
      */
-    public static function fromArtistArray($artists, bool $job = false, bool $exception = false, bool $echo = false)
+    public static function fromArtistArray($artists, bool $job = false, bool $exception = false, bool $echo = false): array
     {
         $results = [];
         $errors = [];
@@ -433,7 +429,6 @@ class ReleasesUpdater
                 'id' => $data['artist']->id,
                 'storeId' => $data['artist']->storeId,
                 'artist' => $data['artist']->name,
-                'last_updated' => $data['artist']->last_updated,
             ];
             if ($updater->job) {
                 $result['job'] = [
