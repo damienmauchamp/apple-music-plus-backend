@@ -6,6 +6,7 @@ use App\Services\DeveloperTokenService\Facades\DeveloperTokenService;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Log;
 
 class AbstractAPI {
 
@@ -150,6 +151,13 @@ class AbstractAPI {
 
 			return $request->run();
 		} catch (GuzzleException $e) {
+            Log::error("[AbstractAPI.get] {$e->getMessage()}", [
+                'uri' => $uri,
+                'parameters' => $parameters,
+                'options' => $options,
+                'class' => self::class->getName(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 			if ($this->token_expiracy_status && $this->token_expiracy_status === $e->getCode()) {
 				// retry
 				$this->init(true);
@@ -170,6 +178,13 @@ class AbstractAPI {
 
 			return $request->run();
 		} catch (GuzzleException $e) {
+            Log::error("[AbstractAPI.post] {$e->getMessage()}", [
+                'uri' => $uri,
+                'parameters' => $parameters,
+                'options' => $options,
+                'class' => self::class->getName(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 			if ($this->token_expiracy_status && $this->token_expiracy_status === $e->getCode()) {
 				// retry
 				$this->init(true);
