@@ -195,6 +195,7 @@ return [
 
     'releases_updater' => [
         'enable_logs' => env('RELEASES_UPDATER_ENABLE_LOGS', false),
+        'jobs_delay' => env('JOB_DELAY', 3000),
     ],
 
 ];

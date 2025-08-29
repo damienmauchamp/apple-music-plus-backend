@@ -31,7 +31,8 @@ use Modules\Artist\Models\Artist;
  */
 class Song extends Model {
     use Releasable;
-	use HasFactory;
+
+//	use HasFactory;
 
 	protected $fillable = [
 		'storeId',
@@ -46,6 +47,7 @@ class Song extends Model {
 		'durationInMillis',
 		'previewUrl',
 		'custom',
+        'disabled',
 	];
 
     protected $casts = [

@@ -50,8 +50,6 @@ class ReleasesUpdater
 
     private int $songsFiltered = 0;
 
-    private readonly bool $enableLogging;
-
     public function __construct($artistStoreId = null, bool $job = false, bool $exception = false, bool $echo = false)
     {
         $this->api = new AppleMusic();
@@ -61,7 +59,6 @@ class ReleasesUpdater
         $this->exception = $exception;
         $this->echo = $echo;
 
-        $this->enableLogging = config('app.releases_updater.enable_logs', false);
         return $this;
     }
 
@@ -194,7 +191,11 @@ class ReleasesUpdater
             $this->albumsResults = [
                 'error' => $e->getMessage(),
             ];
-            // todo : log errors / dd($e, $e->getMessage());
+
+            $this->error("Error while fetching albums for artist {$this->artist->storeId} - {$this->artist->name}: {$e->getMessage()}", [
+                'artist' => $this->artist,
+                'exception' => $e,
+            ]);
 
             return $this;
         }
@@ -243,7 +244,11 @@ class ReleasesUpdater
             $this->albumsResults = [
                 'error' => $e->getMessage(),
             ];
-            // todo : log errors / dd($e, $e->getMessage());
+
+            $this->error("Error while fetching songs for artist {$this->artist->storeId} - {$this->artist->name}: {$e->getMessage()}", [
+                'artist' => $this->artist,
+                'exception' => $e,
+            ]);
 
             return $this;
         }
@@ -400,7 +405,7 @@ class ReleasesUpdater
                 $date = null;
                 if ($job) {
                     // delaying to avoid "Too many requests" from Apple Music
-                    $jobTime->addMilliseconds(env('JOB_DELAY', 3000));
+                    $jobTime->addMilliseconds(config('app.releases_updater.job_delay', 3000));
                     $date = clone $jobTime;
                 }
 
@@ -473,8 +478,15 @@ class ReleasesUpdater
 
     protected function log($message, array $context = []): void
     {
-        if ($this->enableLogging) {
+        if (config('app.releases_updater.enable_logs', false)) {
             Log::channel('services.release-updater')->info($message, $context);
+        }
+    }
+
+    protected function error($message, array $context = []): void
+    {
+        if (config('app.releases_updater.enable_logs', false)) {
+            Log::channel('services.release-updater')->error($message, $context);
         }
     }
 }
