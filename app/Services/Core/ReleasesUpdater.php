@@ -187,6 +187,12 @@ class ReleasesUpdater
             $this->albumsResults = $this->api->fetchCatalogArtistsRelationshipByReleaseDate($this->artist->storeId, 'albums', [
                 'limit' => 100,
             ]);
+
+            $this->log("Fetched " . count($this->albumsResults['data']) . " albums for artist {$this->artist->storeId} - {$this->artist->name}", [
+                'artist' => $this->artist,
+                'results' => $this->albumsResults,
+            ]);
+
         } catch (ClientException $e) {
             $this->albumsResults = [
                 'error' => $e->getMessage(),
