@@ -188,10 +188,10 @@ class ReleasesUpdater
                 'limit' => 100,
             ]);
 
-            $this->log("Fetched " . count($this->albumsResults['data']) . " albums for artist {$this->artist->storeId} - {$this->artist->name}", [
-                'artist' => $this->artist,
-                'results' => $this->albumsResults,
-            ]);
+//            $this->log("Fetched " . count($this->albumsResults['data']) . " albums for artist {$this->artist->storeId} - {$this->artist->name}", [
+//                'artist' => $this->artist,
+//                'results' => $this->albumsResults,
+//            ]);
 
         } catch (ClientException $e) {
             $this->albumsResults = [

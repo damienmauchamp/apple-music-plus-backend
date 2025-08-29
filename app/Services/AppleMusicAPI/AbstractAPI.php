@@ -149,11 +149,11 @@ class AbstractAPI {
             $this->setUrl($uri, $parameters);
         }
 
-        Log::info("[AbstractAPI.get] {$this->name} - GET {$uri}", [
-            'parameters' => $parameters,
-            'options' => $options,
-            'class' => self::class,
-        ]);
+//        Log::info("[AbstractAPI.get] {$this->name} - GET {$uri}", [
+//            'parameters' => $parameters,
+//            'options' => $options,
+//            'class' => self::class,
+//        ]);
 
 		try {
 			$request = new APIRequest($this->client, 'GET', $uri, $parameters, $options, $retrying, $this->scrapped);
@@ -167,7 +167,8 @@ class AbstractAPI {
                 'class' => self::class,
                 'trace' => $e->getTraceAsString(),
             ]);
-			if ($this->token_expiracy_status && $this->token_expiracy_status === $e->getCode()) {
+
+            if ($this->token_expiracy_status && $this->token_expiracy_status === $e->getCode()) {
 				// retry
 				$this->init(true);
 
@@ -197,7 +198,8 @@ class AbstractAPI {
                 'class' => self::class,
                 'trace' => $e->getTraceAsString(),
             ]);
-			if ($this->token_expiracy_status && $this->token_expiracy_status === $e->getCode()) {
+
+            if ($this->token_expiracy_status && $this->token_expiracy_status === $e->getCode()) {
 				// retry
 				$this->init(true);
 
