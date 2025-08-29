@@ -12,6 +12,11 @@ return [
 
         'default_storefront' => env('AM_DEFAULT_STOREFRONT', 'us'),
 
+        'ssl' => [
+            'cert' => env('AM_SSL_CERT', ''),
+            'verify' => env('AM_SSL_VERIRY', true),
+        ],
+
         // default 180 days (15,552,000 seconds)
         'token_default_expiration' => env('AM_DEVELOPER_TOKEN_EXPIRATION', 15_552_000),
 

@@ -81,10 +81,10 @@ class AbstractAPI {
 			'headers' => $this->headers(),
 		];
 
-		if (env('AM_SSL_CERT')) {
-			$options['verify'] = env('AM_SSL_CERT');
+        if ($cert = config('musickit.apple.ssl.cert')) {
+            $options['verify'] = $cert;
 		} else {
-			$options['verify'] = env('AM_SSL_VERIRY', false);
+            $options['verify'] = config('musickit.apple.ssl.verify');
 		}
 
 		$token = ($token ?? $this->developer_token) ?: '';
@@ -124,7 +124,7 @@ class AbstractAPI {
 			return;
 		}
 
-        $this->developer_token = DeveloperTokenService::getFirstOrCreate($renew);
+        $this->developer_token = DeveloperTokenService::getFirstOrCreate($renew)->token;
 	}
 
 	protected function initMusicKitToken(): void {
