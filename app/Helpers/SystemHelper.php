@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\File;
 
 class SystemHelper {
 
-	public static function minReleaseDate(string $format = 'Y-m-d') {
-		return (new Carbon(now()->subDays((int) env('RELEASE_DATA_RETENTION_DAYS'))))->format($format);
+    public static function minReleaseDate(string $format = 'Y-m-d'): string
+    {
+        return (new Carbon(now()->subDays((int)config('app.releases_updater.release_retention_days'))))->format($format);
 	}
 
 	public static function getLastWeekDayNumber(): int {
