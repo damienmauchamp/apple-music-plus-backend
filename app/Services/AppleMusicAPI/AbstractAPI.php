@@ -124,7 +124,7 @@ class AbstractAPI {
 			return;
 		}
 
-        $this->developer_token = DeveloperTokenService::getFirstOrCreate($renew);
+        $this->developer_token = DeveloperTokenService::getFirstOrCreate($renew)->token;
 	}
 
 	protected function initMusicKitToken(): void {
