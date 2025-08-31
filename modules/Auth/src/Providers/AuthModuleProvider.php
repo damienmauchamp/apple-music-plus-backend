@@ -11,7 +11,10 @@ class AuthModuleProvider extends AbstractServiceProvider
 
     public ServiceProvider|string $routeServiceProvider = AuthRouteServiceProvider::class;
 
-    Relation::enforceMorphMap([
-        'user' => \App\Models\User::class,
-    ]);
+    public function boot(): void {
+        parent::boot();
+        Relation::enforceMorphMap([
+            'user' => \App\Models\User::class,
+        ]);
+    }
 }
