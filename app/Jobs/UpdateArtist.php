@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Modules\Artist\Models\Artist;
 use Throwable;
 
-class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
+class UpdateArtist implements ShouldQueue //, ShouldBeUniqueUntilProcessing
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     
@@ -24,10 +24,10 @@ class UpdateArtist implements ShouldQueue, ShouldBeUniqueUntilProcessing
     {
     }
 
-    public function uniqueId(): string
-    {
-        return $this->artist->storeId;
-    }
+//    public function uniqueId(): string
+//    {
+//        return $this->artist->storeId;
+//    }
 
     public function handle(): void
     {
