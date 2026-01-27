@@ -199,4 +199,9 @@ return [
         'release_retention_days' => env('RELEASE_DATA_RETENTION_DAYS', 90),
     ],
 
+    'nightwatch' => [
+        'update_artist_job_sample_rate' => env('NIGHTWATCH_UPDATE_ARTIST_JOB_SAMPLE_RATE', 0.01),
+        'update_artist_job_filter_queued_jobs' => env('NIGHTWATCH_UPDATE_ARTIST_JOB_FILTER_QUEUED_JOBS', false),
+    ],
+
 ];

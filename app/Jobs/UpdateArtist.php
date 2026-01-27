@@ -10,13 +10,14 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Laravel\Nightwatch\Facades\Nightwatch;
 use Modules\Artist\Models\Artist;
 use Throwable;
 
 class UpdateArtist implements ShouldQueue //, ShouldBeUniqueUntilProcessing
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    
+
     public function __construct(
         public Artist $artist,
         public bool $echo = false
@@ -31,6 +32,7 @@ class UpdateArtist implements ShouldQueue //, ShouldBeUniqueUntilProcessing
 
     public function handle(): void
     {
+        Nightwatch::sample(rate: (float)config('app.nightwatch.update_artist_job_sample_rate', 0.01));
         // Log::channel('jobs.artist-update')
         //    ->info("({$this->artist->storeId}) {$this->artist->name}: Updating...");
 
@@ -52,6 +54,8 @@ class UpdateArtist implements ShouldQueue //, ShouldBeUniqueUntilProcessing
                 ->error("({$this->artist->storeId}) {$this->artist->name}: ❌ Job failed - {$exception->getMessage()}", [
                     'exception' => $exception,
                 ]);
+
+            report($exception);
         }
 
         if ($this->echo) {
