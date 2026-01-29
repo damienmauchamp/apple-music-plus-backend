@@ -160,7 +160,7 @@ class AbstractAPI {
 
 			return $request->run();
 		} catch (GuzzleException $e) {
-            Log::error("[AbstractAPI.get] {$e->getMessage()}", [
+            Log::warning("[AbstractAPI.get] {$e->getMessage()}", [
                 'uri' => $uri,
                 'parameters' => $parameters,
                 'options' => $options,
@@ -191,7 +191,7 @@ class AbstractAPI {
 
 			return $request->run();
 		} catch (GuzzleException $e) {
-            Log::error("[AbstractAPI.post] {$e->getMessage()}", [
+            Log::warning("[AbstractAPI.post] {$e->getMessage()}", [
                 'uri' => $uri,
                 'parameters' => $parameters,
                 'options' => $options,
