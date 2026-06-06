@@ -48,9 +48,9 @@ class MusicKit extends AppleMusic {
 	protected function initDeveloperToken(bool $renew = false): void {
 		parent::initDeveloperToken($renew);
 
-		// .env MUSIC_KIT_TOKEN
-		if (env('AM_MUSIC_KIT_TOKEN')) {
-			$this->music_kit_token = env('AM_MUSIC_KIT_TOKEN');
+		// config musickit.apple.music_kit_token (AM_MUSIC_KIT_TOKEN)
+		if ($token = config('musickit.apple.music_kit_token')) {
+			$this->music_kit_token = $token;
 		}
 	}
 

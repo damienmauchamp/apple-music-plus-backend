@@ -45,7 +45,8 @@
             "Modules\\Album\\": "modules/Album/src/",
             "Modules\\Artist\\": "modules/Artist/src/",
             "Modules\\Auth\\": "modules/Auth/src/",
-            "Modules\\Song\\": "modules/Song/src/"
+            "Modules\\Song\\": "modules/Song/src/",
+            "Modules\\User\\": "modules/User/src/"
         }
     },
     "autoload-dev": {

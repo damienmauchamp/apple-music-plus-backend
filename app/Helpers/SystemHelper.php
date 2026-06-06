@@ -15,7 +15,7 @@ class SystemHelper {
 	}
 
 	public static function getLastWeekDayNumber(): int {
-		return (int) env('RELEASE_WEEKDAY', Carbon::FRIDAY);
+		return (int) config('app.releases_updater.release_weekday', Carbon::FRIDAY);
 	}
 
 	public static function getLastWeekDayFromDate(?string $from = null, bool $weekBefore = false) {
@@ -42,8 +42,8 @@ class SystemHelper {
 
     public static function storeFrontdateTime(?string $date = null): Carbon
     {
-        $date = new Carbon($date ?? now(), new DateTimeZone(env('TIMEZONE', 'America/New_York')));
-        $date->setTimezone(new DateTimeZone(env('AM_STOREFRONT_TIMEZONE', 'Europe/Paris')));
+        $date = new Carbon($date ?? now(), new DateTimeZone(config('app.timezone')));
+        $date->setTimezone(new DateTimeZone(config('musickit.apple.storefront_timezone')));
 
 		return $date;
 	}

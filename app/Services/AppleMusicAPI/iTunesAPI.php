@@ -30,7 +30,7 @@ class iTunesAPI extends AbstractAPI {
 	}
 
 	public function getDefaultCountry(): string {
-		return env('AM_ITUNES_DEFAULT_COUNTRY', 'us');
+		return config('musickit.apple.itunes_default_country');
 	}
 
 	protected function setUrl(&$uri, array $parameters = []): string {

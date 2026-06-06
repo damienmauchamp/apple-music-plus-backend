@@ -198,6 +198,7 @@ return [
         'enable_logs' => env('RELEASES_UPDATER_ENABLE_LOGS', false),
         'jobs_delay' => env('JOB_DELAY', 3000),
         'release_retention_days' => env('RELEASE_DATA_RETENTION_DAYS', 90),
+        'release_weekday' => env('RELEASE_WEEKDAY', 5),
     ],
 
     'nightwatch' => [
