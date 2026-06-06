@@ -168,6 +168,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\NightwatchServiceProvider::class,
 
         // Module Service Providers
         Modules\Album\Providers\AlbumModuleProvider::class,
