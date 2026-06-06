@@ -4,11 +4,11 @@ namespace App\Jobs;
 
 use App\Services\Core\ReleasesUpdater;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Log;
 use Laravel\Nightwatch\Facades\Nightwatch;
 use Modules\Artist\Models\Artist;
@@ -32,16 +32,17 @@ class UpdateArtist implements ShouldQueue //, ShouldBeUniqueUntilProcessing
 
     public function handle(): void
     {
-        Nightwatch::sample(rate: (float)config('app.nightwatch.update_artist_job_sample_rate', 0.01));
-        // Log::channel('jobs.artist-update')
-        //    ->info("({$this->artist->storeId}) {$this->artist->name}: Updating...");
+        Context::add([
+            'artist_id'       => $this->artist->id,
+            'artist_store_id' => $this->artist->storeId,
+            'artist_name'     => $this->artist->name,
+        ]);
+
+        Nightwatch::sample(rate: (float) config('app.nightwatch.update_artist_job_sample_rate', 0.01));
 
         $updater = new ReleasesUpdater($this->artist->storeId);
 
-        // fetching artist info
         $updater->updateArtist();
-
-        // fetching albums & songs
         $updater->update();
 
         $this->passed();
@@ -49,14 +50,8 @@ class UpdateArtist implements ShouldQueue //, ShouldBeUniqueUntilProcessing
 
     public function failed(?Throwable $exception): void
     {
-        if (config('app.releases_updater.enable_logs', false)) {
-            Log::channel('jobs.artist-update')
-                ->error("({$this->artist->storeId}) {$this->artist->name}: ❌ Job failed - {$exception->getMessage()}", [
-                    'exception' => $exception,
-                ]);
-
-            report($exception);
-        }
+        Log::error('Artist update job failed', ['exception' => $exception]);
+        report($exception);
 
         if ($this->echo) {
             echo "❌ {$this->artist->name} ({$this->artist->storeId}) - " . $exception->getMessage() . "\n";
@@ -65,10 +60,7 @@ class UpdateArtist implements ShouldQueue //, ShouldBeUniqueUntilProcessing
 
     public function passed(): void
     {
-        if (config('app.releases_updater.enable_logs', false)) {
-            Log::channel('jobs.artist-update')
-                ->info("({$this->artist->storeId}) {$this->artist->name}: Updated");
-        }
+        Log::info('Artist updated');
 
         if (!$this->echo) {
             echo "✅ {$this->artist->name} ({$this->artist->storeId})\n";

@@ -482,17 +482,13 @@ class ReleasesUpdater
         return $this;
     }
 
-    protected function log($message, array $context = []): void
+    protected function log(string $message, array $context = []): void
     {
-        if (config('app.releases_updater.enable_logs', false)) {
-            Log::channel('services.release-updater')->info($message, $context);
-        }
+        Log::info($message, $context);
     }
 
-    protected function error($message, array $context = []): void
+    protected function error(string $message, array $context = []): void
     {
-        if (config('app.releases_updater.enable_logs', false)) {
-            Log::channel('services.release-updater')->error($message, $context);
-        }
+        Log::error($message, $context);
     }
 }

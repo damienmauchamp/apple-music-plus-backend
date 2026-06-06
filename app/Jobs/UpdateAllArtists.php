@@ -15,8 +15,6 @@ class UpdateAllArtists implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private readonly bool $enableLogging;
-
     public function __construct(
         public bool $useJob = true
     )
@@ -25,24 +23,15 @@ class UpdateAllArtists implements ShouldQueue
 
     public function handle(): void
     {
-
         $artists = Artist::orderBy('name')->get();
 
-        if (config('app.releases_updater.enable_logs', false)) {
-            Log::channel('jobs.artists-update')
-                ->info('Scheduling job for ' . count($artists) . ' artists');
-        }
+        Log::info('Scheduling artist updates', ['count' => count($artists)]);
 
         ReleasesUpdater::fromArtistArray($artists, $this->useJob);
     }
 
     public function failed($exception = null): void
     {
-        if (config('app.releases_updater.enable_logs', false)) {
-            Log::channel('jobs.artists-update')
-                ->error("Job failed: {$exception->getMessage()}", [
-                    'exception' => $exception,
-                ]);
-        }
+        Log::error('Artist batch update job failed', ['exception' => $exception]);
     }
 }
