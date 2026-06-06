@@ -203,7 +203,7 @@ class AbstractAPI {
 				// retry
 				$this->init(true);
 
-				return $this->get($uri, $parameters, $options, true);
+                return $this->post($uri, $parameters, $options, true);
 			}
 			throw $e;
 		}
