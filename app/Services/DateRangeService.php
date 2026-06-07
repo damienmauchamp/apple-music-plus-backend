@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 
 class DateRangeService
 {
@@ -21,7 +20,7 @@ class DateRangeService
 
         return [
             'from' => $startOfWeek->startOfDay()->toDateString(),
-            'to'   => $endOfWeek->endOfDay()->toDateString(),
+            'to' => $endOfWeek->endOfDay()->toDateString(),
         ];
     }
 
@@ -32,8 +31,7 @@ class DateRangeService
 
         return [
             'from' => $start->format('Y-m-d'),
-            'to'   => $end->format('Y-m-d'),
+            'to' => $end->format('Y-m-d'),
         ];
     }
-
 }

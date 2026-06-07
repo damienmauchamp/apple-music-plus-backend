@@ -19,7 +19,7 @@ trait Releasable
 
     public function scopeFilterContentRating(Builder $query, ?string $filter = null, bool $includeNulls = false): Builder
     {
-        if (!$filter) {
+        if (! $filter) {
             return $query;
         }
 
@@ -28,7 +28,7 @@ trait Releasable
 
             if ($includeNulls) {
                 $q->orWhereNull('contentRating')
-                  ->orWhere('contentRating', '');
+                    ->orWhere('contentRating', '');
             }
         });
 

@@ -11,10 +11,11 @@ use Modules\Album\Models\Album;
  */
 class LegacyAlbumCollection extends ResourceCollection
 {
-	/**
-	 * @return array<int|string, mixed>
-	 */
-	public function toArray(Request $request): array {
-		return parent::toArray($request);
-	}
+    /**
+     * @return array<int|string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return parent::toArray($request);
+    }
 }

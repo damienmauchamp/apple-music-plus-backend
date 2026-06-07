@@ -1,6 +1,6 @@
 <?php
 
-declare( strict_types = 1 );
+declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
@@ -12,7 +12,7 @@ class ViewLogsMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!App::isProduction()) {
+        if (! App::isProduction()) {
             return $next($request);
         }
 
@@ -20,12 +20,12 @@ class ViewLogsMiddleware
         $password = config('log-viewer.production.password', null);
 
         if (is_null($password)) {
-            return response([ 'message' => 'Not found.' ], 404);
+            return response(['message' => 'Not found.'], 404);
         }
 
         $headerAuthorization = $request->header('Authorization');
 
-        if (!$headerAuthorization) {
+        if (! $headerAuthorization) {
             return response('Unauthorized', 401, [
                 'WWW-Authenticate' => 'Basic realm="Log Viewer"',
             ]);
@@ -33,7 +33,7 @@ class ViewLogsMiddleware
 
         $encodedCredentials = substr($headerAuthorization, 6);
         $decodedCredentials = base64_decode($encodedCredentials);
-        [ $inputUsername, $inputPassword ] = explode(':', $decodedCredentials);
+        [$inputUsername, $inputPassword] = explode(':', $decodedCredentials);
 
         if ($inputUsername !== $username || $inputPassword !== $password) {
 

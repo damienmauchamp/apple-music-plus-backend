@@ -11,10 +11,11 @@ use Modules\Song\Models\Song;
  */
 class LegacySongCollection extends ResourceCollection
 {
-	/**
-	 * @return array<int|string, mixed>
-	 */
-	public function toArray(Request $request): array {
-		return parent::toArray($request);
-	}
+    /**
+     * @return array<int|string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return parent::toArray($request);
+    }
 }

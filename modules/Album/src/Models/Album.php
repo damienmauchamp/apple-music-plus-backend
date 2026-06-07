@@ -21,8 +21,8 @@ use Modules\Song\Models\Song;
  */
 class Album extends Model
 {
-    use Releasable;
     use HasFactory;
+    use Releasable;
 
     protected $fillable = [
         'storeId',
@@ -41,7 +41,7 @@ class Album extends Model
     ];
 
     protected $casts = [
-//        'releaseDate' => 'date:Y-m-d',
+        //        'releaseDate' => 'date:Y-m-d',
         'isSingle' => 'boolean',
         'isCompilation' => 'boolean',
         'isComplete' => 'boolean',
@@ -73,15 +73,15 @@ class Album extends Model
     public function scopeIsAlbum(Builder $query): Builder
     {
         return $query->where('isSingle', false)
-                     ->whereNotLike('name', '% - EP')
-                     ->whereNotLike('name', '% - Single');
+            ->whereNotLike('name', '% - EP')
+            ->whereNotLike('name', '% - Single');
     }
 
     public function scopeIsSingle(Builder $query): Builder
     {
         return $query->where(function ($q) {
             $q->where('isSingle', true)
-              ->orWhereLike('name', '% - Single');
+                ->orWhereLike('name', '% - Single');
         });
     }
 
@@ -89,7 +89,7 @@ class Album extends Model
     {
         return $query->where(function ($q) {
             $q->where('isSingle', false)
-              ->whereLike('name', '% - EP');
+                ->whereLike('name', '% - EP');
         });
     }
 
@@ -114,7 +114,7 @@ class Album extends Model
                     $sub->where('isSingle', false)
                         ->where(function ($inner) use ($today) {
                             $inner->where('releaseDate', '>', $today)
-                                  ->orWhere('isComplete', false);
+                                ->orWhere('isComplete', false);
                         });
                 })->orWhere(function ($sub) use ($today) {
                     $sub->where('isSingle', true)
@@ -140,17 +140,17 @@ class Album extends Model
         }
 
         return $query->where(
-                'releaseDate',
-                $value ? '>' : '<=',
-                Carbon::now()->format('Y-m-d')
-            )->orWhere("isComplete", !$value);
+            'releaseDate',
+            $value ? '>' : '<=',
+            Carbon::now()->format('Y-m-d')
+        )->orWhere('isComplete', ! $value);
     }
 
     public function getUniqueNameKey(): string
     {
         return sprintf('%s-%s',
-           mb_strtolower($this->name),
-           $this->artistName
+            mb_strtolower($this->name),
+            $this->artistName
         );
     }
 

@@ -8,11 +8,8 @@ use Spatie\QueryBuilder\AllowedFilter;
 
 class ListAlbumsRequest extends ListReleasableRequest
 {
-
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -21,8 +18,6 @@ class ListAlbumsRequest extends ListReleasableRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -43,5 +38,4 @@ class ListAlbumsRequest extends ListReleasableRequest
     {
         return array_merge(parent::getSorts(), []);
     }
-
 }

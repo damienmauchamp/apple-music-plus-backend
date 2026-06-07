@@ -11,6 +11,7 @@ class AuthUserController extends Controller
     public function index(Request $request)
     {
         AuthUserResource::$wrap = null;
+
         return new AuthUserResource($request->user());
     }
 }

@@ -13,11 +13,11 @@ class ListSongsController extends Controller
 {
     public function __construct(
         protected ContentRatingService $contentRatingService,
-    ) { }
+    ) {}
 
     public function __invoke(ListSongsRequest $request)
     {
-       $query = QueryBuilder::for(Song::class)
+        $query = QueryBuilder::for(Song::class)
             ->with('artists:id,name,storeId')
             ->allowedFilters($request->getFilters())
             ->allowedSorts($request->getSorts())

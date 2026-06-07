@@ -17,9 +17,7 @@ class UpdateAllArtists implements ShouldQueue
 
     public function __construct(
         public bool $useJob = true
-    )
-    {
-    }
+    ) {}
 
     public function handle(): void
     {

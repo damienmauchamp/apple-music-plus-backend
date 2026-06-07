@@ -14,12 +14,12 @@ class DeveloperTokenResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-//            'id' => $this->id,
+            //            'id' => $this->id,
             'token' => $this->token,
             'notes' => $this->notes,
             'expires_at' => $this->expires_at,
-//            'created_at' => $this->created_at,
-//            'updated_at' => $this->updated_at,
+            //            'created_at' => $this->created_at,
+            //            'updated_at' => $this->updated_at,
         ];
     }
 }

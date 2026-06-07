@@ -25,33 +25,34 @@ use Modules\Artist\Models\Artist;
  * @property int $discNumber
  * @property int $durationInMillis
  * @property string $previewUrl
- * @property boolean $custom
+ * @property bool $custom
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-class Song extends Model {
+class Song extends Model
+{
     use Releasable;
 
-//	use HasFactory;
+    //	use HasFactory;
 
-	protected $fillable = [
-		'storeId',
-		'name',
-		'albumId',
-		'albumName',
-		'artistName',
-		'artworkUrl',
-		'releaseDate',
-		'contentRating',
-		'discNumber',
-		'durationInMillis',
-		'previewUrl',
-		'custom',
+    protected $fillable = [
+        'storeId',
+        'name',
+        'albumId',
+        'albumName',
+        'artistName',
+        'artworkUrl',
+        'releaseDate',
+        'contentRating',
+        'discNumber',
+        'durationInMillis',
+        'previewUrl',
+        'custom',
         'disabled',
-	];
+    ];
 
     protected $casts = [
-//        'releaseDate' => 'date:Y-m-d',
+        //        'releaseDate' => 'date:Y-m-d',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'custom' => 'boolean',
@@ -59,21 +60,23 @@ class Song extends Model {
         'contentRating' => ContentRating::class,
     ];
 
-	public function artists():BelongsToMany {
-		return $this->belongsToMany(Artist::class);
-	}
+    public function artists(): BelongsToMany
+    {
+        return $this->belongsToMany(Artist::class);
+    }
 
-	public function album():BelongsTo {
-		return $this->belongsTo(Album::class, 'albumId', 'storeId');
-	}
+    public function album(): BelongsTo
+    {
+        return $this->belongsTo(Album::class, 'albumId', 'storeId');
+    }
 
     public function getUniqueNameKey(): string
     {
         return sprintf('%s-%s-%s-%s',
-        mb_strtolower($this->name),
-                $this->artistName,
-                mb_strtolower($this->albumName),
-                $this->discNumber
+            mb_strtolower($this->name),
+            $this->artistName,
+            mb_strtolower($this->albumName),
+            $this->discNumber
         );
     }
 }

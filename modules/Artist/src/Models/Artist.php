@@ -19,43 +19,44 @@ use Modules\Song\Models\Song;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-class Artist extends Model {
-	use HasFactory;
+class Artist extends Model
+{
+    use HasFactory;
     use SoftDeletes;
 
-	protected $fillable = [
-		'storeId',
-		'name',
-		'artworkUrl',
-	];
+    protected $fillable = [
+        'storeId',
+        'name',
+        'artworkUrl',
+    ];
 
     public function albums(): BelongsToMany
     {
-		return $this->belongsToMany(Album::class);
-	}
+        return $this->belongsToMany(Album::class);
+    }
 
     public function songs(): BelongsToMany
     {
         return $this->belongsToMany(Song::class);
-	}
+    }
 
     public function users(): BelongsToMany
     {
-		return $this->belongsToMany(User::class);
-	}
+        return $this->belongsToMany(User::class);
+    }
 
     public static function fromStoreId(string|int $storeId): Artist
     {
         return static::where('storeId', $storeId)->first();
-	}
+    }
 
-//	public static function getCacheKey(string | int $storeId): string {
-//		return "artist-$storeId";
-//	}
+    //	public static function getCacheKey(string | int $storeId): string {
+    //		return "artist-$storeId";
+    //	}
 
-//	public static function removeCache(string | int $storeId) {
-//		if (Cache::has(static::getCacheKey($storeId))) {
-//			Cache::forget(static::getCacheKey($storeId));
-//		}
-//	}
+    //	public static function removeCache(string | int $storeId) {
+    //		if (Cache::has(static::getCacheKey($storeId))) {
+    //			Cache::forget(static::getCacheKey($storeId));
+    //		}
+    //	}
 }

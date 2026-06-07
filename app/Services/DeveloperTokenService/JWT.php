@@ -8,20 +8,17 @@ use Illuminate\Support\Carbon;
 /**
  * Class JWT
  *
- * @package Mapkit
  * @source https://github.com/includable/mapkit-jwt/blob/master/src/JWT.php
  */
 class JWT
 {
-
     public static function make(
-        string  $private_key,
-        string  $key_id,
-        string  $team_id,
-        Carbon  $expiresAt,
+        string $private_key,
+        string $key_id,
+        string $team_id,
+        Carbon $expiresAt,
         ?string $origin = null,
-    ): string
-    {
+    ): string {
         $payload = [
             'iss' => $team_id,
             'iat' => time(),
@@ -37,8 +34,8 @@ class JWT
             $private_key,
             'ES256',
             $key_id, [
-            'kid' => sprintf('"%s"', $key_id),
-            'typ' => 'JWT'
-        ]);
+                'kid' => sprintf('"%s"', $key_id),
+                'typ' => 'JWT',
+            ]);
     }
 }

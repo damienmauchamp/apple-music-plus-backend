@@ -9,10 +9,8 @@ class DeveloperTokenDto
 {
     public function __construct(
         public ?Carbon $expiresAt = null,
-        public bool    $renew = false
-    )
-    {
-    }
+        public bool $renew = false
+    ) {}
 
     public static function fromRequest(DeveloperTokenRequest $request): DeveloperTokenDto
     {

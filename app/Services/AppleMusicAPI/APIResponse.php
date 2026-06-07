@@ -3,71 +3,77 @@
 namespace AppleMusicAPI;
 
 use Psr\Http\Message\ResponseInterface;
-use Sunra\PhpSimple\HtmlDomParser;
 
-class APIResponse {
+class APIResponse
+{
+    private ResponseInterface $response;
 
-	private ResponseInterface $response;
-	private bool $scrapped;
-	private ?int $parser = null;
-	private string $content;
+    private bool $scrapped;
 
-	const ITUNES_API_PARSER = 1;
+    private ?int $parser = null;
 
-	public function __construct(ResponseInterface $response,
-								bool              $scrapped = false) {
-		$this->response = $response;
-		$this->content = $this->response->getBody()->getContents();
-		$this->scrapped = $scrapped;
-	}
+    private string $content;
 
-	public function getStatusCode(): int {
-		return $this->response->getStatusCode();
-	}
+    const ITUNES_API_PARSER = 1;
 
-	public function getContents(): string {
-		return $this->content;
-	}
+    public function __construct(ResponseInterface $response,
+        bool $scrapped = false)
+    {
+        $this->response = $response;
+        $this->content = $this->response->getBody()->getContents();
+        $this->scrapped = $scrapped;
+    }
 
-	public function getData(): array {
-		$string = $this->getContents();
+    public function getStatusCode(): int
+    {
+        return $this->response->getStatusCode();
+    }
 
-		if($this->scrapped) {
-			return [
-				'body' => $this->parse(),
-				'raw' => trim($string, "\ \t\n\r\0\x0B"),
-			];
-		}
+    public function getContents(): string
+    {
+        return $this->content;
+    }
 
-		if($json = json_decode($string, true)) {
-			return $json;
-		}
-		return json_decode(trim($string, "\ \t\n\r\0\x0B"), true) ?: [];
-	}
+    public function getData(): array
+    {
+        $string = $this->getContents();
 
-	/**
-	 * @param int|null $parser
-	 * @return APIResponse
-	 */
-	public function setParser(?int $parser): APIResponse {
-		$this->parser = $parser;
-		return $this;
-	}
+        if ($this->scrapped) {
+            return [
+                'body' => $this->parse(),
+                'raw' => trim($string, "\ \t\n\r\0\x0B"),
+            ];
+        }
 
-	private function parse(): array {
-		switch($this->parser) {
-			case self::ITUNES_API_PARSER:
+        if ($json = json_decode($string, true)) {
+            return $json;
+        }
 
-				$content = trim($this->getContents(), " \t\n\r\0\x0B");
-				if(!preg_match('/<script[^>]*id="serialized-server-data">(.*)<\/script>/', $content, $matches)) {
-					return [];
-				}
-				$json = $matches[1];
-				$array = json_decode($json, true);
-				return array_keys($array) === [0] ? $array[0] : $array;
-			default:
-				return [];
-		}
-	}
+        return json_decode(trim($string, "\ \t\n\r\0\x0B"), true) ?: [];
+    }
 
+    public function setParser(?int $parser): APIResponse
+    {
+        $this->parser = $parser;
+
+        return $this;
+    }
+
+    private function parse(): array
+    {
+        switch ($this->parser) {
+            case self::ITUNES_API_PARSER:
+
+                $content = trim($this->getContents(), " \t\n\r\0\x0B");
+                if (! preg_match('/<script[^>]*id="serialized-server-data">(.*)<\/script>/', $content, $matches)) {
+                    return [];
+                }
+                $json = $matches[1];
+                $array = json_decode($json, true);
+
+                return array_keys($array) === [0] ? $array[0] : $array;
+            default:
+                return [];
+        }
+    }
 }

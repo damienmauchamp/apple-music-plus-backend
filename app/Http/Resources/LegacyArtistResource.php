@@ -11,17 +11,18 @@ use Modules\Artist\Models\Artist;
  */
 class LegacyArtistResource extends JsonResource
 {
-	/**
-	 * Transform the resource into an array.
-	 *
-	 * @return array<string, mixed>
-	 */
-	public function toArray(Request $request): array {
-		return [
-			'id' => $this->id,
-			'storeId' => $this->storeId,
-			'name' => $this->name,
-			'artworkUrl' => $this->artworkUrl,
-		];
-	}
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'storeId' => $this->storeId,
+            'name' => $this->name,
+            'artworkUrl' => $this->artworkUrl,
+        ];
+    }
 }

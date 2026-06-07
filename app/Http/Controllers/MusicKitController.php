@@ -5,22 +5,23 @@ namespace App\Http\Controllers;
 use AppleMusicAPI\MusicKit;
 use Illuminate\Http\Request;
 
-class MusicKitController extends Controller {
+class MusicKitController extends Controller
+{
+    public function addResourceToLibrary(Request $request)
+    {
 
-	public function addResourceToLibrary(Request $request) {
+        $request->validate([
+            'type' => 'required|string|in:albums,songs',
+            'ids' => 'required',
+        ]);
 
-		$request->validate([
-			'type' => 'required|string|in:albums,songs',
-			'ids' => 'required',
-		]);
+        $api = new MusicKit;
+        $ids = is_array($request->ids) ? $request->ids : explode(',', $request->ids);
+        $response = $api->addResourceToLibrary($ids, $request->type);
 
-		$api = new MusicKit();
-		$ids = is_array($request->ids) ? $request->ids : explode(',', $request->ids);
-		$response = $api->addResourceToLibrary($ids, $request->type);
-
-		return [
-			'added' => $response->getStatusCode() === 202,
-			'status' => $response->getStatusCode(),
-		];
-	}
+        return [
+            'added' => $response->getStatusCode() === 202,
+            'status' => $response->getStatusCode(),
+        ];
+    }
 }

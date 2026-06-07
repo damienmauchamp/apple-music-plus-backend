@@ -4,6 +4,7 @@ namespace Modules\Song\Providers;
 
 use App\Providers\Modules\AbstractRouteServiceProvider;
 
-class SongRouteServiceProvider extends AbstractRouteServiceProvider {
+class SongRouteServiceProvider extends AbstractRouteServiceProvider
+{
     public ?string $modulePrefix = 'songs';
 }

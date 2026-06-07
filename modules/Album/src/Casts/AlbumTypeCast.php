@@ -16,7 +16,7 @@ class AlbumTypeCast implements CastsAttributes
             $model->isSingle => AlbumType::SINGLE,
             str_ends_with($model->name, ' - EP') => AlbumType::EP,
             str_ends_with($model->name, ' - Single') => AlbumType::SINGLE,
-//            $model->isCompilation => AlbumType::COMPILATION,
+            //            $model->isCompilation => AlbumType::COMPILATION,
             default => AlbumType::ALBUM,
         };
 

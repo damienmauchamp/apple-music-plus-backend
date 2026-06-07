@@ -21,10 +21,10 @@ abstract class AbstractRouteServiceProvider extends RouteServiceProvider
     {
         $module = $this->module ?: $this->resolveModuleName();
         $modulePrefix = sprintf(
-            "api/%s",
+            'api/%s',
             $this->modulePrefix ?: config(
                 "module::{$module}.route.prefix",
-                lcfirst($module) . static::MODULE_SUFFIX
+                lcfirst($module).static::MODULE_SUFFIX
             )
         );
         // $moduleNamespace = $this->moduleNamespace ?: config("module::{$module}.module.namespace", "");
@@ -68,11 +68,11 @@ abstract class AbstractRouteServiceProvider extends RouteServiceProvider
         );
 
         if (file_exists($apiRoutesPath)) {
-//            Route::name("{$namespace}::")
+            //            Route::name("{$namespace}::")
             Route::prefix($prefix)
-                 ->namespace($namespace)
-                 ->middleware('api')
-                 ->group($apiRoutesPath);
+                ->namespace($namespace)
+                ->middleware('api')
+                ->group($apiRoutesPath);
         }
     }
 
@@ -85,9 +85,9 @@ abstract class AbstractRouteServiceProvider extends RouteServiceProvider
 
         if (file_exists($consoleRoutesPath)) {
             Route::prefix($prefix)
-                 ->namespace($namespace)
-                 ->middleware('console')
-                 ->group($consoleRoutesPath);
+                ->namespace($namespace)
+                ->middleware('console')
+                ->group($consoleRoutesPath);
         }
     }
 
@@ -100,11 +100,9 @@ abstract class AbstractRouteServiceProvider extends RouteServiceProvider
 
         if (file_exists($webRoutesPath)) {
             Route::prefix($prefix)
-                 ->namespace($namespace)
-                 ->middleware('web')
-                 ->group($webRoutesPath);
+                ->namespace($namespace)
+                ->middleware('web')
+                ->group($webRoutesPath);
         }
     }
-
-
 }

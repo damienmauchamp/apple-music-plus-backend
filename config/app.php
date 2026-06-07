@@ -1,7 +1,17 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\AuthServiceProvider;
+use App\Providers\EventServiceProvider;
+use App\Providers\NightwatchServiceProvider;
+use App\Providers\RouteServiceProvider;
+use App\Services\DeveloperTokenService\Providers\DeveloperTokenServiceProvider;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
+use Modules\Album\Providers\AlbumModuleProvider;
+use Modules\Artist\Providers\ArtistModuleProvider;
+use Modules\Auth\Providers\AuthModuleProvider;
+use Modules\Song\Providers\SongModuleProvider;
 
 return [
 
@@ -42,7 +52,7 @@ return [
     |
      */
 
-    'debug' => (bool)env('APP_DEBUG', false),
+    'debug' => (bool) env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -163,19 +173,19 @@ return [
         /*
         * Application Service Providers...
         */
-        App\Providers\AppServiceProvider::class,
-        App\Providers\AuthServiceProvider::class,
+        AppServiceProvider::class,
+        AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
-        App\Providers\EventServiceProvider::class,
-        App\Providers\RouteServiceProvider::class,
-        App\Providers\NightwatchServiceProvider::class,
+        EventServiceProvider::class,
+        RouteServiceProvider::class,
+        NightwatchServiceProvider::class,
 
         // Module Service Providers
-        Modules\Album\Providers\AlbumModuleProvider::class,
-        Modules\Artist\Providers\ArtistModuleProvider::class,
-        Modules\Auth\Providers\AuthModuleProvider::class,
-        Modules\Song\Providers\SongModuleProvider::class,
-        App\Services\DeveloperTokenService\Providers\DeveloperTokenServiceProvider::class,
+        AlbumModuleProvider::class,
+        ArtistModuleProvider::class,
+        AuthModuleProvider::class,
+        SongModuleProvider::class,
+        DeveloperTokenServiceProvider::class,
 
     ])->toArray(),
 

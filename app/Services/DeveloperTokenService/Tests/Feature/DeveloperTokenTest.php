@@ -1,8 +1,9 @@
 <?php
 
+use App\Services\DeveloperTokenService\Models\DeveloperToken;
+use App\Services\DeveloperTokenService\Resources\DeveloperTokenResource;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-use App\Services\DeveloperTokenService\Models\DeveloperToken;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -51,7 +52,7 @@ it('resource returns correct format', function () {
         'expires_at' => Carbon::now()->addHour(),
     ]);
 
-    $resource = new \App\Services\DeveloperTokenService\Resources\DeveloperTokenResource($token);
+    $resource = new DeveloperTokenResource($token);
     $array = $resource->toArray(request());
 
     expect($array)->toHaveKeys(['token', 'notes', 'expires_at']);

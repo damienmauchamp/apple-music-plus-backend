@@ -23,7 +23,6 @@ use Modules\Song\Models\Song;
  */
 class ReleasesUpdater
 {
-
     protected $api;
 
     protected $musicKit;
@@ -52,8 +51,8 @@ class ReleasesUpdater
 
     public function __construct($artistStoreId = null, bool $job = false, bool $exception = false, bool $echo = false)
     {
-        $this->api = new AppleMusic();
-        $this->musicKit = new MusicKit();
+        $this->api = new AppleMusic;
+        $this->musicKit = new MusicKit;
         $this->setArtistByStoreId($artistStoreId);
         $this->job = $job;
         $this->exception = $exception;
@@ -68,7 +67,7 @@ class ReleasesUpdater
             // we're not fetching artist info, we'll do that when the job is executed
             $this->artist = $artist;
         } else {
-            $this->artist = (new ArtistRepository())->updateArtistByStoreId($artist->storeId);
+            $this->artist = (new ArtistRepository)->updateArtistByStoreId($artist->storeId);
         }
 
         return $this;
@@ -78,7 +77,7 @@ class ReleasesUpdater
     {
         if ($artistStoreId) {
             $artist = Artist::fromStoreId($artistStoreId);
-            if (!$artist) {
+            if (! $artist) {
                 throw new ArtistUpdateException("Artist not found {$artistStoreId}", 404);
             }
             $this->setArtist($artist);
@@ -113,7 +112,7 @@ class ReleasesUpdater
     {
         $this->lastJob = null;
 
-        $this->log("[{$this->artist?->storeId}] Update: {$this->artist?->name}" . ($this->job ? ' (job)' : ''), [
+        $this->log("[{$this->artist?->storeId}] Update: {$this->artist?->name}".($this->job ? ' (job)' : ''), [
             'job' => $this->job,
             'dateTime' => $dateTime,
         ]);
@@ -174,12 +173,12 @@ class ReleasesUpdater
 
     public function updateArtist()
     {
-        $this->artist = (new ArtistRepository())->updateArtistByStoreId($this->artist->storeId);
+        $this->artist = (new ArtistRepository)->updateArtistByStoreId($this->artist->storeId);
     }
 
     public function updateAlbums()
     {
-        if (!$this->artist) {
+        if (! $this->artist) {
             throw new Exception('No artist found.');
         }
 
@@ -188,7 +187,7 @@ class ReleasesUpdater
                 'limit' => 100,
             ]);
 
-            $this->log("Fetched " . count($this->albumsResults['data']) . " albums for artist {$this->artist->storeId} - {$this->artist->name}", [
+            $this->log('Fetched '.count($this->albumsResults['data'])." albums for artist {$this->artist->storeId} - {$this->artist->name}", [
                 'artist' => $this->artist,
                 'results' => $this->albumsResults,
             ]);
@@ -237,7 +236,7 @@ class ReleasesUpdater
 
     public function updateSongs()
     {
-        if (!$this->artist) {
+        if (! $this->artist) {
             throw new Exception('No artist found.');
         }
 
@@ -310,7 +309,7 @@ class ReleasesUpdater
             ->pluck('storeId')
             ->toArray();
 
-        if (!$albumStoreIds) {
+        if (! $albumStoreIds) {
             return $this;
         }
 
@@ -351,7 +350,7 @@ class ReleasesUpdater
             ->pluck('storeId')
             ->toArray();
 
-        if (!$songsStoreIds) {
+        if (! $songsStoreIds) {
             return $this;
         }
 
@@ -387,7 +386,7 @@ class ReleasesUpdater
     /**
      * Undocumented function
      *
-     * @param Artist[] $artists
+     * @param  Artist[]  $artists
      */
     public static function fromArtistArray($artists, bool $job = false, bool $exception = false, bool $echo = false): array
     {
@@ -395,8 +394,8 @@ class ReleasesUpdater
         $errors = [];
 
         set_time_limit(0);
-        $updater = new ReleasesUpdater();
-        $updater->log("[FromArray] " . count($artists) . " artists" . ($job ? ' (job)' : ''));
+        $updater = new ReleasesUpdater;
+        $updater->log('[FromArray] '.count($artists).' artists'.($job ? ' (job)' : ''));
         $updater->setJob($job);
         $updater->setException($exception);
         $updater->setEcho($echo);
@@ -422,6 +421,7 @@ class ReleasesUpdater
                     'message' => 'Something went wrong (1)',
                     'artist' => $artist,
                 ];
+
                 continue;
             } catch (Exception $exception) {
                 $errors[] = [
@@ -430,7 +430,7 @@ class ReleasesUpdater
                     'artist' => $artist,
                 ];
 
-                if (!$updater->exception) {
+                if (! $updater->exception) {
                     continue;
                 }
             }

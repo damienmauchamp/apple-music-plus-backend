@@ -7,12 +7,12 @@ use RuntimeException;
 trait ModuleResolver
 {
     public string $modulesDirectory = __DIR__
-    . DIRECTORY_SEPARATOR . '..'
-    . DIRECTORY_SEPARATOR . '..'
-    . DIRECTORY_SEPARATOR . '..'
-    . DIRECTORY_SEPARATOR . 'modules';
+        .DIRECTORY_SEPARATOR.'..'
+        .DIRECTORY_SEPARATOR.'..'
+        .DIRECTORY_SEPARATOR.'..'
+        .DIRECTORY_SEPARATOR.'modules';
 
-    public function resolveModuleName():string
+    public function resolveModuleName(): string
     {
         $class = static::class;
 
@@ -29,12 +29,13 @@ trait ModuleResolver
         );
     }
 
-    public function resolveModulePath(string $path, string $module): string {
+    public function resolveModulePath(string $path, string $module): string
+    {
         $module = ucfirst($module);
 
-        if (!is_dir("$this->modulesDirectory/$module")) {
+        if (! is_dir("$this->modulesDirectory/$module")) {
             throw new RuntimeException("Module directory does not exist: $this->modulesDirectory/$module"
-            . ' - ' . realpath("$this->modulesDirectory/$module"));
+            .' - '.realpath("$this->modulesDirectory/$module"));
         }
 
         return "$this->modulesDirectory/$module/$path";

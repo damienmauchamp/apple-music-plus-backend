@@ -13,10 +13,8 @@ readonly class DeveloperTokenService
 {
     public function __construct(
         private ?string $configurationToken,
-        private int     $defaultExpirationTime,
-    )
-    {
-    }
+        private int $defaultExpirationTime,
+    ) {}
 
     /**
      * @throws MissingDeveloperTokenConfigurationException
@@ -24,8 +22,7 @@ readonly class DeveloperTokenService
      */
     public static function fromDto(
         DeveloperTokenDto $dto,
-    ): DeveloperToken
-    {
+    ): DeveloperToken {
         return app(self::class)->getFirstOrCreate(
             $dto->renew,
             $dto->expiresAt,
@@ -37,10 +34,9 @@ readonly class DeveloperTokenService
      * @throws DeveloperTokenCreationFailedException
      */
     public function getFirstOrCreate(
-        bool    $renew = false,
+        bool $renew = false,
         ?Carbon $expiresAt = null,
-    ): DeveloperToken
-    {
+    ): DeveloperToken {
         if ($this->configurationToken) {
             return DeveloperToken::make([
                 'token' => $this->configurationToken,
@@ -72,13 +68,13 @@ readonly class DeveloperTokenService
         $team_id = config('musickit.apple.team_id');
         $key_id = config('musickit.apple.key_id');
 
-        if (!$private_key) {
+        if (! $private_key) {
             throw new MissingDeveloperTokenConfigurationException('Unable to generate developer token : no APPLE_AUTH_KEY_FILE or APPLE_AUTH_KEY found');
         }
-        if (!$team_id) {
+        if (! $team_id) {
             throw new MissingDeveloperTokenConfigurationException('Unable to generate developer token : no APPLE_TEAM_ID found');
         }
-        if (!$key_id) {
+        if (! $key_id) {
             throw new MissingDeveloperTokenConfigurationException('Unable to generate developer token : no APPLE_KEY_ID found');
         }
 
@@ -113,5 +109,4 @@ readonly class DeveloperTokenService
 
         return null;
     }
-
 }

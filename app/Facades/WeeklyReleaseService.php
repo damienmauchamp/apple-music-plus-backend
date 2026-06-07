@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @see \App\Services\WeeklyReleaseService
+ *
  * @method static fromRequest(Request $request, string $key = 'filter')
  */
 class WeeklyReleaseService extends Facade

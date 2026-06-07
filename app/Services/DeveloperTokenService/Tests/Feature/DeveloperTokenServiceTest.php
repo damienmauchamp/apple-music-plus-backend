@@ -46,7 +46,7 @@ it('throws exception if config is missing', function () {
     config(['musickit.apple.team_id' => null]);
     $service = app(DeveloperTokenService::class);
 
-    expect(fn() => $service->generate(Carbon::now()->addHour()))
+    expect(fn () => $service->generate(Carbon::now()->addHour()))
         ->toThrow(MissingDeveloperTokenConfigurationException::class);
 });
 
@@ -64,6 +64,6 @@ it('throws exception if private key is missing', function () {
     config(['musickit.apple.auth_key.value' => null]);
     $service = app(DeveloperTokenService::class);
 
-    expect(fn() => $service->generate(Carbon::now()->addHour()))
+    expect(fn () => $service->generate(Carbon::now()->addHour()))
         ->toThrow(MissingDeveloperTokenConfigurationException::class);
 });
