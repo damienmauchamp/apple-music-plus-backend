@@ -6,11 +6,8 @@ use App\Http\Requests\ListReleasableRequest;
 
 class ListSongsRequest extends ListReleasableRequest
 {
-
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -19,8 +16,6 @@ class ListSongsRequest extends ListReleasableRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -36,5 +31,4 @@ class ListSongsRequest extends ListReleasableRequest
     {
         return array_merge(parent::getSorts(), []);
     }
-
 }

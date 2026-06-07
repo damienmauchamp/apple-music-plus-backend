@@ -17,7 +17,7 @@ class AuthController extends Controller
     public function register(Request $request): JsonResponse
     {
         try {
-            //Validated
+            // Validated
             $validateUser = Validator::make($request->all(),
                 [
                     'name' => 'required',
@@ -42,7 +42,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'User Created Successfully',
-                'token' => $user->createToken("API_TOKEN")->plainTextToken,
+                'token' => $user->createToken('API_TOKEN')->plainTextToken,
                 'user' => new $user,
             ], 200);
 
@@ -57,7 +57,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
-            //Validated
+            // Validated
             $validateUser = Validator::make($request->all(),
                 [
                     'email' => 'required',
@@ -75,7 +75,7 @@ class AuthController extends Controller
                     ], 401);
                 }
 
-                if (!Auth::attempt($request->only(['email', 'password']))) {
+                if (! Auth::attempt($request->only(['email', 'password']))) {
                     return response()->json([
                         'status' => false,
                         'message' => 'Email & Password does not exist.',
@@ -87,7 +87,7 @@ class AuthController extends Controller
                 return response()->json([
                     'status' => true,
                     'message' => 'Logged In Successfully',
-                    'token' => $user->createToken("API_TOKEN")->plainTextToken,
+                    'token' => $user->createToken('API_TOKEN')->plainTextToken,
                     'user' => $user,
                 ], 200);
             }
@@ -102,7 +102,7 @@ class AuthController extends Controller
 
     public function authenticateFrontend()
     {
-        if (!Auth::guard('web')->attempt(
+        if (! Auth::guard('web')->attempt(
             request()->only(['email', 'password']),
             request()->boolean('remember')
         )) {

@@ -4,7 +4,5 @@ namespace Modules\Album\Services;
 
 class AlbumService
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 }

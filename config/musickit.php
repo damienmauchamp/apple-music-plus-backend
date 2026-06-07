@@ -14,7 +14,7 @@ return [
 
         'ssl' => [
             'cert' => env('AM_SSL_CERT', ''),
-            'verify' => env('AM_SSL_VERIRY', true),
+            'verify' => env('AM_SSL_VERIFY', true),
         ],
 
         // default 180 days (15,552,000 seconds)
@@ -22,5 +22,9 @@ return [
 
         // restrict developer token usage to specific origins if set
         'developer_token_allowed_origins' => env('AM_DEVELOPER_TOKEN_ALLOWED_ORIGINS'),
+
+        'music_kit_token' => env('AM_MUSIC_KIT_TOKEN', ''),
+        'itunes_default_country' => env('AM_ITUNES_DEFAULT_COUNTRY', 'us'),
+        'storefront_timezone' => env('AM_STOREFRONT_TIMEZONE', 'Europe/Paris'),
     ],
 ];

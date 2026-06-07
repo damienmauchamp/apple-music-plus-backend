@@ -25,10 +25,10 @@ class DeveloperTokenController extends Controller
             ], 500);
         } catch (Throwable $e) {
             Log::error($e);
+
             return response()->json([
                 'error' => 'An unexpected error occurred.',
             ], 500);
         }
     }
-
 }

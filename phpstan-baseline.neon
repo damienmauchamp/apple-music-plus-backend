@@ -1,0 +1,265 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$artists of static method App\\Services\\Core\\ReleasesUpdater\:\:fromArtistArray\(\) expects array\<Modules\\Artist\\Models\\Artist\>, Illuminate\\Database\\Eloquent\\Collection\<int, Modules\\Artist\\Models\\Artist\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/FetchAllArtistsReleases.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:filterContentRating\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Filters/ContentRatingFilter.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:isUpcoming\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Filters/UpcomingFilter.php
+
+		-
+			message: '#^Variable \$weekly on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: app/Helpers/SystemHelper.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 3
+			path: app/Http/Controllers/ArtistController.php
+
+		-
+			message: '#^Parameter \#1 \$artists of static method App\\Services\\Core\\ReleasesUpdater\:\:fromArtistArray\(\) expects array\<Modules\\Artist\\Models\\Artist\>, Illuminate\\Database\\Eloquent\\Collection\<int, Modules\\Artist\\Models\\Artist\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/ArtistController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: app/Http/Controllers/LegacyReleasesController.php
+
+		-
+			message: '#^Relation ''artists'' is not found in App\\Models\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/TestController.php
+
+		-
+			message: '#^Method App\\Http\\Middleware\\MusicKitToken\:\:isValidToken\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Http/Middleware/MusicKitToken.php
+
+		-
+			message: '#^Static call to instance method App\\Facades\\WeeklyReleaseService\:\:fromRequest\(\)\.$#'
+			identifier: method.staticCall
+			count: 1
+			path: app/Http/Requests/ListReleasableRequest.php
+
+		-
+			message: '#^Class App\\Http\\Resources\\LegacyAlbumCollection @extends tag contains incompatible type Illuminate\\Http\\Resources\\Json\\ResourceCollection&iterable\<int, Modules\\Album\\Models\\Album\>\.$#'
+			identifier: generics.notCompatible
+			count: 1
+			path: app/Http/Resources/LegacyAlbumCollection.php
+
+		-
+			message: '#^Class App\\Http\\Resources\\LegacySongCollection @extends tag contains incompatible type Illuminate\\Http\\Resources\\Json\\ResourceCollection&iterable\<int, Modules\\Song\\Models\\Song\>\.$#'
+			identifier: generics.notCompatible
+			count: 1
+			path: app/Http/Resources/LegacySongCollection.php
+
+		-
+			message: '#^Parameter \#1 \$artists of static method App\\Services\\Core\\ReleasesUpdater\:\:fromArtistArray\(\) expects array\<Modules\\Artist\\Models\\Artist\>, Illuminate\\Database\\Eloquent\\Collection\<int, Modules\\Artist\\Models\\Artist\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Jobs/UpdateAllArtists.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property App\\Models\\User\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property App\\Models\\User\:\:\$hidden is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$hidden\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(\[type\] \$storeId\)\: Unexpected token "\[", expected type at offset 54 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: app/Repositories/ArtistRepository.php
+
+		-
+			message: '#^Property AppleMusicAPI\\APIRequest\:\:\$page is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: app/Services/AppleMusicAPI/APIRequest.php
+
+		-
+			message: '#^Property AppleMusicAPI\\APIRequest\:\:\$parameters is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: app/Services/AppleMusicAPI/APIRequest.php
+
+		-
+			message: '#^Property AppleMusicAPI\\APIRequest\:\:\$retrying is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: app/Services/AppleMusicAPI/APIRequest.php
+
+		-
+			message: '#^Property AppleMusicAPI\\AbstractAPI\:\:\$token_expiracy_status \(int\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: app/Services/AppleMusicAPI/AbstractAPI.php
+
+		-
+			message: '#^Property AppleMusicAPI\\AbstractAPI\:\:\$token_expiracy_status_max_try \(int\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: app/Services/AppleMusicAPI/AbstractAPI.php
+
+		-
+			message: '#^Property AppleMusicAPI\\AbstractAPI\:\:\$token_expiracy_status_try \(int\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: app/Services/AppleMusicAPI/AbstractAPI.php
+
+		-
+			message: '#^Property AppleMusicAPI\\AppleMusic\:\:\$limit \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: app/Services/AppleMusicAPI/AppleMusic.php
+
+		-
+			message: '#^Property AppleMusicAPI\\AppleMusic\:\:\$limit is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: app/Services/AppleMusicAPI/AppleMusic.php
+
+		-
+			message: '#^Parameter \#1 \$storefront of method AppleMusicAPI\\AppleMusic\:\:__construct\(\) expects string, bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/AppleMusicAPI/MusicKit.php
+
+		-
+			message: '#^Property AppleMusicAPI\\MusicKit\:\:\$l is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: app/Services/AppleMusicAPI/MusicKit.php
+
+		-
+			message: '#^Property AppleMusicAPI\\MusicKit\:\:\$limit \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: app/Services/AppleMusicAPI/MusicKit.php
+
+		-
+			message: '#^Property AppleMusicAPI\\MusicKit\:\:\$offset is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: app/Services/AppleMusicAPI/MusicKit.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Symfony\\Component\\HttpFoundation\\HeaderBag\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/AppleMusicAPI/MusicKit.php
+
+		-
+			message: '#^Using nullsafe property access on non\-nullable type Illuminate\\Http\\Request\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/AppleMusicAPI/MusicKit.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 5
+			path: app/Services/CacheHandler.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$contentRating\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ContentRatingService.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getUniqueNameKey\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Services/ContentRatingService.php
+
+		-
+			message: '#^Method App\\Services\\Core\\ReleasesUpdater\:\:__construct\(\) with return type void returns \$this\(App\\Services\\Core\\ReleasesUpdater\) but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: app/Services/Core/ReleasesUpdater.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: app/Services/Core/ReleasesUpdater.php
+
+		-
+			message: '#^Called ''Model\:\:make\(\)'' which performs unnecessary work, use ''new Model\(\)''\.$#'
+			identifier: larastan.noModelMake
+			count: 1
+			path: app/Services/DeveloperTokenService/DeveloperTokenService.php
+
+		-
+			message: '#^Left side of && is always true\.$#'
+			identifier: booleanAnd.leftAlwaysTrue
+			count: 1
+			path: app/Services/DeveloperTokenService/Middlewares/CheckOriginMiddleware.php
+
+		-
+			message: '#^Cannot call method toDateTimeString\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Services/DeveloperTokenService/Tests/Feature/DeveloperTokenServiceTest.php
+
+		-
+			message: '#^Call to an undefined method PHPUnit\\Framework\\TestCase\:\:getJson\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: app/Services/DeveloperTokenService/Tests/Feature/DeveloperTokenTest.php
+
+		-
+			message: '#^Match arm comparison between Modules\\Album\\Enum\\AlbumType\:\:COMPILATION and Modules\\Album\\Enum\\AlbumType\:\:COMPILATION is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: modules/Album/src/Filters/AlbumTypeFilter.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Modules\\Album\\Models\\Album\>\:\:allowedFilters\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/Album/src/Http/Controllers/ListAlbumsController.php
+
+		-
+			message: '#^Method Modules\\Auth\\Http\\Controllers\\AuthController\:\:authenticateFrontend\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: modules/Auth/src/Http/Controllers/AuthController.php
+
+		-
+			message: '#^Static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\User\>\:\:create\(\) invoked with 2 parameters, 0\-1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: modules/Auth/src/Http/Controllers/AuthController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Modules\\Song\\Models\\Song\>\:\:allowedFilters\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/Song/src/Http/Controllers/ListSongsController.php

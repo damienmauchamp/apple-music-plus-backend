@@ -7,8 +7,6 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class DeveloperTokenRequest extends FormRequest
 {
-
-
     public function authorize(): bool
     {
         return true;
@@ -28,5 +26,4 @@ class DeveloperTokenRequest extends FormRequest
     {
         return DeveloperTokenDto::fromRequest($this);
     }
-
 }

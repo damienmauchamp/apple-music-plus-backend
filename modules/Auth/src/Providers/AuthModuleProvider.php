@@ -2,6 +2,7 @@
 
 namespace Modules\Auth\Providers;
 
+use App\Models\User;
 use App\Providers\Modules\AbstractServiceProvider;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -12,10 +13,11 @@ class AuthModuleProvider extends AbstractServiceProvider
 
     public ServiceProvider|string $routeServiceProvider = AuthRouteServiceProvider::class;
 
-    public function boot(): void {
+    public function boot(): void
+    {
         parent::boot();
         Relation::enforceMorphMap([
-            'user' => \App\Models\User::class,
+            'user' => User::class,
         ]);
     }
 }

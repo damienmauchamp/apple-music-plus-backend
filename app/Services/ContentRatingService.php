@@ -12,9 +12,7 @@ class ContentRatingService
     /**
      * Filter a collection of releasables by content rating priority.
      *
-     * @param Collection<Album|Song> $releasables
-     *
-     * @return Collection
+     * @param  Collection<Album|Song>  $releasables
      */
     public function filterContentRatingPriority(Collection $releasables): Collection
     {
@@ -23,7 +21,7 @@ class ContentRatingService
 
         return $releasables
             ->sortBy(function ($releasable) use ($preferred, $fallback) {
-                return match ( $releasable->contentRating ) {
+                return match ($releasable->contentRating) {
                     $preferred => 1,
                     $fallback => 2,
                     default => 3,

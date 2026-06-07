@@ -7,14 +7,15 @@ use Illuminate\Http\Request;
 class WeeklyReleaseService
 {
     private array $filters;
+
     private bool $weekly;
+
     private string $startDay;
 
     public function __construct(
         private readonly Request $request,
         private readonly string $key = 'filter',
-    )
-    {
+    ) {
         $this->filters = $this->request->input($this->key, []);
         $this->weekly = $this->request->boolean("$this->key.weekly");
         $this->startDay = config('music.weekly_start_day', 'friday');
@@ -27,7 +28,7 @@ class WeeklyReleaseService
 
     public function handle(): void
     {
-        if (!$this->weekly) {
+        if (! $this->weekly) {
             return;
         }
 
@@ -35,7 +36,7 @@ class WeeklyReleaseService
 
         $filter = array_merge($this->filters, [
             'from' => $range['from'],
-            'to'   => $range['to'],
+            'to' => $range['to'],
         ]);
 
         $this->applyFilters($filter);
@@ -43,7 +44,7 @@ class WeeklyReleaseService
 
     private function getDateRange(): array
     {
-        if (!empty($this->filters['from'])) {
+        if (! empty($this->filters['from'])) {
             return DateRangeService::resolveWeeklyRange($this->filters['from'], $this->startDay);
         }
 
@@ -55,7 +56,7 @@ class WeeklyReleaseService
 
     private function applyFilters(array $filter): void
     {
-        $data = [ 'filter' => array_merge($this->filters, $filter)];
+        $data = ['filter' => array_merge($this->filters, $filter)];
 
         $this->request->merge($data);
 

@@ -2,161 +2,179 @@
 
 namespace AppleMusicAPI;
 
-//class MusicKit extends AbstractAPI {
-class MusicKit extends AppleMusic {
-	protected string $name = 'MusicKit API';
-	protected string $path = 'v1/me/';
-	private string $music_kit_token = '';
+// class MusicKit extends AbstractAPI {
+class MusicKit extends AppleMusic
+{
+    protected string $name = 'MusicKit API';
 
-	public const MAX_LIMIT = 100;
-	private ?int $limit = null;
-	private string $offset = '';
-	private string $l = '';
+    protected string $path = 'v1/me/';
 
-	public function __construct(?string $music_kit_token = null, bool $renew = false) {
-		// $this->music_kit_token = $music_kit_token ?? self::getHeaderToken() ?? $_SESSION['headerUserMusicToken'] ?? '';
-		$this->music_kit_token = $music_kit_token ?? self::getHeaderToken() ?? '';
-		parent::__construct($renew);
-	}
+    private string $music_kit_token = '';
 
-	public static function getRequestHeaderMusicToken(): ?string {
-		return request()?->headers?->get('Music-Token', null);
-	}
+    public const MAX_LIMIT = 100;
 
-	private static function getHeaderToken(): ?string {
-		return self::getRequestHeaderMusicToken();
-	}
+    private ?int $limit = null;
 
-	public function setMusicKitToken(string $music_kit_token): self {
-		$this->music_kit_token = $music_kit_token;
-		$this->init();
+    private string $offset = '';
 
-		return $this;
-	}
+    private string $l = '';
 
-	public function getMusicKitToken(): string {
-		return $this->music_kit_token;
-	}
+    public function __construct(?string $music_kit_token = null, bool $renew = false)
+    {
+        // $this->music_kit_token = $music_kit_token ?? self::getHeaderToken() ?? $_SESSION['headerUserMusicToken'] ?? '';
+        $this->music_kit_token = $music_kit_token ?? self::getHeaderToken() ?? '';
+        parent::__construct($renew);
+    }
 
-	public function headers(): array {
-		return array_merge(parent::headers(), [
-			'Content-Type' => 'application/json',
-			'Music-User-Token' => $this->music_kit_token,
-		]);
-	}
+    public static function getRequestHeaderMusicToken(): ?string
+    {
+        return request()?->headers?->get('Music-Token', null);
+    }
 
-	protected function initDeveloperToken(bool $renew = false): void {
-		parent::initDeveloperToken($renew);
+    private static function getHeaderToken(): ?string
+    {
+        return self::getRequestHeaderMusicToken();
+    }
 
-		// .env MUSIC_KIT_TOKEN
-		if (env('AM_MUSIC_KIT_TOKEN')) {
-			$this->music_kit_token = env('AM_MUSIC_KIT_TOKEN');
-		}
-	}
+    public function setMusicKitToken(string $music_kit_token): self
+    {
+        $this->music_kit_token = $music_kit_token;
+        $this->init();
 
-	private function getPage($uri, array $parameters = [],
-		?int $max_page = 5,
-		?int $max_results = null): array {
+        return $this;
+    }
 
-		// setting limit
-		$parameters['limit'] = $parameters['limit'] ?? $this->limit ?? self::MAX_LIMIT;
+    public function getMusicKitToken(): string
+    {
+        return $this->music_kit_token;
+    }
 
-		$page = 1;
-		$results = 0;
-		$data = [];
-		while (true) {
-			// setting pagination
-			$parameters['offset'] = ($page - 1) * $parameters['limit'];
+    public function headers(): array
+    {
+        return array_merge(parent::headers(), [
+            'Content-Type' => 'application/json',
+            'Music-User-Token' => $this->music_kit_token,
+        ]);
+    }
 
-			// fetch
-			$response = $this->get($uri, $parameters)->getData();
+    protected function initDeveloperToken(bool $renew = false): void
+    {
+        parent::initDeveloperToken($renew);
 
-			// data
-			$results += count($response['data']);
-			$data = array_merge($data, array_values($response['data']));
-			$next = $response['next'] ?? null;
-			$total = $response['meta']['total'];
+        // config musickit.apple.music_kit_token (AM_MUSIC_KIT_TOKEN)
+        if ($token = config('musickit.apple.music_kit_token')) {
+            $this->music_kit_token = $token;
+        }
+    }
 
-			if (!$next || !$data || $max_results !== null && $results >= $max_results || $max_page !== null && $page >= $max_page) {
-				break;
-			}
+    private function getPage($uri, array $parameters = [],
+        ?int $max_page = 5,
+        ?int $max_results = null): array
+    {
 
-			$page++;
-		}
+        // setting limit
+        $parameters['limit'] = $parameters['limit'] ?? $this->limit ?? self::MAX_LIMIT;
 
-		return [
-			'results' => $results,
-			'data' => $data,
-			'page' => $page,
-			'total_page' => (int) ceil($total / $parameters['limit']),
-			'total' => $total ?? 0,
-		];
-	}
+        $page = 1;
+        $results = 0;
+        $data = [];
+        while (true) {
+            // setting pagination
+            $parameters['offset'] = ($page - 1) * $parameters['limit'];
 
-	public function test(): APIResponse {
-		return $this->get('/library/search', [
-			'term' => 'test',
-			'types' => 'library-songs',
-		]);
-	}
+            // fetch
+            $response = $this->get($uri, $parameters)->getData();
 
-	// region Albums
+            // data
+            $results += count($response['data']);
+            $data = array_merge($data, array_values($response['data']));
+            $next = $response['next'] ?? null;
+            $total = $response['meta']['total'];
 
-	public function addResourceToLibrary(array $ids, string $type, array $parameters = []): APIResponse {
-		$parameters["ids[$type]"] = implode(',', $ids);
+            if (! $next || ! $data || $max_results !== null && $results >= $max_results || $max_page !== null && $page >= $max_page) {
+                break;
+            }
 
-		return $this->post('/library', $parameters);
-	}
+            $page++;
+        }
 
-	// endregion Albums
+        return [
+            'results' => $results,
+            'data' => $data,
+            'page' => $page,
+            'total_page' => (int) ceil($total / $parameters['limit']),
+            'total' => $total ?? 0,
+        ];
+    }
 
-	// region Search
+    public function test(): APIResponse
+    {
+        return $this->get('/library/search', [
+            'term' => 'test',
+            'types' => 'library-songs',
+        ]);
+    }
 
-	// endregion Search
+    // region Albums
 
-	// region Artists
+    public function addResourceToLibrary(array $ids, string $type, array $parameters = []): APIResponse
+    {
+        $parameters["ids[$type]"] = implode(',', $ids);
 
-	public function getAllLibraryArtists(array $parameters = []): APIResponse {
-		return $this->get('/library/artists', $parameters);
-	}
+        return $this->post('/library', $parameters);
+    }
 
-	public function getAllLibraryArtistsPaginate(array $parameters = [],
-		?int $max_page = 5,
-		?int $max_results = null): array {
-		return $this->getPage('/library/artists', $parameters, $max_page, $max_results);
-	}
+    // endregion Albums
 
-	// endregion Artists
+    // region Search
 
-	// region trash
+    // endregion Search
 
-//	public static function current(): self {
-//		$api = new self();
-//		return $api->setUserToken();
-//	}
-//
-//	/**
-//	 * @throws Exception No user found
-//	 */
-//	public static function fromUser(int $id): self {
-//		$api = new self();
-//		return $api->setUserTokenViaId($id);
-//	}
-//
-//	public function setUserToken(): self {
-//		return $this->setMusicKitToken($this->app->getUserToken());
-//	}
-//
-//	/**
-//	 * @throws Exception No user found
-//	 */
-//	public function setUserTokenViaId(int $id): self {
-//		$user = $this->app->manager()->findOne2('users', ['id' => $id]);
-//		if(!$user) {
-//			throw new Exception('No user found');
-//		}
-//		return $this->setMusicKitToken($user['musickit_user_token']);
-//	}
-	// endregion trash
+    // region Artists
+
+    public function getAllLibraryArtists(array $parameters = []): APIResponse
+    {
+        return $this->get('/library/artists', $parameters);
+    }
+
+    public function getAllLibraryArtistsPaginate(array $parameters = [],
+        ?int $max_page = 5,
+        ?int $max_results = null): array
+    {
+        return $this->getPage('/library/artists', $parameters, $max_page, $max_results);
+    }
+
+    // endregion Artists
+
+    // region trash
+
+    //	public static function current(): self {
+    //		$api = new self();
+    //		return $api->setUserToken();
+    //	}
+    //
+    //	/**
+    //	 * @throws Exception No user found
+    //	 */
+    //	public static function fromUser(int $id): self {
+    //		$api = new self();
+    //		return $api->setUserTokenViaId($id);
+    //	}
+    //
+    //	public function setUserToken(): self {
+    //		return $this->setMusicKitToken($this->app->getUserToken());
+    //	}
+    //
+    //	/**
+    //	 * @throws Exception No user found
+    //	 */
+    //	public function setUserTokenViaId(int $id): self {
+    //		$user = $this->app->manager()->findOne2('users', ['id' => $id]);
+    //		if(!$user) {
+    //			throw new Exception('No user found');
+    //		}
+    //		return $this->setMusicKitToken($user['musickit_user_token']);
+    //	}
+    // endregion trash
 
 }

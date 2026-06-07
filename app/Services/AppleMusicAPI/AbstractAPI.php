@@ -8,159 +8,181 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 
-class AbstractAPI {
+class AbstractAPI
+{
+    protected string $name = 'API';
 
-	protected string $name = 'API';
-	protected string $url = 'https://api.music.apple.com/';
-	protected string $path = 'v1/';
-	protected string $storefront;
-	//
-	protected bool $developer = true;
-	protected bool $scrapped = false;
-	private string $developer_token = '';
-	private string $music_kit_token = '';
-	// private int $token_expiracy = 3600; // 3600;
-	//
-	private ?int $token_expiracy_status = 401;
-	private ?int $token_expiracy_status_try = 0;
-	private ?int $token_expiracy_status_max_try = 2;
-	//
-	private Client $client;
+    protected string $url = 'https://api.music.apple.com/';
 
-	//
+    protected string $path = 'v1/';
 
-	public function __construct(bool $renew = false) {
-//		parent::__construct();
-		$this->init($renew);
-	}
+    protected string $storefront;
 
-	public function init(bool $renew = false): void {
-		$this->initDeveloperToken($renew);
-		$this->initMusicKitToken();
-		$this->initClient();
-	}
+    //
+    protected bool $developer = true;
 
-	/**
-	 * @throws Exception Too many failures
-	 */
-	public function prepare(bool $retrying = false): void {
-		if (!$retrying) {
-			$this->token_expiracy_status_try = 0;
+    protected bool $scrapped = false;
 
-			return;
-		}
+    private string $developer_token = '';
 
-		$this->token_expiracy_status_try++;
+    private string $music_kit_token = '';
 
-		if ($this->token_expiracy_status_try > $this->token_expiracy_status_max_try) {
-			// todo : custom exception
-			throw new Exception('Too many failures');
-		}
-	}
+    // private int $token_expiracy = 3600; // 3600;
+    //
+    private ?int $token_expiracy_status = 401;
 
-	public function headers(): array {
-		$headers = [];
-		if ($this->music_kit_token) {
-			$headers['Music-User-Token'] = $this->music_kit_token;
-		}
+    private ?int $token_expiracy_status_try = 0;
 
-		return $headers;
-	}
+    private ?int $token_expiracy_status_max_try = 2;
 
-	protected function setUrl(&$uri, array $parameters = []): string {
-		$uri = preg_replace('/\/+/', '/', sprintf('%s/%s%s', $this->path, $uri,
-			$parameters ? sprintf('?%s', http_build_query($parameters)) : ''));
+    //
+    private Client $client;
 
-		return $uri;
-	}
+    //
 
-	protected function initClient(?string $token = null): self {
-		$options = [
-			'base_uri' => $this->url,
-//			'Accept' => 'application/json',
-			'headers' => $this->headers(),
-		];
+    public function __construct(bool $renew = false)
+    {
+        //		parent::__construct();
+        $this->init($renew);
+    }
+
+    public function init(bool $renew = false): void
+    {
+        $this->initDeveloperToken($renew);
+        $this->initMusicKitToken();
+        $this->initClient();
+    }
+
+    /**
+     * @throws Exception Too many failures
+     */
+    public function prepare(bool $retrying = false): void
+    {
+        if (! $retrying) {
+            $this->token_expiracy_status_try = 0;
+
+            return;
+        }
+
+        $this->token_expiracy_status_try++;
+
+        if ($this->token_expiracy_status_try > $this->token_expiracy_status_max_try) {
+            // todo : custom exception
+            throw new Exception('Too many failures');
+        }
+    }
+
+    public function headers(): array
+    {
+        $headers = [];
+        if ($this->music_kit_token) {
+            $headers['Music-User-Token'] = $this->music_kit_token;
+        }
+
+        return $headers;
+    }
+
+    protected function setUrl(&$uri, array $parameters = []): string
+    {
+        $uri = preg_replace('/\/+/', '/', sprintf('%s/%s%s', $this->path, $uri,
+            $parameters ? sprintf('?%s', http_build_query($parameters)) : ''));
+
+        return $uri;
+    }
+
+    protected function initClient(?string $token = null): self
+    {
+        $options = [
+            'base_uri' => $this->url,
+            //			'Accept' => 'application/json',
+            'headers' => $this->headers(),
+        ];
 
         if ($cert = config('musickit.apple.ssl.cert')) {
             $options['verify'] = $cert;
-		} else {
+        } else {
             $options['verify'] = config('musickit.apple.ssl.verify');
-		}
+        }
 
-		$token = ($token ?? $this->developer_token) ?: '';
-		if ($token) {
-			$options['headers'] = array_merge([
-				'Authorization' => "Bearer {$token}",
-			], $options['headers']);
-		}
-		$this->client = new Client($options);
+        $token = ($token ?? $this->developer_token) ?: '';
+        if ($token) {
+            $options['headers'] = array_merge([
+                'Authorization' => "Bearer {$token}",
+            ], $options['headers']);
+        }
+        $this->client = new Client($options);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	protected function tokenExpired(string $token): bool {
-		$current_token = $this->developer_token;
-		$this->initClient($token);
+    protected function tokenExpired(string $token): bool
+    {
+        $current_token = $this->developer_token;
+        $this->initClient($token);
 
-		$expired = false;
-		try {
-			$response = $this->test();
-		} catch (GuzzleException $e) {
-			$expired = true;
-		}
-		$this->developer_token = $current_token;
+        $expired = false;
+        try {
+            $response = $this->test();
+        } catch (GuzzleException $e) {
+            $expired = true;
+        }
+        $this->developer_token = $current_token;
 
-		return $expired;
-	}
+        return $expired;
+    }
 
-	/**
-	 * @throws Exception
-	 */
-	protected function initDeveloperToken(bool $renew = false): void {
+    /**
+     * @throws Exception
+     */
+    protected function initDeveloperToken(bool $renew = false): void
+    {
 
-		if (!$this->developer) {
-			$this->developer_token = '';
+        if (! $this->developer) {
+            $this->developer_token = '';
 
-			return;
-		}
+            return;
+        }
 
         $this->developer_token = DeveloperTokenService::getFirstOrCreate($renew)->token;
-	}
+    }
 
-	protected function initMusicKitToken(): void {
-		$this->music_kit_token = MusicKit::getRequestHeaderMusicToken() ?? '';
-	}
+    protected function initMusicKitToken(): void
+    {
+        $this->music_kit_token = MusicKit::getRequestHeaderMusicToken() ?? '';
+    }
 
-	public function setMusicKitToken(string $music_kit_token): self {
-		$this->music_kit_token = $music_kit_token;
+    public function setMusicKitToken(string $music_kit_token): self
+    {
+        $this->music_kit_token = $music_kit_token;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @throws GuzzleException 400 error
-	 * @throws Exception Too many failures
-	 */
-	protected function get($uri, array $parameters = [], array $options = [], bool $retrying = false): APIResponse {
+    /**
+     * @throws GuzzleException 400 error
+     * @throws Exception Too many failures
+     */
+    protected function get($uri, array $parameters = [], array $options = [], bool $retrying = false): APIResponse
+    {
 
-		$this->prepare($retrying);
+        $this->prepare($retrying);
 
-        if (!$retrying) {
+        if (! $retrying) {
             $this->setUrl($uri, $parameters);
         }
 
-//        Log::info("[AbstractAPI.get] {$this->name} - GET {$uri}", [
-//            'parameters' => $parameters,
-//            'options' => $options,
-//            'class' => self::class,
-//        ]);
+        //        Log::info("[AbstractAPI.get] {$this->name} - GET {$uri}", [
+        //            'parameters' => $parameters,
+        //            'options' => $options,
+        //            'class' => self::class,
+        //        ]);
 
-		try {
-			$request = new APIRequest($this->client, 'GET', $uri, $parameters, $options, $retrying, $this->scrapped);
+        try {
+            $request = new APIRequest($this->client, 'GET', $uri, $parameters, $options, $retrying, $this->scrapped);
 
-			return $request->run();
-		} catch (GuzzleException $e) {
-            Log::warning("[AbstractAPI.get] {$e->getMessage()}", [
+            return $request->run();
+        } catch (GuzzleException $e) {
+            Log::error("[AbstractAPI.get] {$e->getMessage()}", [
                 'uri' => $uri,
                 'parameters' => $parameters,
                 'options' => $options,
@@ -169,29 +191,30 @@ class AbstractAPI {
             ]);
 
             if ($this->token_expiracy_status && $this->token_expiracy_status === $e->getCode()) {
-				// retry
-				$this->init(true);
+                // retry
+                $this->init(true);
 
-				return $this->get($uri, $parameters, $options, true);
-			}
-			throw $e;
-		}
-	}
+                return $this->get($uri, $parameters, $options, true);
+            }
+            throw $e;
+        }
+    }
 
-	protected function post($uri, array $parameters = [], array $options = [], bool $retrying = false): APIResponse {
+    protected function post($uri, array $parameters = [], array $options = [], bool $retrying = false): APIResponse
+    {
 
-		$this->prepare($retrying);
+        $this->prepare($retrying);
 
-        if (!$retrying) {
+        if (! $retrying) {
             $this->setUrl($uri, $parameters);
         }
 
-		try {
-			$request = new APIRequest($this->client, 'POST', $uri, $parameters, $options, $retrying, $this->scrapped);
+        try {
+            $request = new APIRequest($this->client, 'POST', $uri, $parameters, $options, $retrying, $this->scrapped);
 
-			return $request->run();
-		} catch (GuzzleException $e) {
-            Log::warning("[AbstractAPI.post] {$e->getMessage()}", [
+            return $request->run();
+        } catch (GuzzleException $e) {
+            Log::error("[AbstractAPI.post] {$e->getMessage()}", [
                 'uri' => $uri,
                 'parameters' => $parameters,
                 'options' => $options,
@@ -200,25 +223,26 @@ class AbstractAPI {
             ]);
 
             if ($this->token_expiracy_status && $this->token_expiracy_status === $e->getCode()) {
-				// retry
-				$this->init(true);
+                // retry
+                $this->init(true);
 
-				return $this->get($uri, $parameters, $options, true);
-			}
-			throw $e;
-		}
+                return $this->post($uri, $parameters, $options, true);
+            }
+            throw $e;
+        }
 
-	}
+    }
 
-	/**
-	 * @throws GuzzleException 400 error
-	 */
-	public function test(): APIResponse {
-		return $this->get('/test');
-	}
+    /**
+     * @throws GuzzleException 400 error
+     */
+    public function test(): APIResponse
+    {
+        return $this->get('/test');
+    }
 
-//	public function parse(ResponseInterface $response) {
-//		return json_decode($response->getBody()->getContents(), true);
-//	}
+    //	public function parse(ResponseInterface $response) {
+    //		return json_decode($response->getBody()->getContents(), true);
+    //	}
 
 }

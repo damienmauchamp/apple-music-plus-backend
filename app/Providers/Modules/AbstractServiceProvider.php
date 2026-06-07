@@ -2,8 +2,6 @@
 
 namespace App\Providers\Modules;
 
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 abstract class AbstractServiceProvider extends ServiceProvider
@@ -52,6 +50,5 @@ abstract class AbstractServiceProvider extends ServiceProvider
         }
     }
 
-    public function boot(): void { }
-
+    public function boot(): void {}
 }

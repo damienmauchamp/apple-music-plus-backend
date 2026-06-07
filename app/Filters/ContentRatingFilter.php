@@ -16,7 +16,7 @@ class ContentRatingFilter implements Filter
         $includeNulls = request()->boolean('filter.include_empty_content_rating'); // facultatif, ex: ?include_null_content_rating=1
         $rating = ContentRating::tryFrom($value);
 
-        if (!$rating) {
+        if (! $rating) {
             return $query;
         }
 

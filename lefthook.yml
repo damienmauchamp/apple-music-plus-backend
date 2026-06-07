@@ -1,0 +1,11 @@
+pre-commit:
+  commands:
+    pint:
+      glob: "*.php"
+      run: ./vendor/bin/sail exec -T laravel.test vendor/bin/pint {staged_files}
+      stage_fixed: true
+
+pre-push:
+  commands:
+    phpstan:
+      run: ./vendor/bin/sail exec -T laravel.test vendor/bin/phpstan analyse --memory-limit=512M

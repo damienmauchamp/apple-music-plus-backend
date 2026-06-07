@@ -4,4 +4,4 @@ namespace Modules\Auth\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 
-class UserController extends Controller { }
+class UserController extends Controller {}

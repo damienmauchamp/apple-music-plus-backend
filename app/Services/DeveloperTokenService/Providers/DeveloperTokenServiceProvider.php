@@ -9,9 +9,9 @@ class DeveloperTokenServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(DeveloperTokenService::class, fn() => new DeveloperTokenService(
+        $this->app->singleton(DeveloperTokenService::class, fn () => new DeveloperTokenService(
             config('musickit.apple.developer_token'),
-            (int)config('musickit.apple.token_default_expiration'),
+            (int) config('musickit.apple.token_default_expiration'),
         ));
     }
 }

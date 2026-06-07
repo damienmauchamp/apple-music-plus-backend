@@ -13,7 +13,7 @@ class ListAlbumsController extends Controller
 {
     public function __construct(
         protected ContentRatingService $contentRatingService,
-    ) { }
+    ) {}
 
     public function __invoke(ListAlbumsRequest $request)
     {
