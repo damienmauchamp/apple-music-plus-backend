@@ -1,0 +1,11 @@
+{
+    "name": "Song",
+    "alias": "song",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Song\\Providers\\SongModuleProvider"
+    ],
+    "files": []
+}

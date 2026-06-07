@@ -1,0 +1,28 @@
+{
+    "name": "d_mchp/song",
+    "description": "",
+    "authors": [
+        {
+            "name": "Damien Mauchamp",
+            "email": "damien.mauchamp@hartprint.ca"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Song\\": "app/",
+            "Modules\\Song\\Database\\Factories\\": "database/factories/",
+            "Modules\\Song\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Song\\Tests\\": "tests/"
+        }
+    }
+}

@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "ext-openssl": "*",
         "arifhp86/laravel-clear-expired-cache-file": "^1.0",
         "firebase/php-jwt": "^7.0",
         "guzzlehttp/guzzle": "^7.2",
@@ -16,10 +17,11 @@
         "laravel/nightwatch": "^1.7",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.8",
+        "nwidart/laravel-modules": "^13.0",
         "opcodesio/log-viewer": "^3.10",
         "predis/predis": "^2.0",
         "spatie/laravel-query-builder": "^6.3",
-        "ext-openssl": "*"
+        "wikimedia/composer-merge-plugin": "^2.1"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.0.0",
@@ -41,13 +43,7 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "AppleMusicAPI\\": "app/Services/AppleMusicAPI",
-            "Modules\\": "modules/",
-            "Modules\\Album\\": "modules/Album/src/",
-            "Modules\\Artist\\": "modules/Artist/src/",
-            "Modules\\Auth\\": "modules/Auth/src/",
-            "Modules\\Song\\": "modules/Song/src/",
-            "Modules\\User\\": "modules/User/src/"
+            "AppleMusicAPI\\": "app/Services/AppleMusicAPI"
         }
     },
     "autoload-dev": {
@@ -83,6 +79,14 @@
     "extra": {
         "laravel": {
             "dont-discover": []
+        },
+        "merge-plugin": {
+            "include": [
+                "Modules/*/composer.json"
+            ],
+            "recurse": false,
+            "replace": false,
+            "merge-dev": false
         }
     },
     "config": {
@@ -91,7 +95,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "wikimedia/composer-merge-plugin": true
         }
     },
     "minimum-stability": "stable",
