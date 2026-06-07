@@ -10,7 +10,7 @@ trait ModuleResolver
         .DIRECTORY_SEPARATOR.'..'
         .DIRECTORY_SEPARATOR.'..'
         .DIRECTORY_SEPARATOR.'..'
-        .DIRECTORY_SEPARATOR.'modules';
+        .DIRECTORY_SEPARATOR.'Modules';
 
     public function resolveModuleName(): string
     {

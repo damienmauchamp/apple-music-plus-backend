@@ -1,0 +1,7 @@
+{
+    "Album": true,
+    "Artist": true,
+    "Auth": true,
+    "Song": true,
+    "User": true
+}

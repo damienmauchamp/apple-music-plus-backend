@@ -1,0 +1,28 @@
+{
+    "name": "d_mchp/artist",
+    "description": "",
+    "authors": [
+        {
+            "name": "Damien Mauchamp",
+            "email": "damien.mauchamp@hartprint.ca"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Artist\\": "app/",
+            "Modules\\Artist\\Database\\Factories\\": "database/factories/",
+            "Modules\\Artist\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Artist\\Tests\\": "tests/"
+        }
+    }
+}

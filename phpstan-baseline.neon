@@ -1,6 +1,24 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Match arm comparison between Modules\\Album\\Enum\\AlbumType\:\:COMPILATION and Modules\\Album\\Enum\\AlbumType\:\:COMPILATION is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: Modules/Album/app/Filters/AlbumTypeFilter.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Modules\\Album\\Models\\Album\>\:\:allowedFilters\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: Modules/Album/app/Http/Controllers/ListAlbumsController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Modules\\Song\\Models\\Song\>\:\:allowedFilters\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: Modules/Song/app/Http/Controllers/ListSongsController.php
+
+		-
 			message: '#^Parameter \#1 \$artists of static method App\\Services\\Core\\ReleasesUpdater\:\:fromArtistArray\(\) expects array\<Modules\\Artist\\Models\\Artist\>, Illuminate\\Database\\Eloquent\\Collection\<int, Modules\\Artist\\Models\\Artist\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -233,33 +251,3 @@ parameters:
 			identifier: method.notFound
 			count: 3
 			path: app/Services/DeveloperTokenService/Tests/Feature/DeveloperTokenTest.php
-
-		-
-			message: '#^Match arm comparison between Modules\\Album\\Enum\\AlbumType\:\:COMPILATION and Modules\\Album\\Enum\\AlbumType\:\:COMPILATION is always true\.$#'
-			identifier: match.alwaysTrue
-			count: 1
-			path: modules/Album/src/Filters/AlbumTypeFilter.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Modules\\Album\\Models\\Album\>\:\:allowedFilters\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: modules/Album/src/Http/Controllers/ListAlbumsController.php
-
-		-
-			message: '#^Method Modules\\Auth\\Http\\Controllers\\AuthController\:\:authenticateFrontend\(\) invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: modules/Auth/src/Http/Controllers/AuthController.php
-
-		-
-			message: '#^Static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\User\>\:\:create\(\) invoked with 2 parameters, 0\-1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: modules/Auth/src/Http/Controllers/AuthController.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Modules\\Song\\Models\\Song\>\:\:allowedFilters\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: modules/Song/src/Http/Controllers/ListSongsController.php
