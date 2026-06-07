@@ -1,11 +1,19 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\NightwatchServiceProvider;
+use App\Services\DeveloperTokenService\Providers\DeveloperTokenServiceProvider;
+use Modules\Album\Providers\AlbumModuleProvider;
+use Modules\Artist\Providers\ArtistModuleProvider;
+use Modules\Auth\Providers\AuthModuleProvider;
+use Modules\Song\Providers\SongModuleProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\NightwatchServiceProvider::class,
-    Modules\Album\Providers\AlbumModuleProvider::class,
-    Modules\Artist\Providers\ArtistModuleProvider::class,
-    Modules\Auth\Providers\AuthModuleProvider::class,
-    Modules\Song\Providers\SongModuleProvider::class,
-    App\Services\DeveloperTokenService\Providers\DeveloperTokenServiceProvider::class,
+    AppServiceProvider::class,
+    NightwatchServiceProvider::class,
+    AlbumModuleProvider::class,
+    ArtistModuleProvider::class,
+    AuthModuleProvider::class,
+    SongModuleProvider::class,
+    DeveloperTokenServiceProvider::class,
 ];
