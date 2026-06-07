@@ -40,9 +40,4 @@ jobs:
           DB_DATABASE: ':memory:'
           APPLE_TEAM_ID: TESTTEAMID
           APPLE_KEY_ID: TESTKEY01
-          APPLE_AUTH_KEY: |
-            -----BEGIN PRIVATE KEY-----
-            MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgdiSaH7SnLuFlUvTr
-            F7wNVumn+zvvdE+OOcY5pTZ8nvKhRANCAAQXjlAm3wSWMacTLVXzxSpvb0lK1L00
-            Fb7lzKzF2pX1IZuFdFQIPCJEzbGYsSVtlrDiRd7A2skhejt+3PE4/UfK
-            -----END PRIVATE KEY-----
+          APPLE_AUTH_KEY: ${{ secrets.APPLE_AUTH_KEY }}
